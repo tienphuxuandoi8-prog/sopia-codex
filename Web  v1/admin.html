@@ -1,0 +1,2044 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sophia Codex — Xưởng Quản Trị Minh Triết (Admin)</title>
+  
+  <!-- Google Fonts: 6 Bộ Font Học Viện (Be Vietnam Pro, Cinzel, Inter, Lora, Merriweather, Playfair Display) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            ui: ['"Be Vietnam Pro"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            heading: ['"Be Vietnam Pro"', 'sans-serif'],
+            display: ['"Be Vietnam Pro"', 'sans-serif'],
+            reading: ['Lora', 'Georgia', 'serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+          },
+          colors: {
+            scholar: {
+              50: '#F5F8F6',
+              100: '#E4ECE7',
+              700: '#234C38',
+              800: '#163526',
+              900: '#10261C',
+              950: '#0B1A13'
+            },
+            parchment: {
+              50: '#FDFBF7',
+              100: '#F8F4EB',
+              200: '#EFE8D8',
+              300: '#E4D8BE'
+            },
+            gold: {
+              400: '#DDB35D',
+              500: '#C59B4B',
+              600: '#A97F33'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- PWA Manifest & Theme Color -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#181E1A">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom Styles for animations and themes -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* Ép toàn bộ giao diện quản trị dùng font Be Vietnam Pro sắc nét, đều đặn */
+    body, button, input, select, textarea {
+      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+    
+    .font-reading {
+      font-family: 'Lora', Georgia, serif !important;
+    }
+
+    /* Đảm bảo toàn bộ chữ số cân đối tuyệt đối trên cùng trục */
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1, "cv02" 1, "cv03" 1, "cv04" 1, "cv11" 1;
+    }
+
+    /* Đồng nhất chiều cao và căn lề cho thẻ KPI */
+    .kpi-card {
+      min-height: 148px;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#F8F5EE] text-[#181E1A] font-ui antialiased selection:bg-amber-200 selection:text-emerald-950 flex flex-col">
+
+  <!-- ==================== TOP ANNOUNCEMENT / STATUS BAR ==================== -->
+  <div class="bg-[#11261B] text-amber-200 text-xs py-1.5 px-4 border-b border-amber-600/30 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <span class="flex h-2 w-2 relative">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      </span>
+      <span class="font-medium tracking-wide">Xưởng Quản Trị Sophia Codex • Cơ Sở Dữ Liệu SQLite (Node 24) Sẵn Sàng</span>
+    </div>
+    <div class="hidden sm:flex items-center gap-4 text-[11px] text-stone-300">
+      <span id="top-db-health-badge" class="flex items-center gap-1.5 text-amber-300 font-mono">
+        <i data-lucide="database" class="w-3.5 h-3.5 text-emerald-400"></i>
+        <span>sophia.db • Đang kết nối</span>
+      </span>
+      <span>|</span>
+      <a href="/" target="_blank" class="hover:text-amber-200 underline flex items-center gap-1">
+        <span>Xem Thư Viện Độc Giả</span>
+        <i data-lucide="external-link" class="w-3 h-3"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN ADMIN CONTAINER ==================== -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- ==================== LEFT SIDEBAR: SCHOLAR NAVIGATION ==================== -->
+    <aside id="admin-sidebar" class="w-64 bg-[#0E1A13] text-stone-200 border-r border-emerald-900/60 flex flex-col justify-between shrink-0 transition-all duration-300">
+      
+      <!-- Brand & Section List -->
+      <div class="p-4 space-y-6">
+        <!-- Brand Header -->
+        <div class="flex items-center gap-3 pb-4 border-b border-emerald-900/60">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-950 to-[#0A1610] border border-amber-500/50 flex items-center justify-center text-amber-400 shadow-md">
+            <i data-lucide="shield" class="w-5 h-5 text-amber-400"></i>
+          </div>
+          <div>
+            <div class="font-extrabold text-base tracking-wider text-amber-300">SOPHIA CODEX</div>
+            <div class="text-[10px] text-stone-400 font-semibold uppercase tracking-widest">Studio Quản Trị</div>
+          </div>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="space-y-1.5 text-xs font-medium">
+          <!-- Item: Tổng quan (Active) -->
+          <button id="nav-btn-overview" onclick="switchAdminTab('overview')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-500/10 text-amber-300 font-bold border border-amber-500/30 transition-all shadow-sm">
+            <div class="flex items-center gap-3">
+              <i data-lucide="layout-dashboard" class="w-4 h-4 text-amber-400"></i>
+              <span>Tổng Quan (Dashboard)</span>
+            </div>
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+          </button>
+
+          <!-- Item: Quản lý sách -->
+          <button id="nav-btn-books" onclick="switchAdminTab('books')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="book-open" class="w-4 h-4 text-stone-400"></i>
+              <span>Tủ Sách Toàn Văn</span>
+            </div>
+            <span id="sidebar-books-count" class="text-[10px] bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800 text-stone-300 font-mono">5</span>
+          </button>
+
+          <!-- Item: Quản lý chương -->
+          <button id="nav-btn-chapters" onclick="switchAdminTab('chapters')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="layers" class="w-4 h-4 text-stone-400"></i>
+              <span>Chương Mục Toàn Văn</span>
+            </div>
+            <span id="sidebar-chapters-count" class="text-[10px] bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800 text-stone-300 font-mono">99</span>
+          </button>
+
+          <!-- Item: Âm thanh & BGM -->
+          <button id="nav-btn-audio" onclick="switchAdminTab('audio')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="headphones" class="w-4 h-4 text-stone-400"></i>
+              <span>Studio & Nhạc Nền</span>
+            </div>
+          </button>
+
+          <!-- Item: Socrates AI Hub -->
+          <button id="nav-btn-ai" onclick="switchAdminTab('ai')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+              <span>Hiền Triết AI Hub</span>
+            </div>
+            <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30 font-semibold">AI</span>
+          </button>
+
+          <!-- Item: Danh ngôn & Thiệp FB -->
+          <button id="nav-btn-quotes" onclick="switchAdminTab('quotes')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="image" class="w-4 h-4 text-stone-400"></i>
+              <span>Danh Ngôn & Thiệp FB</span>
+            </div>
+          </button>
+
+          <!-- Item: Triết gia & Trường phái -->
+          <button id="nav-btn-philosophers" onclick="switchAdminTab('philosophers')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="landmark" class="w-4 h-4 text-stone-400"></i>
+              <span>Bậc Thầy & Trường Phái</span>
+            </div>
+          </button>
+
+          <!-- Item: Cài đặt & Cơ sở dữ liệu -->
+          <button id="nav-btn-settings" onclick="openDbHealthModal()" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="database" class="w-4 h-4 text-stone-400"></i>
+              <span>Sức Khỏe SQLite & Backup</span>
+            </div>
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Bottom User / Quick Action Box -->
+      <div class="p-4 border-t border-emerald-900/60 bg-[#09130E] space-y-3">
+        <!-- Editor Badge -->
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center font-bold text-xs">
+            AD
+          </div>
+          <div class="min-w-0">
+            <div class="text-xs font-semibold text-stone-200 truncate">Biên Tập Viên Trưởng</div>
+            <div class="text-[10px] text-amber-400 font-mono">Quyền Quản Trị Tối Cao</div>
+          </div>
+        </div>
+
+        <!-- Jump to Front-End Button -->
+        <a href="/" target="_blank" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300 text-xs font-medium border border-white/10 transition-colors">
+          <i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Mở Thư Viện Độc Giả</span>
+        </a>
+      </div>
+
+    </aside>
+
+    <!-- ==================== RIGHT MAIN WORKSPACE ==================== -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+
+      <!-- ==================== TOP CONTROL BAR ==================== -->
+      <header class="sticky top-0 z-30 bg-[#FAF7F2]/95 dark:bg-[#0E1A13]/95 backdrop-blur-md border-b border-[#E4D9C0] dark:border-emerald-900/60 px-6 py-3.5 flex items-center justify-between gap-4">
+        
+        <!-- Breadcrumb & Search -->
+        <div class="flex items-center gap-4 flex-1 max-w-xl">
+          <div class="flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400">
+            <span class="font-medium text-stone-900 dark:text-stone-200">Sophia Codex</span>
+            <span>/</span>
+            <span id="breadcrumb-current-tab" class="text-amber-700 dark:text-amber-400 font-bold">Bảng Điều Khiển Tổng Quan</span>
+          </div>
+
+          <!-- Quick Search Bar -->
+          <div class="relative flex-1 hidden md:block">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="admin-search-input" placeholder="Tìm tác phẩm, chương, tác giả trong cơ sở dữ liệu... (/)" 
+                   class="w-full pl-8 pr-10 py-1.5 rounded-full text-xs bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-inner">
+            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] text-stone-400 bg-stone-100 dark:bg-emerald-900 px-1 py-0.5 rounded font-mono">Ctrl+K</span>
+          </div>
+        </div>
+
+        <!-- Right Action Controls -->
+        <div class="flex items-center gap-3">
+          <!-- Refresh Data Button -->
+          <button onclick="loadOverviewDashboard()" class="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200/70 dark:hover:bg-emerald-900 transition-colors" title="Làm mới dữ liệu từ SQLite">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Theme Switcher -->
+          <div class="flex items-center bg-stone-200/70 dark:bg-emerald-950 p-1 rounded-full border border-stone-300/60 dark:border-emerald-800/60 text-xs">
+            <button onclick="setTheme('light')" class="px-2 py-0.5 rounded-full text-xs hover:bg-white dark:hover:bg-emerald-900" title="Giấy ngà ban ngày">☀️</button>
+            <button onclick="setTheme('dark')" class="px-2 py-0.5 rounded-full text-xs hover:bg-white dark:hover:bg-emerald-900" title="Đêm viện hàn lâm">🌙</button>
+          </div>
+
+          <!-- Quick 1-Click Backup SQLite -->
+          <button onclick="triggerDbBackup()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-emerald-950 text-stone-700 dark:text-stone-300 border border-stone-300 dark:border-emerald-800 hover:border-amber-500 text-xs font-medium shadow-sm transition-all">
+            <i data-lucide="save" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span>Sao Lưu SQLite</span>
+          </button>
+
+          <!-- Magic Quick Action: Thêm Sách Mới -->
+          <button onclick="openNewBookModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 text-xs font-bold shadow-md transition-all">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Thêm Tác Phẩm</span>
+          </button>
+        </div>
+
+      </header>
+
+      <!-- ==================== WORKSPACE BODY CONTENT ==================== -->
+      <main class="p-6 md:p-8 space-y-8 max-w-7xl w-full mx-auto">
+
+        <!-- ========================================================================= -->
+        <!-- TAB 1: PHÂN HỆ TỔNG QUAN (DASHBOARD OVERVIEW) -->
+        <!-- ========================================================================= -->
+        <section id="tab-overview" class="space-y-8 animate-fade-in">
+          
+          <!-- EXECUTIVE GREETING BANNER -->
+          <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#0E1A13] via-[#142C20] to-[#0A1610] text-white p-6 md:p-8 border border-amber-500/30 shadow-xl">
+            <div class="absolute -right-12 -bottom-12 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              
+              <div class="space-y-3 max-w-2xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-400/30 shadow-sm">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400 shrink-0"></i>
+                  <span>Trung Tâm Điều Hành Thư Viện Minh Triết Toàn Cầu</span>
+                </div>
+                <h1 class="font-extrabold text-2xl sm:text-3xl md:text-4xl text-white tracking-tight leading-snug">
+                  Chào mừng trở lại, Biên Tập Viên Trưởng
+                </h1>
+                <p id="dashboard-daily-quote-banner" class="text-xs sm:text-sm text-stone-300 italic font-reading leading-relaxed pl-3.5 border-l-2 border-amber-500/70">
+                  "Hạnh phúc của cuộc đời không phụ thuộc vào những gì xảy đến với bạn, mà vào cách bạn lựa chọn phản ứng với chúng." — Epictetus
+                </p>
+              </div>
+
+              <!-- Quick Status Widget -->
+              <div class="flex items-center gap-4 bg-black/45 backdrop-blur-md px-5 py-4 rounded-2xl border border-white/10 shrink-0 shadow-inner">
+                <div class="text-right space-y-0.5">
+                  <div class="text-[11px] font-bold text-stone-400 uppercase tracking-wider">CƠ SỞ DỮ LIỆU SQLITE</div>
+                  <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5 justify-end">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Hoàn Hảo (Online)</span>
+                  </div>
+                  <div id="quick-db-size-text" class="text-[11px] text-amber-200/90 font-mono">196 KB • 99 Chương Toàn Văn</div>
+                </div>
+                <button onclick="openDbHealthModal()" class="w-10 h-10 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 flex items-center justify-center transition-all hover:scale-105" title="Xem chi tiết sức khỏe DB">
+                  <i data-lucide="hard-drive" class="w-5 h-5"></i>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ==================== 6 REALTIME SCHOLAR KPI CARDS ==================== -->
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            
+            <!-- KPI 1: Sách Toàn Văn -->
+            <div class="kpi-card p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm flex flex-col justify-between hover:border-amber-500/50 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 truncate">TÁC PHẨM</span>
+                <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="book-open" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="my-auto py-1">
+                <div class="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums">
+                  <span id="kpi-books-count">5</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold truncate pt-2 border-t border-stone-100 dark:border-emerald-900/40">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                <span class="truncate">100% Toàn văn</span>
+              </div>
+            </div>
+
+            <!-- KPI 2: Tổng Chương Đầy Đủ -->
+            <div class="kpi-card p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm flex flex-col justify-between hover:border-amber-500/50 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 truncate">CHƯƠNG TOÀN VĂN</span>
+                <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="layers" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="my-auto py-1">
+                <div class="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums">
+                  <span id="kpi-chapters-count">99</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] text-stone-600 dark:text-stone-400 font-medium truncate pt-2 border-t border-stone-100 dark:border-emerald-900/40">
+                <span class="w-1.5 h-1.5 rounded-full bg-stone-400 shrink-0"></span>
+                <span class="truncate">Đầy đủ bài học thực tế</span>
+              </div>
+            </div>
+
+            <!-- KPI 3: Giờ Đọc Sâu (Deep Reading Hours) -->
+            <div class="kpi-card p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm flex flex-col justify-between hover:border-amber-500/50 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 truncate">GIỜ ĐỌC SÂU</span>
+                <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="clock" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="my-auto py-1">
+                <div class="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums flex items-baseline">
+                  <span id="kpi-reading-hours">11.3</span>
+                  <span class="text-base font-bold text-stone-400 ml-1">giờ</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] text-blue-600 dark:text-blue-400 font-semibold truncate pt-2 border-t border-stone-100 dark:border-emerald-900/40">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
+                <span class="truncate">Chiêm nghiệm thực tế</span>
+              </div>
+            </div>
+
+            <!-- KPI 4: Sách Nói Studio -->
+            <div class="kpi-card p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm flex flex-col justify-between hover:border-amber-500/50 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 truncate">SÁCH NÓI STUDIO</span>
+                <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="headphones" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="my-auto py-1">
+                <div class="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums flex items-baseline">
+                  <span id="kpi-audio-hours">12.5</span>
+                  <span class="text-base font-bold text-stone-400 ml-1">giờ</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] text-purple-600 dark:text-purple-400 font-semibold truncate pt-2 border-t border-stone-100 dark:border-emerald-900/40">
+                <span class="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0"></span>
+                <span class="truncate">Studio + AI Scholar</span>
+              </div>
+            </div>
+
+            <!-- KPI 5: Thiệp Facebook Đã Tạo -->
+            <div class="kpi-card p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm flex flex-col justify-between hover:border-amber-500/50 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 truncate">THIỆP FB ĐÃ TẠO</span>
+                <div class="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="image" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="my-auto py-1">
+                <div class="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums">
+                  <span id="kpi-shares-count">789</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] text-rose-600 dark:text-rose-400 font-semibold truncate pt-2 border-t border-stone-100 dark:border-emerald-900/40">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
+                <span class="truncate">Chuẩn 1080p HD</span>
+              </div>
+            </div>
+
+            <!-- KPI 6: Độc Giả Chiêm Nghiệm -->
+            <div class="kpi-card p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm flex flex-col justify-between hover:border-amber-500/50 hover:shadow-md transition-all">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 truncate">ĐỘC GIẢ TRÍ TUỆ</span>
+                <div class="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="users" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <div class="my-auto py-1">
+                <div class="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums flex items-baseline">
+                  <span id="kpi-readers-count">68,400+</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 text-[11px] text-teal-600 dark:text-teal-400 font-semibold truncate pt-2 border-t border-stone-100 dark:border-emerald-900/40">
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-500 shrink-0"></span>
+                <span class="truncate">Toàn cầu đón đọc</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ==================== HÀNG 2: XU HƯỚNG & TOP TÁC PHẨM ==================== -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Cột Trái (7 cols): Top Tác Phẩm Được Đọc Nhiều Nhất -->
+            <div class="lg:col-span-7 bg-white dark:bg-[#111E17] p-6 rounded-3xl border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-4">
+              <div class="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-emerald-900/60">
+                <div>
+                  <h3 class="font-bold tracking-tight text-base text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                    <i data-lucide="trending-up" class="w-4 h-4 text-amber-600"></i>
+                    <span>Tác Phẩm Được Đọc & Chiêm Nghiệm Nhiều Nhất</span>
+                  </h3>
+                  <p class="text-xs text-stone-500">Xếp hạng theo tổng thời gian độc giả nghiền ngẫm thực tế</p>
+                </div>
+                <span class="text-xs font-mono text-stone-400">Thời gian thực</span>
+              </div>
+
+              <!-- List Top Books -->
+              <div id="top-books-container" class="space-y-3">
+                <!-- Rendered by js/admin.js -->
+              </div>
+            </div>
+
+            <!-- Cột Phải (5 cols): Phân Bố Trường Phái Triết Học -->
+            <div class="lg:col-span-5 bg-white dark:bg-[#111E17] p-6 rounded-3xl border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-4">
+              <div class="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-emerald-900/60">
+                <div>
+                  <h3 class="font-bold tracking-tight text-base text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                    <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i>
+                    <span>Cơ Cấu Trường Phái Tư Tưởng</span>
+                  </h3>
+                  <p class="text-xs text-stone-500">Phân bố số lượng tác phẩm trong CSDL</p>
+                </div>
+              </div>
+
+              <!-- School Distribution Progress Bars -->
+              <div id="school-distribution-container" class="space-y-3.5 pt-1">
+                <!-- Rendered by js/admin.js -->
+              </div>
+
+              <div class="pt-3 border-t border-stone-100 dark:border-emerald-900/60 flex items-center justify-between text-xs text-stone-500">
+                <span>Dữ liệu liên kết chuẩn Foreign Key</span>
+                <span class="text-amber-700 dark:text-amber-400 font-semibold">Tất cả danh mục active</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ==================== HÀNG 3: TRÍ TUỆ AI SOCRATES & DANH NGÔN HÔM NAY ==================== -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Cột Trái (7 cols): Socrates AI Curiosity Feed -->
+            <div class="lg:col-span-7 bg-white dark:bg-[#111E17] p-6 rounded-3xl border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-4">
+              <div class="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-emerald-900/60">
+                <div>
+                  <h3 class="font-bold tracking-tight text-base text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i>
+                    <span>Bản Đồ Nhiệt Chiêm Nghiệm: Độc Giả Hỏi Gì Hiền Triết AI?</span>
+                  </h3>
+                  <p class="text-xs text-stone-500">Những trăn trở và đối thoại thực tế của người đọc với Socrates</p>
+                </div>
+                <span class="text-[10px] bg-amber-500/15 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full font-medium">Socrates Log</span>
+              </div>
+
+              <!-- AI Conversation Stream -->
+              <div id="recent-ai-stream" class="space-y-3">
+                <!-- Rendered by js/admin.js -->
+              </div>
+            </div>
+
+            <!-- Cột Phải (5 cols): Danh Ngôn Hôm Nay & Xưởng Thiệp Nhanh -->
+            <div class="lg:col-span-5 bg-gradient-to-br from-[#FAF8F5] to-[#F1EAE0] dark:from-[#0E1A13] dark:to-[#08120D] p-6 rounded-3xl border border-amber-600/30 shadow-sm space-y-4">
+              <div class="flex items-center justify-between pb-2 border-b border-amber-600/20">
+                <div>
+                  <h3 class="font-bold tracking-tight text-base text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                    <i data-lucide="feather" class="w-4 h-4 text-amber-600"></i>
+                    <span>Danh Ngôn Hiển Thị Hôm Nay</span>
+                  </h3>
+                  <p class="text-xs text-stone-500">Đang xuất hiện trực tiếp ở trang chủ thư viện</p>
+                </div>
+                <button onclick="openChangeDailyQuoteModal()" class="text-xs font-bold text-amber-700 dark:text-amber-400 hover:underline">
+                  Đổi câu khác →
+                </button>
+              </div>
+
+              <!-- Daily Quote Preview Card -->
+              <div class="p-4 rounded-2xl bg-white/90 dark:bg-emerald-950/60 border border-stone-200 dark:border-emerald-800 space-y-3 shadow-inner">
+                <blockquote id="admin-daily-quote-text" class="font-reading italic text-stone-800 dark:text-stone-200 text-sm leading-relaxed">
+                  "Hạnh phúc của cuộc đời không phụ thuộc vào những gì xảy đến với bạn, mà vào cách bạn lựa chọn phản ứng với chúng."
+                </blockquote>
+                <div class="flex items-center justify-between pt-1 border-t border-stone-100 dark:border-emerald-900/60 text-xs">
+                  <div>
+                    <span id="admin-daily-quote-author" class="font-bold text-emerald-950 dark:text-amber-300">Epictetus</span>
+                    <span class="text-stone-400"> • </span>
+                    <span id="admin-daily-quote-school" class="text-amber-700 dark:text-amber-400 font-medium">Khắc Kỷ</span>
+                  </div>
+                  <span id="admin-daily-quote-shares" class="text-stone-400 text-[11px] font-mono">161 lượt xuất ảnh</span>
+                </div>
+              </div>
+
+              <!-- Quick Quote Actions -->
+              <div class="pt-1 flex flex-wrap gap-2">
+                <button onclick="openNewQuoteModal()" class="flex-1 py-2 px-3 rounded-xl bg-white dark:bg-emerald-950 hover:bg-stone-100 text-stone-800 dark:text-stone-200 text-xs font-medium border border-stone-300 dark:border-emerald-800 flex items-center justify-center gap-1.5 transition-colors">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                  <span>Thêm Danh Ngôn Mới</span>
+                </button>
+                <button onclick="switchAdminTab('quotes')" class="py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors">
+                  <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                  <span>Mở Xưởng Thiệp FB</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ==================== HÀNG 4: HỘP THAO TÁC NHANH THÔNG MINH ==================== -->
+          <div class="p-6 rounded-3xl bg-gradient-to-r from-emerald-950 via-[#10241A] to-[#0D1C14] text-white border border-amber-500/30 shadow-lg space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 class="font-bold tracking-tight text-base text-amber-300 flex items-center gap-2">
+                  <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+                  <span>Thao Tác Nhanh Không Ma Sát (Zero-Friction Actions)</span>
+                </h3>
+                <p class="text-xs text-stone-300">Tối ưu hóa các tác vụ quản trị thường nhật cho Solo Creator</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <!-- Action 1 -->
+              <button onclick="openSmartIngestModal()" class="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-all group flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <i data-lucide="file-up" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-stone-100 group-hover:text-amber-300 transition-colors">Nạp Sách 1-Chạm</div>
+                  <div class="text-[11px] text-stone-400 line-clamp-1">Kéo thả file .docx hoặc text</div>
+                </div>
+              </button>
+
+              <!-- Action 2 -->
+              <button onclick="openNewBookModal()" class="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-all group flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <i data-lucide="book-plus" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-stone-100 group-hover:text-emerald-300 transition-colors">Tạo Tác Phẩm Mới</div>
+                  <div class="text-[11px] text-stone-400 line-clamp-1">Khai báo bìa, tác giả, trường phái</div>
+                </div>
+              </button>
+
+              <!-- Action 3 -->
+              <button onclick="triggerDbBackup()" class="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-all group flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <i data-lucide="save" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-stone-100 group-hover:text-blue-300 transition-colors">Sao Lưu SQLite 1-Click</div>
+                  <div class="text-[11px] text-stone-400 line-clamp-1">Lưu an toàn tệp sophia.db</div>
+                </div>
+              </button>
+
+              <!-- Action 4 -->
+              <button onclick="openDbHealthModal()" class="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-all group flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <i data-lucide="database" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-bold text-stone-100 group-hover:text-purple-300 transition-colors">Kiểm Tra Sức Khỏe DB</div>
+                  <div class="text-[11px] text-stone-400 line-clamp-1">Thống kê bản ghi các bảng</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 2: QUẢN LÝ TỦ SÁCH (BOOK STUDIO) -->
+        <!-- ========================================================================= -->
+        <section id="tab-books" class="hidden space-y-6">
+          <!-- Header Bar with Filter & Actions -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-emerald-900">
+            <div>
+              <h2 class="font-bold tracking-tight text-xl text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <i data-lucide="book-open" class="w-5 h-5 text-amber-500"></i>
+                <span>Tủ Sách Triết Học Toàn Văn</span>
+              </h2>
+              <p class="text-xs text-stone-500 mt-0.5">Quản lý toàn bộ kiệt tác, bìa sách nghệ thuật và liên kết chương mục</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <button onclick="openSmartIngestModal()" class="px-3.5 py-2 rounded-xl bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-500/40 text-xs font-bold hover:bg-purple-900/40 flex items-center gap-1.5 transition-all">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>Smart Ingest (Nạp Tự Động)</span>
+              </button>
+              <button onclick="openNewBookModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-md hover:from-amber-600 hover:to-amber-700 transition-all">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Thêm Tác Phẩm Mới</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Category Filter Pills -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+            <button onclick="filterAdminBooks('all')" id="book-filter-all" class="admin-book-filter px-3.5 py-1.5 rounded-xl font-bold bg-emerald-950 text-amber-300 border border-amber-500/30 transition-all">Tất Cả</button>
+            <button onclick="filterAdminBooks('stoicism')" id="book-filter-stoicism" class="admin-book-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Khắc Kỷ</button>
+            <button onclick="filterAdminBooks('eastern')" id="book-filter-eastern" class="admin-book-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Đạo Gia / Phương Đông</button>
+            <button onclick="filterAdminBooks('existentialism')" id="book-filter-existentialism" class="admin-book-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Hiện Sinh</button>
+            <button onclick="filterAdminBooks('classical')" id="book-filter-classical" class="admin-book-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Cổ Điển Hy Lạp</button>
+            <button onclick="filterAdminBooks('enlightenment')" id="book-filter-enlightenment" class="admin-book-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Khai Sáng</button>
+          </div>
+
+          <!-- Books Grid -->
+          <div id="admin-books-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Rendered by js/admin.js -->
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 3: CHƯƠNG MỤC TOÀN VĂN (CHAPTER STUDIO) -->
+        <!-- ========================================================================= -->
+        <section id="tab-chapters" class="hidden space-y-6">
+          <!-- Book Selector & Controls Bar -->
+          <div class="bg-white dark:bg-[#111E17] p-5 rounded-3xl border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="space-y-1">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 block">Chọn Tác Phẩm Cần Quản Lý Chương:</label>
+                <div class="flex items-center gap-3">
+                  <select id="chapter-book-selector" onchange="onSelectBookForChapters(this.value)" class="px-4 py-2 rounded-xl bg-stone-100 dark:bg-emerald-950 text-stone-900 dark:text-stone-100 font-bold text-sm border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer min-w-[260px]">
+                    <!-- Populated dynamically by js/admin.js -->
+                  </select>
+                </div>
+              </div>
+
+              <!-- Quick Action Buttons for Chapters -->
+              <div class="flex items-center gap-2 pt-2 sm:pt-0">
+                <button onclick="openSmartIngestForCurrentBook()" class="px-3.5 py-2 rounded-xl bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-500/40 text-xs font-bold hover:bg-purple-900/40 flex items-center gap-1.5 transition-all">
+                  <i data-lucide="file-up" class="w-4 h-4"></i>
+                  <span>Nạp Hàng Loạt (Smart Ingest)</span>
+                </button>
+                <button onclick="openNewChapterModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold text-xs flex items-center gap-1.5 shadow-md hover:from-amber-600 hover:to-amber-700 transition-all">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  <span>+ Thêm Chương Mới</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Selected Book Summary Info Pill -->
+            <div id="selected-book-meta-bar" class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-stone-50 dark:bg-emerald-950/40 border border-stone-200/80 dark:border-emerald-800/40 text-xs text-stone-600 dark:text-stone-400">
+              <!-- Rendered by js/admin.js -->
+            </div>
+          </div>
+
+          <!-- Chapters List Container -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Danh Sách Chương Toàn Văn:</span>
+              <span id="chapters-list-count" class="text-xs font-mono text-amber-700 dark:text-amber-400 font-semibold">12 chương</span>
+            </div>
+            <div id="admin-chapters-list" class="space-y-3">
+              <!-- Rendered by js/admin.js -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 4: KHO DANH NGÔN & XƯỞNG THIỆP FACEBOOK (QUOTES & FB CARD STUDIO) -->
+        <!-- ========================================================================= -->
+        <section id="tab-quotes" class="hidden space-y-6">
+          
+          <!-- Header Bar -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-emerald-900">
+            <div>
+              <h2 class="font-bold tracking-tight text-xl text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <i data-lucide="quote" class="w-5 h-5 text-amber-500"></i>
+                <span>Kho Danh Ngôn Minh Triết & Xưởng Thiệp Facebook</span>
+              </h2>
+              <p class="text-xs text-stone-500 mt-0.5">Quản lý trích dẫn triết học, câu nói hôm nay và thiết kế ảnh thiệp HD 1080p chia sẻ mạng xã hội</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <button onclick="openQuoteCardStudio()" class="px-3.5 py-2 rounded-xl bg-purple-900/20 text-purple-700 dark:text-purple-300 border border-purple-500/40 text-xs font-bold hover:bg-purple-900/40 flex items-center gap-1.5 transition-all shadow-sm">
+                <i data-lucide="image" class="w-4 h-4"></i>
+                <span>Xưởng Tạo Thiệp FB</span>
+              </button>
+              <button onclick="openNewQuoteModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-md hover:from-amber-600 hover:to-amber-700 transition-all">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Thêm Danh Ngôn Mới</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Highlight: Spotlight Active Daily Quote Banner -->
+          <div id="admin-daily-quote-hero" class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#FAF7F2] via-[#F4EFE6] to-[#ECE3D2] dark:from-[#0E1A13] dark:via-[#13281E] dark:to-[#0A1610] p-6 border-2 border-amber-500/40 shadow-md">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div class="space-y-2 max-w-3xl">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-current text-amber-500"></i>
+                  <span>DANH NGÔN ĐANG XUẤT HIỆN TRÊN TRANG CHỦ HÔM NAY</span>
+                </div>
+                <blockquote id="hero-daily-quote-text" class="font-reading italic text-stone-900 dark:text-stone-100 text-base md:text-lg leading-relaxed">
+                  "Hạnh phúc của cuộc đời không phụ thuộc vào những gì xảy đến với bạn, mà vào cách bạn lựa chọn phản ứng với chúng."
+                </blockquote>
+                <div class="flex items-center gap-2 text-xs text-stone-600 dark:text-stone-300">
+                  <span id="hero-daily-quote-author" class="font-bold text-emerald-900 dark:text-amber-300">Epictetus</span>
+                  <span>•</span>
+                  <span id="hero-daily-quote-school" class="text-amber-700 dark:text-amber-400 font-semibold">Chủ nghĩa Khắc Kỷ</span>
+                  <span>•</span>
+                  <span id="hero-daily-quote-context" class="text-stone-500 italic">Sách Hướng Dẫn Sống Khắc Kỷ</span>
+                </div>
+              </div>
+
+              <!-- Quick action for active daily quote -->
+              <div class="flex md:flex-col items-center gap-2 shrink-0">
+                <button onclick="openHeroDailyQuoteCard()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs flex items-center gap-1.5 shadow-md transition-all">
+                  <i data-lucide="image" class="w-4 h-4"></i>
+                  <span>Xuất Thiệp Câu Này</span>
+                </button>
+                <span id="hero-daily-quote-shares" class="text-[11px] text-stone-500 font-mono">161 lượt xuất ảnh</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Filter Pills -->
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+              <button onclick="filterAdminQuotes('all')" id="quote-filter-all" class="admin-quote-filter px-3.5 py-1.5 rounded-xl font-bold bg-emerald-950 text-amber-300 border border-amber-500/30 transition-all">Tất Cả Danh Ngôn</button>
+              <button onclick="filterAdminQuotes('stoicism')" id="quote-filter-stoicism" class="admin-quote-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Khắc Kỷ</button>
+              <button onclick="filterAdminQuotes('eastern')" id="quote-filter-eastern" class="admin-quote-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Đạo Gia / Phương Đông</button>
+              <button onclick="filterAdminQuotes('existentialism')" id="quote-filter-existentialism" class="admin-quote-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Hiện Sinh</button>
+              <button onclick="filterAdminQuotes('classical')" id="quote-filter-classical" class="admin-quote-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Cổ Điển Hy Lạp</button>
+              <button onclick="filterAdminQuotes('enlightenment')" id="quote-filter-enlightenment" class="admin-quote-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Thời Kỳ Khai Sáng</button>
+            </div>
+            <span id="admin-quotes-counter" class="text-xs font-mono text-stone-500 shrink-0">4 danh ngôn</span>
+          </div>
+
+          <!-- Quotes List Container -->
+          <div id="admin-quotes-list" class="space-y-3">
+            <!-- Rendered by js/admin.js -->
+          </div>
+
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 5: HIỀN TRIẾT AI HUB (SOCRATES AI STUDIO & MONITOR) -->
+        <!-- ========================================================================= -->
+        <section id="tab-ai" class="hidden space-y-6">
+          
+          <!-- Header Bar -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-emerald-900">
+            <div>
+              <h2 class="font-bold tracking-tight text-xl text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-5 h-5 text-amber-500"></i>
+                <span>Hiền Triết AI Hub — Điều Hành & Đàm Đạo Socrates</span>
+              </h2>
+              <p class="text-xs text-stone-500 mt-0.5">Giám sát dòng tương tác của độc giả, thử nghiệm đối thoại Socratic trực tiếp và quản lý câu hỏi phản biện</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <button onclick="focusAdminAiPlayground()" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold shadow-md flex items-center gap-1.5 transition-all">
+                <i data-lucide="message-square" class="w-4 h-4"></i>
+                <span>Thử Nghiệm Trực Tiếp</span>
+              </button>
+              <button onclick="loadAiHub()" class="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200/70 dark:hover:bg-emerald-900 transition-colors border border-stone-200 dark:border-emerald-800" title="Làm mới luồng dữ liệu AI">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 KPI Cards for AI Hub -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            
+            <!-- KPI 1 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">TỔNG ĐÀM ĐẠO AI</span>
+                <i data-lucide="messages-square" class="w-4 h-4 text-amber-500"></i>
+              </div>
+              <div class="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums" id="ai-kpi-total">
+                --
+              </div>
+              <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Lưu trữ 100% SQLite
+              </div>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">TÁC PHẨM HỎI NHIỀU NHẤT</span>
+                <i data-lucide="crown" class="w-4 h-4 text-purple-500"></i>
+              </div>
+              <div class="text-base font-bold text-stone-900 dark:text-stone-100 truncate" id="ai-kpi-top-book">
+                Suy Tưởng
+              </div>
+              <div class="text-[10px] text-purple-600 dark:text-purple-400 font-mono" id="ai-kpi-top-count">
+                -- lượt truy vấn
+              </div>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">ĐỘ HÀI LÒNG CHIÊM NGHIỆM</span>
+                <i data-lucide="thumbs-up" class="w-4 h-4 text-blue-500"></i>
+              </div>
+              <div class="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums">
+                98.5%
+              </div>
+              <div class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                Phản hồi tích cực
+              </div>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">ĐỘ TRỄ PHẢN HỒI</span>
+                <i data-lucide="zap" class="w-4 h-4 text-emerald-500"></i>
+              </div>
+              <div class="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums">
+                820<span class="text-sm font-normal text-stone-400">ms</span>
+              </div>
+              <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                Socrates Engine cực nhanh
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Main Dual Workspace: Stream (7 cols) + Playground (5 cols) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left (7 cols): Dòng Thời Gian Lịch Sử Đàm Đạo Của Độc Giả -->
+            <div class="lg:col-span-7 bg-white dark:bg-[#111E17] p-5 rounded-3xl border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-stone-100 dark:border-emerald-900/60">
+                <div>
+                  <h3 class="font-bold tracking-tight text-sm text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                    <i data-lucide="history" class="w-4 h-4 text-amber-500"></i>
+                    <span>Dòng Lịch Sử Đàm Đạo Thời Gian Thực</span>
+                  </h3>
+                  <p class="text-[11px] text-stone-500">Ghi nhận toàn bộ câu hỏi và phản hồi từ độc giả</p>
+                </div>
+                
+                <!-- Filter by Book dropdown & Clear History Button -->
+                <div class="flex items-center gap-2">
+                  <select id="ai-filter-book" onchange="filterAiStream(this.value)" class="px-3 py-1.5 rounded-xl bg-stone-100 dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer">
+                    <option value="all">Tất cả tác phẩm</option>
+                    <!-- Populated by JS -->
+                  </select>
+                  <button onclick="handleClearAiHistory()" class="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-xs font-semibold flex items-center gap-1 transition-all" title="Dọn dẹp lịch sử đàm đạo">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Xóa Lịch Sử</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Stream List -->
+              <div id="admin-ai-stream-list" class="space-y-3 max-h-[580px] overflow-y-auto pr-1">
+                <!-- Rendered by js/admin.js -->
+              </div>
+            </div>
+
+            <!-- Right (5 cols): Xưởng Thử Nghiệm Đối Thoại Trực Tiếp (Admin Live AI Playground) -->
+            <div class="lg:col-span-5 bg-gradient-to-br from-[#FAF7F2] to-[#EFE8D8] dark:from-[#0E1A13] dark:to-[#08120D] p-5 rounded-3xl border-2 border-amber-500/40 shadow-md space-y-4">
+              <div class="flex items-center justify-between pb-2 border-b border-amber-500/20">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-stone-950 font-bold flex items-center justify-center text-xs shadow">
+                    S
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-sm text-stone-900 dark:text-stone-100">Xưởng Thử Nghiệm Socrates AI</h3>
+                    <p class="text-[11px] text-stone-500">Đàm đạo trực tiếp & kiểm tra độ chuẩn xác</p>
+                  </div>
+                </div>
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Socrates Sẵn sàng"></span>
+              </div>
+
+              <!-- Context Book Selection -->
+              <div>
+                <label class="block text-[11px] font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">Tác Phẩm Ngữ Cảnh Đối Thoại:</label>
+                <select id="admin-ai-playground-book" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 font-bold text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+
+              <!-- Live Playground Chat Display -->
+              <div id="admin-ai-playground-chat" class="h-64 p-3 rounded-2xl bg-white/90 dark:bg-emerald-950/80 border border-stone-200 dark:border-emerald-900/60 overflow-y-auto space-y-3 shadow-inner text-xs">
+                <div class="flex gap-2.5">
+                  <div class="w-6 h-6 rounded-lg bg-emerald-950 text-amber-300 flex items-center justify-center text-[10px] font-bold shrink-0">S</div>
+                  <div class="p-2.5 rounded-2xl bg-stone-100 dark:bg-emerald-900/50 text-stone-800 dark:text-stone-200 leading-relaxed font-ui">
+                    Chào Biên Tập Viên! Hãy chọn một tác phẩm ở trên và đặt câu hỏi để kiểm thử khả năng đối thoại Socratic của tôi.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick Prompt Presets -->
+              <div class="space-y-1">
+                <span class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block">Gợi Ý Thử Nhanh:</span>
+                <div class="flex flex-wrap gap-1.5 text-[11px]">
+                  <button type="button" onclick="sendPlaygroundPreset('Giải thích nguyên lý kiểm soát trong nghịch cảnh')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 hover:border-amber-500 hover:text-amber-700 transition-colors">
+                    🏛️ Nguyên lý kiểm soát
+                  </button>
+                  <button type="button" onclick="sendPlaygroundPreset('Vô vi trong quản trị hiện đại có ý nghĩa gì?')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 hover:border-amber-500 hover:text-amber-700 transition-colors">
+                    🌊 Vô vi quản trị
+                  </button>
+                  <button type="button" onclick="sendPlaygroundPreset('Đặt cho tôi 1 câu hỏi phản biện sâu sắc')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 hover:border-amber-500 hover:text-amber-700 transition-colors">
+                    💡 Đố phản biện
+                  </button>
+                </div>
+              </div>
+
+              <!-- Chat Input Box -->
+              <form onsubmit="handleAdminAiPlaygroundSubmit(event)" class="relative flex items-center gap-1.5">
+                <input type="text" id="admin-ai-playground-input" placeholder="Nhập câu hỏi triết học cần thử nghiệm..." class="flex-1 px-3.5 py-2.5 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-inner">
+                <button type="submit" id="admin-ai-playground-send" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold text-xs shadow flex items-center justify-center hover:from-amber-600 hover:to-amber-700 transition-all shrink-0">
+                  <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                </button>
+              </form>
+            </div>
+
+          </div>
+
+          <!-- Bottom: Thư Viện Gợi Ý Câu Hỏi Phản Biện Theo Tác Phẩm -->
+          <div class="p-5 rounded-3xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-emerald-900/60">
+              <div>
+                <h4 class="font-bold text-sm text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                  <i data-lucide="compass" class="w-4 h-4 text-emerald-600"></i>
+                  <span>Thư Viện Câu Hỏi Gợi Ý Cho Độc Giả (Socratic Presets)</span>
+                </h4>
+                <p class="text-[11px] text-stone-500">Các câu hỏi mẫu xuất hiện trên thanh chat độc giả khi đọc tác phẩm</p>
+              </div>
+            </div>
+
+            <div id="admin-ai-presets-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+              <!-- Rendered by js/admin.js -->
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 6: BẬC THẦY & DÒNG THỜI GIAN LỊCH SỬ (PHILOSOPHERS STUDIO & TIMELINE) -->
+        <!-- ========================================================================= -->
+        <section id="tab-philosophers" class="hidden space-y-6">
+          
+          <!-- Header Bar with Filter & Actions -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-emerald-900">
+            <div>
+              <h2 class="font-bold tracking-tight text-xl text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <i data-lucide="landmark" class="w-5 h-5 text-amber-500"></i>
+                <span>Bậc Thầy Tư Tưởng & Dòng Thời Gian Lịch Sử</span>
+              </h2>
+              <p class="text-xs text-stone-500 mt-0.5">Quản lý hồ sơ hiền triết, liên kết tác phẩm toàn văn, danh ngôn tiêu biểu và biên niên sử tư tưởng nhân loại</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <!-- View Mode Toggle: Cards vs Timeline -->
+              <div class="flex items-center p-1 rounded-xl bg-stone-100 dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-xs">
+                <button onclick="togglePhilosophersView('cards')" id="phil-view-cards-btn" class="px-3 py-1.5 rounded-lg font-bold bg-white dark:bg-emerald-900 text-amber-600 dark:text-amber-300 shadow-sm transition-all flex items-center gap-1.5">
+                  <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                  <span>Thẻ Chân Dung</span>
+                </button>
+                <button onclick="togglePhilosophersView('timeline')" id="phil-view-timeline-btn" class="px-3 py-1.5 rounded-lg font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-all flex items-center gap-1.5">
+                  <i data-lucide="git-commit" class="w-3.5 h-3.5"></i>
+                  <span>Dòng Thời Gian</span>
+                </button>
+              </div>
+
+              <button onclick="openNewPhilosopherModal()" class="bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-md hover:from-amber-600 hover:to-amber-700 transition-all">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                <span>+ Thêm Bậc Thầy</span>
+              </button>
+              <button onclick="loadPhilosophersTab()" class="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200/70 dark:hover:bg-emerald-900 transition-colors border border-stone-200 dark:border-emerald-800" title="Làm mới dữ liệu">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 KPI Cards for Philosophers -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            
+            <!-- KPI 1 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">TỔNG BẬC THẦY</span>
+                <i data-lucide="users" class="w-4 h-4 text-amber-500"></i>
+              </div>
+              <div class="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums" id="phil-kpi-total">
+                5
+              </div>
+              <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Lưu trữ 100% SQLite
+              </div>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">TRƯỜNG PHÁI ĐẠI DIỆN</span>
+                <i data-lucide="shield" class="w-4 h-4 text-purple-500"></i>
+              </div>
+              <div class="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums" id="phil-kpi-schools">
+                5
+              </div>
+              <div class="text-[10px] text-purple-600 dark:text-purple-400 font-mono">
+                Đông & Tây Toàn Diện
+              </div>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">TÁC PHẨM LIÊN KẾT</span>
+                <i data-lucide="book-check" class="w-4 h-4 text-blue-500"></i>
+              </div>
+              <div class="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums" id="phil-kpi-books">
+                5
+              </div>
+              <div class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                Đã có toàn văn đi kèm
+              </div>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">BIÊN NIÊN SỬ BAO QUÁT</span>
+                <i data-lucide="hourglass" class="w-4 h-4 text-emerald-500"></i>
+              </div>
+              <div class="text-sm font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums pt-1" id="phil-kpi-era">
+                2600 Năm Lịch Sử
+              </div>
+              <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                Từ TK 6 TCN → Hiện đại
+              </div>
+            </div>
+
+          </div>
+
+          <!-- School Filter Pills -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+            <button onclick="filterAdminPhilosophers('all')" id="phil-filter-all" class="admin-phil-filter px-3.5 py-1.5 rounded-xl font-bold bg-emerald-950 text-amber-300 border border-amber-500/30 transition-all">Tất Cả</button>
+            <button onclick="filterAdminPhilosophers('Khắc Kỷ')" id="phil-filter-stoicism" class="admin-phil-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Khắc Kỷ</button>
+            <button onclick="filterAdminPhilosophers('Đạo Gia')" id="phil-filter-eastern" class="admin-phil-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Đạo Gia / Phương Đông</button>
+            <button onclick="filterAdminPhilosophers('Hiện sinh')" id="phil-filter-existentialism" class="admin-phil-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Hiện Sinh</button>
+            <button onclick="filterAdminPhilosophers('Cổ điển Hy Lạp')" id="phil-filter-classical" class="admin-phil-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Cổ Điển Hy Lạp</button>
+            <button onclick="filterAdminPhilosophers('Khai Sáng')" id="phil-filter-enlightenment" class="admin-phil-filter px-3.5 py-1.5 rounded-xl font-medium bg-white dark:bg-emerald-950/60 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 transition-all">Khai Sáng</button>
+          </div>
+
+          <!-- View 1: Thẻ Chân Dung Bậc Thầy Grid -->
+          <div id="philosophers-cards-view" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Rendered by js/admin.js -->
+          </div>
+
+          <!-- View 2: Trục Dòng Thời Gian Lịch Sử Timeline -->
+          <div id="philosophers-timeline-view" class="hidden bg-white dark:bg-[#111E17] p-6 rounded-3xl border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-6">
+            <div class="pb-3 border-b border-stone-100 dark:border-emerald-900/60">
+              <h3 class="font-bold text-sm text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <i data-lucide="git-commit" class="w-4 h-4 text-amber-500"></i>
+                <span>Trục Biên Niên Sử Tư Tưởng Nhân Loại (Philosophy Chronology)</span>
+              </h3>
+              <p class="text-xs text-stone-500">Hành trình tiếp nối tư tưởng từ Cổ đại Phương Đông tới Khai Sáng và Hiện Sinh</p>
+            </div>
+            
+            <div id="admin-philosophers-timeline-flow" class="relative pl-6 md:pl-8 space-y-8 before:absolute before:left-3 md:before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-amber-500 via-emerald-600 to-purple-600">
+              <!-- Rendered by js/admin.js -->
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 7: ÂM THANH & NHẠC NỀN STUDIO (AUDIO STUDIO & BGM CONSOLE) -->
+        <!-- ========================================================================= -->
+        <section id="tab-audio" class="hidden space-y-6">
+          
+          <!-- Header Bar -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-emerald-900">
+            <div>
+              <h2 class="font-bold tracking-tight text-xl text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <i data-lucide="headphones" class="w-5 h-5 text-amber-500"></i>
+                <span>Studio Âm Thanh & Nhạc Nền Thiền Định (BGM Hub)</span>
+              </h2>
+              <p class="text-xs text-stone-500 mt-0.5">Quản lý luồng âm thanh toàn văn của từng tác phẩm, cấu hình nhạc cụ thiền định và kiểm âm trực tiếp</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <button onclick="focusAdminBgmTester()" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 text-xs font-bold shadow-md flex items-center gap-1.5 transition-all">
+                <i data-lucide="play" class="w-4 h-4"></i>
+                <span>Thử Nhạc Nền Trực Tiếp</span>
+              </button>
+              <button onclick="loadAudioStudioTab()" class="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200/70 dark:hover:bg-emerald-900 transition-colors border border-stone-200 dark:border-emerald-800" title="Làm mới dữ liệu">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 KPI Cards for Audio Hub -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            
+            <!-- KPI 1 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">TỔNG THỜI LƯỢNG AUDIO</span>
+                <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i>
+              </div>
+              <div class="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums" id="audio-kpi-duration">
+                12.5 giờ
+              </div>
+              <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Thu âm chuẩn Studio & TTS
+              </div>
+            </div>
+
+            <!-- KPI 2 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">TÁC PHẨM CÓ AUDIO</span>
+                <i data-lucide="book-headphones" class="w-4 h-4 text-purple-500"></i>
+              </div>
+              <div class="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums" id="audio-kpi-books">
+                5 / 5
+              </div>
+              <div class="text-[10px] text-purple-600 dark:text-purple-400 font-mono">
+                100% Khả dụng cho độc giả
+              </div>
+            </div>
+
+            <!-- KPI 3 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">NHẠC CỤ THIỀN ĐỊNH BGM</span>
+                <i data-lucide="music" class="w-4 h-4 text-blue-500"></i>
+              </div>
+              <div class="text-2xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums">
+                5 Nhạc Cụ
+              </div>
+              <div class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                Harp, Lyre, Flute, Strings, Piano
+              </div>
+            </div>
+
+            <!-- KPI 4 -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-stone-500">ĐỘNG CƠ ÂM HỌC</span>
+                <i data-lucide="cpu" class="w-4 h-4 text-emerald-500"></i>
+              </div>
+              <div class="text-sm font-extrabold tracking-tight text-emerald-600 dark:text-emerald-400 tabular-nums pt-1">
+                Web Audio API + Bass EQ
+              </div>
+              <div class="text-[10px] text-stone-400 font-semibold">
+                Độ trễ 0ms • Không đệm mạng
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Main Dual Workspace: Books Audio Sources (7 cols) + Live Mixing & Testing Console (5 cols) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left (7 cols): Danh Sách Cấu Hình Audio Tác Phẩm -->
+            <div class="lg:col-span-7 bg-white dark:bg-[#111E17] p-5 rounded-3xl border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-emerald-900/60">
+                <div>
+                  <h3 class="font-bold tracking-tight text-sm text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                    <i data-lucide="list-music" class="w-4 h-4 text-amber-500"></i>
+                    <span>Cấu Hình Âm Thanh & BGM Từng Tác Phẩm</span>
+                  </h3>
+                  <p class="text-[11px] text-stone-500">Liên kết URL file âm thanh Studio Podcast và nhạc cụ thiền định</p>
+                </div>
+              </div>
+
+              <!-- Books Audio Table / List -->
+              <div id="admin-audio-books-list" class="space-y-3">
+                <!-- Rendered by js/admin.js -->
+              </div>
+            </div>
+
+            <!-- Right (5 cols): Bàn Kiểm Âm Trực Tiếp (Live Audio & BGM Mixing Console) -->
+            <div class="lg:col-span-5 bg-gradient-to-br from-[#FAF7F2] to-[#EFE8D8] dark:from-[#0E1A13] dark:to-[#08120D] p-5 rounded-3xl border-2 border-amber-500/40 shadow-md space-y-4" id="admin-audio-console">
+              
+              <div class="flex items-center justify-between pb-2 border-b border-amber-500/20">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-stone-950 font-bold flex items-center justify-center text-xs shadow">
+                    <i data-lucide="sliders" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-sm text-stone-900 dark:text-stone-100">Bàn Kiểm Âm Live BGM & TTS</h3>
+                    <p class="text-[11px] text-stone-500">Phát thử nghiệm Web Audio Synthesizer</p>
+                  </div>
+                </div>
+                <span id="admin-audio-status-dot" class="w-2.5 h-2.5 rounded-full bg-stone-300 dark:bg-stone-600" title="Trạng thái bàn phát"></span>
+              </div>
+
+              <!-- Soundscape Selection -->
+              <div>
+                <label class="block text-[11px] font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">Giai Điệu & Nhạc Cụ Trường Phái:</label>
+                <select id="admin-bgm-soundscape-select" onchange="changeAdminBgmSoundscape(this.value)" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 font-bold text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer">
+                  <option value="suy-tuong">🏛️ Khắc Kỷ: Đàn Hạc Thư Phòng (Acoustic Harp)</option>
+                  <option value="cong-hoa">🏺 Hy Lạp: Đàn Lia Cổ Điển (Ancient Lyre)</option>
+                  <option value="dao-duc-kinh">🎋 Đạo Gia: Sáo Trúc & Chuông Thiền (Zen Flute)</option>
+                  <option value="zarathustra">🏔️ Hiện Sinh: Vĩ Cầm Núi Tuyết (Strings)</option>
+                  <option value="ban-ve-tu-do">🏛️ Khai Sáng: Thính Phòng Oxford (Piano)</option>
+                </select>
+              </div>
+
+              <!-- Live Audio Visualizer Animation Simulation -->
+              <div class="p-4 rounded-2xl bg-black/80 border border-amber-500/30 flex items-center justify-center gap-1.5 h-20 overflow-hidden shadow-inner" id="admin-waveform-container">
+                <span class="w-1.5 h-3 bg-amber-500 rounded-full transition-all duration-150 wave-bar"></span>
+                <span class="w-1.5 h-5 bg-amber-400 rounded-full transition-all duration-150 wave-bar"></span>
+                <span class="w-1.5 h-8 bg-amber-300 rounded-full transition-all duration-150 wave-bar"></span>
+                <span class="w-1.5 h-12 bg-emerald-400 rounded-full transition-all duration-150 wave-bar"></span>
+                <span class="w-1.5 h-6 bg-amber-400 rounded-full transition-all duration-150 wave-bar"></span>
+                <span class="w-1.5 h-14 bg-amber-300 rounded-full transition-all duration-150 wave-bar"></span>
+                <span class="w-1.5 h-9 bg-emerald-400 rounded-full transition-all duration-150 wave-bar"></span>
+                <span class="w-1.5 h-4 bg-amber-500 rounded-full transition-all duration-150 wave-bar"></span>
+                <span class="w-1.5 h-7 bg-amber-400 rounded-full transition-all duration-150 wave-bar"></span>
+                <span class="w-1.5 h-11 bg-emerald-300 rounded-full transition-all duration-150 wave-bar"></span>
+                <span class="w-1.5 h-5 bg-amber-500 rounded-full transition-all duration-150 wave-bar"></span>
+              </div>
+
+              <!-- Controls: Play / Stop & Volume -->
+              <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                  <button id="admin-bgm-play-btn" onclick="toggleAdminBgmPlay()" class="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold text-xs shadow flex items-center justify-center gap-2 transition-transform hover:scale-[1.01]">
+                    <i data-lucide="play" class="w-4 h-4"></i>
+                    <span id="admin-bgm-play-text">Phát Thử Giai Điệu BGM</span>
+                  </button>
+                  <button onclick="stopAdminBgmPlay()" class="p-2.5 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 hover:bg-stone-300 transition-colors" title="Dừng hẳn">
+                    <i data-lucide="square" class="w-4 h-4"></i>
+                  </button>
+                </div>
+
+                <!-- Volume Slider -->
+                <div>
+                  <div class="flex items-center justify-between text-[11px] font-bold text-stone-600 dark:text-stone-400 mb-1">
+                    <span>Âm lượng BGM:</span>
+                    <span id="admin-bgm-vol-text">35%</span>
+                  </div>
+                  <input type="range" id="admin-bgm-volume" min="0" max="100" value="35" oninput="setAdminBgmVolume(this.value)" class="w-full h-1.5 bg-stone-300 dark:bg-emerald-900 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                </div>
+
+                <!-- TTS Voice Sample Test -->
+                <div class="pt-2 border-t border-amber-500/20 space-y-2">
+                  <span class="text-[11px] font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider block">Thử Nghiệm Giọng Học Giả AI (Warm TTS):</span>
+                  <div class="flex gap-2">
+                    <input type="text" id="admin-tts-sample-text" value="Hạnh phúc cuộc đời bạn phụ thuộc vào chất lượng những suy nghĩ của bạn." class="flex-1 px-3 py-1.5 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 text-xs shadow-inner">
+                    <button onclick="speakAdminTtsSample()" class="px-3.5 py-1.5 rounded-xl bg-emerald-900 hover:bg-emerald-800 text-amber-300 text-xs font-bold border border-emerald-700 flex items-center gap-1.5 transition-colors shrink-0">
+                      <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
+                      <span>Đọc</span>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODALS (CỬA SỔ CHỨC NĂNG THÔNG MINH) -->
+  <!-- ========================================================================= -->
+
+  <!-- MODAL 1: SỨC KHỎE CSDL SQLITE & SAO LƯU -->
+  <div id="modal-db-health" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div class="bg-[#FAF8F5] dark:bg-[#0E1A13] rounded-3xl border border-stone-300 dark:border-emerald-800 w-full max-w-lg p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-emerald-900">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold">
+            <i data-lucide="database" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-stone-900 dark:text-stone-100">Trạng Thái Cơ Sở Dữ Liệu SQLite</h3>
+            <p class="text-[11px] text-stone-500">Native Engine (node:sqlite) • Node.js v24</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-db-health')" class="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="db-health-details" class="space-y-3 text-xs">
+        <!-- Rendered by js/admin.js -->
+      </div>
+
+      <div class="pt-2 flex items-center justify-end gap-2">
+        <button onclick="triggerDbBackup()" class="px-4 py-2 rounded-xl bg-emerald-950 text-amber-300 font-bold text-xs border border-amber-500/40 hover:bg-emerald-900 transition-colors flex items-center gap-1.5">
+          <i data-lucide="save" class="w-4 h-4"></i> Sao Lưu Ngay (Backup DB)
+        </button>
+        <button onclick="closeModal('modal-db-health')" class="px-4 py-2 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 text-xs font-semibold">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: THÊM TÁC PHẨM MỚI -->
+  <div id="modal-new-book" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div class="bg-[#FAF8F5] dark:bg-[#0E1A13] rounded-3xl border border-stone-300 dark:border-emerald-800 w-full max-w-xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-emerald-900">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 flex items-center justify-center font-bold">
+            <i data-lucide="book-plus" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-stone-900 dark:text-stone-100">Khai Báo Tác Phẩm Triết Học Mới</h3>
+            <p class="text-[11px] text-stone-500">Lưu trực tiếp vào bảng books trong SQLite</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-new-book')" class="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-new-book" onsubmit="handleCreateBook(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tên Tác Phẩm (Tiếng Việt) *</label>
+          <input type="text" id="new-book-title" required placeholder="Ví dụ: Đạo Đức Kinh, Suy Tưởng..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tên Gốc / Ngoại Ngữ</label>
+            <input type="text" id="new-book-original-title" placeholder="Ví dụ: Meditations, Tao Te Ching..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tác Giả *</label>
+            <input type="text" id="new-book-author" required placeholder="Ví dụ: Marcus Aurelius, Lão Tử..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Trường Phái Triết Học *</label>
+            <select id="new-book-category" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="stoicism">Chủ nghĩa Khắc Kỷ (Stoicism)</option>
+              <option value="eastern">Triết học Phương Đông</option>
+              <option value="existentialism">Chủ nghĩa Hiện sinh</option>
+              <option value="classical">Hy Lạp & La Mã Cổ Đại</option>
+              <option value="enlightenment">Thời kỳ Khai Sáng</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Niên Đại Tác Phẩm</label>
+            <input type="text" id="new-book-year" placeholder="Ví dụ: 170 SCN, Thế kỷ 6 TCN..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Lời Đề Tựa (Tagline)</label>
+          <input type="text" id="new-book-tagline" placeholder="Ví dụ: Cuộc hành trình tự vấn nội tâm của bậc minh triết..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tóm Tắt Khái Quát</label>
+          <textarea id="new-book-summary" rows="3" placeholder="Giới thiệu nội dung cốt lõi và giá trị ứng dụng của tác phẩm..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-reading"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-new-book')" class="px-4 py-2 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 text-xs font-semibold">
+            Hủy Bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 text-xs font-bold shadow-md hover:from-amber-600 hover:to-amber-700">
+            Lưu Vào SQLite
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: THÊM DANH NGÔN MỚI -->
+  <div id="modal-new-quote" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div class="bg-[#FAF8F5] dark:bg-[#0E1A13] rounded-3xl border border-stone-300 dark:border-emerald-800 w-full max-w-lg p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-emerald-900">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 flex items-center justify-center font-bold">
+            <i data-lucide="quote" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-stone-900 dark:text-stone-100">Thêm Danh Ngôn Minh Triết</h3>
+            <p class="text-[11px] text-stone-500">Dùng cho trang chủ và làm thiệp Facebook</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-new-quote')" class="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-new-quote" onsubmit="handleCreateQuote(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Nội Dung Trích Dẫn *</label>
+          <textarea id="new-quote-text" required rows="3" placeholder="Nhập câu danh ngôn sâu sắc..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-reading italic"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tác Giả *</label>
+            <input type="text" id="new-quote-author" required placeholder="Ví dụ: Marcus Aurelius" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Trường Phái</label>
+            <input type="text" id="new-quote-school" placeholder="Ví dụ: Khắc Kỷ, Đạo Gia" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Bối Cảnh / Xuất Xứ</label>
+          <input type="text" id="new-quote-context" placeholder="Ví dụ: Suy Tưởng Quyển IV, Chương 33 Đạo Đức Kinh..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="new-quote-set-daily" class="rounded accent-amber-600">
+          <label for="new-quote-set-daily" class="text-stone-700 dark:text-stone-300">Đặt làm Danh ngôn Hôm nay trên trang chủ ngay</label>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-new-quote')" class="px-4 py-2 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 text-xs font-semibold">
+            Hủy Bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 text-xs font-bold shadow-md hover:from-amber-600 hover:to-amber-700">
+            Lưu Danh Ngôn
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: SMART INGEST (NẠP SÁCH 1-CHẠM TỰ ĐỘNG BÓC TÁCH) -->
+  <div id="modal-smart-ingest" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div class="bg-[#FAF8F5] dark:bg-[#0E1A13] rounded-3xl border border-stone-300 dark:border-emerald-800 w-full max-w-2xl p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-emerald-900">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-600 flex items-center justify-center font-bold">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-stone-900 dark:text-stone-100">Smart Ingest — Nạp Toàn Văn Tự Động Vào SQLite</h3>
+            <p class="text-[11px] text-stone-500">Tự động nhận diện cấu trúc chương hồi, đếm từ và tạo 3 bài học thực tế</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-smart-ingest')" class="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-smart-ingest" onsubmit="handleSmartIngestSubmit(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tác Phẩm Đích Cần Nạp Thêm Chương *</label>
+          <select id="smart-ingest-book-select" required class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-bold text-stone-700 dark:text-stone-300">Dán Toàn Văn Bản Thảo Vào Đây *</label>
+            <span class="text-[10px] text-amber-700 dark:text-amber-400 font-medium">Hỗ trợ nhận diện: "Chương 1:", "Quyển I:", "Hồi 1:"</span>
+          </div>
+          <textarea id="smart-ingest-raw-text" required rows="9" placeholder="Dán nội dung sách của bạn vào đây...&#10;&#10;Ví dụ:&#10;Chương 1: Khởi đầu của sự tĩnh lặng&#10;Đoạn văn thứ nhất của chương...&#10;&#10;Chương 2: Làm chủ tâm trí&#10;Đoạn văn của chương hai..." class="w-full p-3 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-purple-500 font-reading text-xs leading-relaxed"></textarea>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-stone-100 dark:bg-emerald-950/40 border border-stone-200 dark:border-emerald-800/60 flex items-center justify-between">
+          <div class="text-[11px] text-stone-600 dark:text-stone-400">
+            <span>Hoặc nạp nhanh từ tệp tin trên máy (.txt, .md):</span>
+          </div>
+          <input type="file" id="smart-ingest-file-input" accept=".txt,.md,.markdown" onchange="handleSmartIngestFile(event)" class="text-[11px] text-stone-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200">
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-smart-ingest')" class="px-4 py-2 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 text-xs font-semibold">
+            Hủy Bỏ
+          </button>
+          <button type="submit" id="btn-smart-ingest-submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xs font-bold shadow-md flex items-center gap-1.5 transition-all">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>⚡ AI Bóc Tách & Nạp Vào SQLite</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 5: CHỈNH SỬA TÁC PHẨM (EDIT BOOK MODAL) -->
+  <div id="modal-edit-book" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div class="bg-[#FAF8F5] dark:bg-[#0E1A13] rounded-3xl border border-stone-300 dark:border-emerald-800 w-full max-w-xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-emerald-900">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 flex items-center justify-center font-bold">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-stone-900 dark:text-stone-100">Chỉnh Sửa Thông Tin Tác Phẩm</h3>
+            <p class="text-[11px] text-stone-500">Cập nhật dữ liệu kiệt tác trong bảng books</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-edit-book')" class="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-edit-book" onsubmit="handleUpdateBookSubmit(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="edit-book-id">
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tên Tác Phẩm *</label>
+          <input type="text" id="edit-book-title" required class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tên Gốc / Ngoại Ngữ</label>
+            <input type="text" id="edit-book-original-title" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tác Giả *</label>
+            <input type="text" id="edit-book-author" required class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Trường Phái Triết Học *</label>
+            <select id="edit-book-category" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="stoicism">Chủ nghĩa Khắc Kỷ (Stoicism)</option>
+              <option value="eastern">Triết học Phương Đông</option>
+              <option value="existentialism">Chủ nghĩa Hiện sinh</option>
+              <option value="classical">Hy Lạp & La Mã Cổ Đại</option>
+              <option value="enlightenment">Thời kỳ Khai Sáng</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tên Trường Phái Hiển Thị</label>
+            <input type="text" id="edit-book-school" placeholder="Ví dụ: Khắc Kỷ, Đạo Gia..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Niên Đại Tác Phẩm</label>
+            <input type="text" id="edit-book-year" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Trạng Thái Xuất Bản</label>
+            <select id="edit-book-status" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="published">Đã Xuất Bản (Mở đọc)</option>
+              <option value="draft">Bản Thảo (Nội bộ)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Lời Đề Tựa (Tagline)</label>
+          <input type="text" id="edit-book-tagline" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tóm Tắt Khái Quát</label>
+          <textarea id="edit-book-summary" rows="3" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-reading leading-relaxed"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tệp Bìa Sách (Đường dẫn)</label>
+          <input type="text" id="edit-book-cover" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono text-[11px]">
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-edit-book')" class="px-4 py-2 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 text-xs font-semibold">
+            Hủy Bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 text-xs font-bold shadow-md hover:from-amber-600 hover:to-amber-700">
+            Cập Nhật Sách
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 6: TRÌNH SOẠN THẢO CHƯƠNG TOÀN VĂN (CHAPTER EDITOR MODAL) -->
+  <div id="modal-chapter-editor" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div class="bg-[#FAF8F5] dark:bg-[#0E1A13] rounded-3xl border border-stone-300 dark:border-emerald-800 w-full max-w-3xl p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-emerald-900">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-600 flex items-center justify-center font-bold">
+            <i data-lucide="edit" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 id="chapter-editor-modal-title" class="font-bold text-sm text-stone-900 dark:text-stone-100">Soạn Thảo Toàn Văn Chương</h3>
+            <p id="chapter-editor-book-subtitle" class="text-[11px] text-stone-500">Tác phẩm: Suy Tưởng — Marcus Aurelius</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-chapter-editor')" class="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-chapter-editor" onsubmit="handleChapterEditorSubmit(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="editor-chapter-id">
+        <input type="hidden" id="editor-book-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Số Thứ Tự / Tên Quyển *</label>
+            <input type="text" id="editor-chapter-number" required placeholder="Ví dụ: Quyển I, Chương 1..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tiêu Đề Chương *</label>
+            <input type="text" id="editor-chapter-title" required placeholder="Ví dụ: Những bài học ân nghĩa và tu dưỡng..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tiêu Đề Phụ (Subtitle)</label>
+          <input type="text" id="editor-chapter-subtitle" placeholder="Ví dụ: Khảo sát về bản chất công lý..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-bold text-stone-700 dark:text-stone-300">Nội Dung Toàn Văn Các Đoạn (Paragraphs) *</label>
+            <span class="text-[10px] text-stone-400">Xuống dòng 2 lần (Enter) để tách thành một đoạn văn riêng biệt</span>
+          </div>
+          <textarea id="editor-chapter-paragraphs" required rows="9" placeholder="Nhập các đoạn văn toàn văn của chương..." class="w-full p-3 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-reading text-xs leading-relaxed"></textarea>
+        </div>
+
+        <!-- 3 Practical Takeaways Builder -->
+        <div class="space-y-2 pt-2 border-t border-stone-200 dark:border-emerald-900">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+              <i data-lucide="compass" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>Hộp 3 Bài Học Thực Tiễn (Takeaways Cuối Chương)</span>
+            </span>
+            <span class="text-[10px] text-stone-400">Xuất hiện ở cuối chương sách</span>
+          </div>
+
+          <!-- Takeaway 1 -->
+          <div class="p-2.5 rounded-xl bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 space-y-1.5">
+            <input type="text" id="editor-takeaway-1-title" placeholder="Bài học 1: Tiêu đề hành động..." class="w-full px-2.5 py-1 rounded-lg bg-stone-50 dark:bg-emerald-900/60 border border-stone-200 dark:border-emerald-800 font-bold text-xs">
+            <input type="text" id="editor-takeaway-1-desc" placeholder="Mô tả cụ thể cách áp dụng vào công việc / tâm lý..." class="w-full px-2.5 py-1 rounded-lg bg-stone-50 dark:bg-emerald-900/60 border border-stone-200 dark:border-emerald-800 text-[11px]">
+          </div>
+
+          <!-- Takeaway 2 -->
+          <div class="p-2.5 rounded-xl bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 space-y-1.5">
+            <input type="text" id="editor-takeaway-2-title" placeholder="Bài học 2: Tiêu đề hành động..." class="w-full px-2.5 py-1 rounded-lg bg-stone-50 dark:bg-emerald-900/60 border border-stone-200 dark:border-emerald-800 font-bold text-xs">
+            <input type="text" id="editor-takeaway-2-desc" placeholder="Mô tả cụ thể cách áp dụng vào công việc / tâm lý..." class="w-full px-2.5 py-1 rounded-lg bg-stone-50 dark:bg-emerald-900/60 border border-stone-200 dark:border-emerald-800 text-[11px]">
+          </div>
+
+          <!-- Takeaway 3 -->
+          <div class="p-2.5 rounded-xl bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 space-y-1.5">
+            <input type="text" id="editor-takeaway-3-title" placeholder="Bài học 3: Tiêu đề hành động..." class="w-full px-2.5 py-1 rounded-lg bg-stone-50 dark:bg-emerald-900/60 border border-stone-200 dark:border-emerald-800 font-bold text-xs">
+            <input type="text" id="editor-takeaway-3-desc" placeholder="Mô tả cụ thể cách áp dụng vào công việc / tâm lý..." class="w-full px-2.5 py-1 rounded-lg bg-stone-50 dark:bg-emerald-900/60 border border-stone-200 dark:border-emerald-800 text-[11px]">
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-chapter-editor')" class="px-4 py-2 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 text-xs font-semibold">
+            Hủy Bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-xs font-bold shadow-md hover:from-emerald-700 hover:to-emerald-800">
+            Lưu Chương Vào SQLite
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 7: CHỈNH SỬA DANH NGÔN (EDIT QUOTE) -->
+  <div id="modal-edit-quote" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div class="bg-[#FAF8F5] dark:bg-[#0E1A13] rounded-3xl border border-stone-300 dark:border-emerald-800 w-full max-w-lg p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-emerald-900">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 flex items-center justify-center font-bold">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-stone-900 dark:text-stone-100">Chỉnh Sửa Danh Ngôn Minh Triết</h3>
+            <p class="text-[11px] text-stone-500">Cập nhật nội dung trong bảng quotes của SQLite</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-edit-quote')" class="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-edit-quote" onsubmit="handleUpdateQuoteSubmit(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="edit-quote-id">
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Nội Dung Trích Dẫn *</label>
+          <textarea id="edit-quote-text" required rows="3" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-reading italic"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tác Giả *</label>
+            <input type="text" id="edit-quote-author" required class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Trường Phái</label>
+            <input type="text" id="edit-quote-school" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Bối Cảnh / Xuất Xứ</label>
+          <input type="text" id="edit-quote-context" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modal-edit-quote')" class="px-4 py-2 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 text-xs font-semibold">
+            Hủy Bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 text-xs font-bold shadow-md hover:from-amber-600 hover:to-amber-700">
+            Cập Nhật Danh Ngôn
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 8: XƯỞNG TẠO THIỆP DANH NGÔN FACEBOOK (ADMIN CANVAS STUDIO HD 1080P) -->
+  <div id="modal-admin-quote-card" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+    <div class="relative z-10 w-full max-w-4xl bg-[#FAF8F5] dark:bg-[#0D1812] rounded-3xl shadow-2xl border border-stone-300 dark:border-emerald-800 overflow-hidden flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 border-b border-stone-200 dark:border-emerald-900 bg-white/70 dark:bg-emerald-950/60 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm">📸</span>
+          <div>
+            <h3 class="font-bold text-stone-900 dark:text-stone-100 text-sm md:text-base leading-tight">Xưởng Tạo Thiệp Danh Ngôn Facebook (HD 1080p)</h3>
+            <p class="text-[11px] text-stone-500 dark:text-stone-400">Xuất ảnh thiệp nghệ thuật độ phân giải cao chuẩn Feed (1:1) & Story (9:16)</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-admin-quote-card')" class="p-2 rounded-xl text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-emerald-900 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Dual Column: Preview + Settings) -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <!-- Left: Live Visual Preview -->
+        <div class="lg:col-span-7 flex flex-col items-center justify-center">
+          <div class="relative max-h-[460px] max-w-full flex items-center justify-center p-2 rounded-2xl bg-black/5 dark:bg-black/30 border border-stone-200 dark:border-emerald-900/60 shadow-inner">
+            <img id="admin-quote-preview-image" alt="Quote Card Preview" class="max-h-[430px] max-w-full rounded-xl shadow-2xl object-contain">
+          </div>
+          <!-- Hidden Native Canvas for High-Res 1080p Rendering -->
+          <canvas id="admin-quote-canvas" class="hidden"></canvas>
+        </div>
+
+        <!-- Right: Controls & Customization -->
+        <div class="lg:col-span-5 space-y-4 text-xs">
+          
+          <!-- Format Selector (Feed 1:1 vs Story 9:16) -->
+          <div>
+            <label class="font-bold text-stone-700 dark:text-stone-300 block mb-1.5 uppercase tracking-wider text-[10px]">Định Dạng Mạng Xã Hội:</label>
+            <div class="grid grid-cols-2 gap-2 bg-stone-200/70 dark:bg-emerald-950 p-1 rounded-2xl border border-stone-300/60 dark:border-emerald-800">
+              <button id="admin-card-btn-feed" onclick="setAdminCardFormat('feed')" class="py-2 px-3 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 bg-amber-500 text-stone-950 shadow-sm">
+                <span>🖼️ Feed Post (1:1)</span>
+              </button>
+              <button id="admin-card-btn-story" onclick="setAdminCardFormat('story')" class="py-2 px-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-1.5 text-stone-600 dark:text-stone-300 hover:bg-white/10">
+                <span>📱 Story Tin (9:16)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Theme Palette Selector -->
+          <div>
+            <label class="font-bold text-stone-700 dark:text-stone-300 block mb-1.5 uppercase tracking-wider text-[10px]">Tông Màu Bìa Thiệp:</label>
+            <div class="flex items-center gap-2">
+              <button id="admin-theme-navy" onclick="setAdminCardTheme('navy')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-300 dark:border-emerald-800 bg-[#0E1B15] text-amber-200 ring-2 ring-amber-400 font-medium">
+                <span class="w-3 h-3 rounded-full bg-[#0E1B15] border border-amber-400"></span>
+                <span>Hàn Lâm Viện</span>
+              </button>
+              <button id="admin-theme-parchment" onclick="setAdminCardTheme('parchment')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-300 dark:border-emerald-800 bg-[#F8F4EB] text-stone-800 font-medium">
+                <span class="w-3 h-3 rounded-full bg-[#F8F4EB] border border-stone-400"></span>
+                <span>Giấy Ngà Cổ</span>
+              </button>
+              <button id="admin-theme-jade" onclick="setAdminCardTheme('jade')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-300 dark:border-emerald-800 bg-[#0D261B] text-teal-200 font-medium">
+                <span class="w-3 h-3 rounded-full bg-[#0D261B] border border-teal-400"></span>
+                <span>Ngọc Bích</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Edit Quote Text -->
+          <div>
+            <label class="font-bold text-stone-700 dark:text-stone-300 block mb-1 uppercase tracking-wider text-[10px]">Nội Dung Trích Dẫn:</label>
+            <textarea id="admin-card-input-text" rows="4" oninput="onAdminCardTextChange()" class="w-full p-3 rounded-2xl bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-inner font-reading italic"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="font-bold text-stone-700 dark:text-stone-300 block mb-1 uppercase tracking-wider text-[10px]">Tác Giả:</label>
+              <input type="text" id="admin-card-input-author" oninput="onAdminCardMetaChange()" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold">
+            </div>
+            <div>
+              <label class="font-bold text-stone-700 dark:text-stone-300 block mb-1 uppercase tracking-wider text-[10px]">Tác Phẩm / Xuất Xứ:</label>
+              <input type="text" id="admin-card-input-book" oninput="onAdminCardMetaChange()" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-2 space-y-2">
+            <button onclick="downloadAdminQuotePNG()" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold shadow-lg flex items-center justify-center gap-2 text-xs transition-transform hover:scale-[1.01]">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Tải Ảnh PNG (Chuẩn 1080p Facebook)</span>
+            </button>
+            <button onclick="copyAdminQuoteToClipboard()" class="w-full py-2.5 px-4 rounded-2xl bg-stone-200/80 hover:bg-stone-300/80 dark:bg-emerald-900/60 dark:hover:bg-emerald-900 text-stone-800 dark:text-stone-200 font-medium border border-stone-300/50 dark:border-emerald-800 flex items-center justify-center gap-2 text-xs transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Sao Chép Kèm Hashtag Facebook</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: SOẠN THẢO & THÊM BẬC THẦY TRIẾT HỌC -->
+  <div id="modal-philosopher-editor" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div class="bg-[#FAF8F5] dark:bg-[#0E1A13] rounded-3xl border border-stone-300 dark:border-emerald-800 w-full max-w-xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-emerald-900">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 flex items-center justify-center font-bold">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 id="philosopher-modal-title" class="font-bold text-sm text-stone-900 dark:text-stone-100">Khai Báo Bậc Thầy Triết Học</h3>
+            <p class="text-[11px] text-stone-500">Lưu vào bảng philosophers trong SQLite</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-philosopher-editor')" class="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-philosopher-editor" onsubmit="handleSavePhilosopher(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="phil-edit-mode" value="create">
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Mã Định Danh (Slug ID) *</label>
+            <input type="text" id="phil-edit-id" required placeholder="Ví dụ: aristotle, seneca..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tên Bậc Thầy *</label>
+            <input type="text" id="phil-edit-name" required placeholder="Ví dụ: Aristotle, Seneca..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Danh Hiệu / Tước Xưng *</label>
+            <input type="text" id="phil-edit-title" required placeholder="Ví dụ: Triết gia Khắc Kỷ La Mã..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Thời Kỳ / Niên Đại *</label>
+            <input type="text" id="phil-edit-era" required placeholder="Ví dụ: 4 TCN – 65 SCN, Thế kỷ 6 TCN..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Trường Phái *</label>
+            <input type="text" id="phil-edit-school" required placeholder="Ví dụ: Chủ nghĩa Khắc Kỷ (Stoicism)..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tác Phẩm Toàn Văn Đi Kèm</label>
+            <select id="phil-edit-book-id" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">URL Ảnh Chân Dung (Avatar)</label>
+            <input type="text" id="phil-edit-avatar" placeholder="https://..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 text-[11px]">
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">URL Ảnh Dự Phòng (Fallback)</label>
+            <input type="text" id="phil-edit-fallback" placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 text-[11px]">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Danh Ngôn Khắc Họa Tư Tưởng *</label>
+          <textarea id="phil-edit-quote" rows="2" required placeholder="Trích dẫn tiêu biểu nhất..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tóm Tắt Tiểu Sử & Đóng Góp Triết Học *</label>
+          <textarea id="phil-edit-bio" rows="3" required placeholder="Vị trí lịch sử, bối cảnh ra đời của tư tưởng..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2 border-t border-stone-200 dark:border-emerald-900">
+          <button type="button" onclick="closeModal('modal-philosopher-editor')" class="px-4 py-2 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 font-semibold hover:bg-stone-300 transition-colors">
+            Hủy Bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold hover:from-amber-600 hover:to-amber-700 transition-all shadow-md">
+            Lưu Bậc Thầy Vào SQLite
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CẤU HÌNH AUDIO & BGM TÁC PHẨM -->
+  <div id="modal-audio-editor" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+    <div class="bg-[#FAF8F5] dark:bg-[#0E1A13] rounded-3xl border border-stone-300 dark:border-emerald-800 w-full max-w-lg p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-emerald-900">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 flex items-center justify-center font-bold">
+            <i data-lucide="music" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 id="audio-modal-title" class="font-bold text-sm text-stone-900 dark:text-stone-100">Cấu Hình Luồng Âm Thanh Tác Phẩm</h3>
+            <p class="text-[11px] text-stone-500">Cập nhật trường studio_audio_url và bgm_theme trong bảng books</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-audio-editor')" class="p-1 rounded-lg text-stone-400 hover:text-stone-700 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-audio-editor" onsubmit="handleSaveAudioConfig(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="audio-edit-book-id">
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Tác Phẩm:</label>
+          <input type="text" id="audio-edit-book-title" readonly class="w-full px-3 py-2 rounded-xl bg-stone-100 dark:bg-emerald-950/60 border border-stone-300 dark:border-emerald-800 font-bold cursor-not-allowed">
+        </div>
+
+        <div>
+          <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">URL Luồng Âm Thanh Studio (Audio Stream URL):</label>
+          <input type="text" id="audio-edit-stream-url" placeholder="https://cdn.example.com/audio/suy-tuong.mp3 hoặc audio/suy-tuong.mp3" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono text-[11px]">
+          <p class="text-[10px] text-stone-400 mt-1">Định dạng hỗ trợ: .mp3, .m4a, .aac. Nếu để trống, độc giả sẽ sử dụng giọng đọc AI Warm TTS theo mặc định.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Giai Điệu BGM Đồng Bộ:</label>
+            <select id="audio-edit-bgm-theme" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer">
+              <option value="harp">Đàn Hạc (Khắc Kỷ)</option>
+              <option value="lyre">Đàn Lia (Hy Lạp Cổ)</option>
+              <option value="zen-flute">Sáo Trúc (Đạo Gia)</option>
+              <option value="strings">Vĩ Cầm (Hiện Sinh)</option>
+              <option value="piano">Piano (Khai Sáng)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-stone-700 dark:text-stone-300 mb-1">Thời Lượng Thu Âm:</label>
+            <input type="text" id="audio-edit-duration" placeholder="Ví dụ: 2 giờ 30 phút, 60 phút..." class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950 border border-stone-300 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2 border-t border-stone-200 dark:border-emerald-900">
+          <button type="button" onclick="closeModal('modal-audio-editor')" class="px-4 py-2 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 font-semibold hover:bg-stone-300 transition-colors">
+            Hủy Bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-bold hover:from-amber-600 hover:to-amber-700 transition-all shadow-md">
+            Lưu Cấu Hình Âm Thanh
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="admin-toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 bg-emerald-950 text-amber-200 border border-amber-500/40 px-4 py-3 rounded-2xl shadow-2xl text-xs flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="admin-toast-message">Thông báo thành công!</span>
+  </div>
+
+  <!-- Admin Application Logic -->
+  <script src="js/bgm.js"></script>
+  <script src="js/admin.js"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+          console.log('🏛️ Sophia Codex Admin PWA Service Worker đã sẵn sàng:', reg.scope);
+        }).catch(err => {
+          console.warn('⚠️ Service Worker không thể đăng ký:', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

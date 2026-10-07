@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="100%" height="100%">
+  <defs>
+    <radialGradient id="jadeBg" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#123B26"/>
+      <stop offset="60%" stop-color="#0A2115"/>
+      <stop offset="100%" stop-color="#030C07"/>
+    </radialGradient>
+    <linearGradient id="goldGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF3C4"/>
+      <stop offset="30%" stop-color="#E5BE4A"/>
+      <stop offset="60%" stop-color="#AD8620"/>
+      <stop offset="100%" stop-color="#FCE185"/>
+    </linearGradient>
+    <linearGradient id="spineShadow3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.8"/>
+      <stop offset="25%" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="embossFilter3">
+      <feDropShadow dx="1" dy="1.5" stdDeviation="1.2" flood-color="#000000" flood-opacity="0.9"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="560" rx="8" fill="url(#jadeBg)"/>
+  <rect x="0" y="0" width="22" height="560" fill="url(#spineShadow3)"/>
+
+  <!-- Spine Silk Cord Stitching (Phong cách chỉ buộc sách cổ Đông Phương) -->
+  <line x1="14" y1="0" x2="14" y2="560" stroke="url(#goldGrad3)" stroke-width="1.5" stroke-dasharray="8,14" opacity="0.6"/>
+  <circle cx="14" cy="50" r="3" fill="url(#goldGrad3)"/>
+  <circle cx="14" cy="180" r="3" fill="url(#goldGrad3)"/>
+  <circle cx="14" cy="310" r="3" fill="url(#goldGrad3)"/>
+  <circle cx="14" cy="440" r="3" fill="url(#goldGrad3)"/>
+
+  <!-- Outer Border with Ruyi Cloud Corners -->
+  <rect x="30" y="24" width="344" height="512" rx="4" fill="none" stroke="url(#goldGrad3)" stroke-width="3" filter="url(#embossFilter3)"/>
+  <rect x="36" y="30" width="332" height="500" rx="3" fill="none" stroke="url(#goldGrad3)" stroke-width="1" opacity="0.75"/>
+
+  <!-- Chinese Calligraphy Characters at Top -->
+  <text x="202" y="90" text-anchor="middle" fill="url(#goldGrad3)" font-family="'KaiTi', 'SimSun', 'Songti SC', serif" font-size="28" letter-spacing="8" font-weight="bold" filter="url(#embossFilter3)">
+    道 德 經
+  </text>
+  <line x1="140" y1="108" x2="264" y2="108" stroke="url(#goldGrad3)" stroke-width="1" opacity="0.7"/>
+
+  <!-- Author Name -->
+  <text x="202" y="150" text-anchor="middle" fill="url(#goldGrad3)" font-family="'Cinzel', serif" font-size="20" letter-spacing="6" font-weight="bold" filter="url(#embossFilter3)">
+    LÃO TỬ
+  </text>
+  <text x="202" y="172" text-anchor="middle" fill="url(#goldGrad3)" font-family="'Times New Roman', serif" font-style="italic" font-size="12" letter-spacing="4" opacity="0.9">
+    LAO TZU • TAO TE CHING
+  </text>
+
+  <!-- Central Yin-Yang Taiji & Bagua Medallion -->
+  <g transform="translate(202, 260)" filter="url(#embossFilter3)">
+    <circle cx="0" cy="0" r="54" fill="none" stroke="url(#goldGrad3)" stroke-width="2.5"/>
+    <circle cx="0" cy="0" r="46" fill="none" stroke="url(#goldGrad3)" stroke-width="1" stroke-dasharray="4,2"/>
+    
+    <!-- Yin-Yang Symbol -->
+    <path d="M 0 -36 A 36 36 0 0 1 0 36 A 18 18 0 0 1 0 0 A 18 18 0 0 0 0 -36 Z" fill="url(#goldGrad3)" opacity="0.95"/>
+    <circle cx="0" cy="18" r="5" fill="#0A2115"/>
+    <circle cx="0" cy="-18" r="5" fill="url(#goldGrad3)"/>
+    <circle cx="0" cy="0" r="36" fill="none" stroke="url(#goldGrad3)" stroke-width="1.5"/>
+  </g>
+
+  <!-- Main Title -->
+  <text x="202" y="375" text-anchor="middle" fill="url(#goldGrad3)" font-family="'Cinzel', 'Times New Roman', serif" font-size="28" letter-spacing="3" font-weight="bold" filter="url(#embossFilter3)">
+    ĐẠO ĐỨC KINH
+  </text>
+  <text x="202" y="405" text-anchor="middle" fill="url(#goldGrad3)" font-family="'Times New Roman', serif" font-style="italic" font-size="14" letter-spacing="2" opacity="0.9">
+    Thượng Thiện Nhược Thủy • Vô Vi Nhi Trị
+  </text>
+
+  <line x1="120" y1="422" x2="284" y2="422" stroke="url(#goldGrad3)" stroke-width="1.5" opacity="0.75"/>
+  <circle cx="202" cy="422" r="3" fill="url(#goldGrad3)"/>
+
+  <text x="202" y="460" text-anchor="middle" fill="url(#goldGrad3)" font-family="'Cinzel', serif" font-size="10" letter-spacing="2" opacity="0.85">
+    MINH TRIẾT ĐÔNG PHƯƠNG
+  </text>
+  <text x="202" y="495" text-anchor="middle" fill="url(#goldGrad3)" font-family="'Cinzel', serif" font-size="9" letter-spacing="3" opacity="0.75">
+    TRUNG HOA CỔ ĐẠI • THẾ KỶ VI TCN
+  </text>
+</svg>

@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sophia Codex — Thư Viện Triết Học Toàn Cầu</title>
+  
+  <!-- Google Fonts: Be Vietnam Pro + Cinzel + Inter + Lora + Merriweather + Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            ui: ['"Be Vietnam Pro"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            reading: ['Lora', 'Georgia', 'serif'],
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            heading: ['"Playfair Display"', 'Georgia', 'serif'],
+            serif: ['Lora', 'Georgia', 'serif']
+          },
+          colors: {
+            scholar: {
+              50: '#F5F8F6',
+              100: '#E4ECE7',
+              700: '#234C38',
+              800: '#163526',
+              900: '#10261C',
+              950: '#0B1A13'
+            },
+            parchment: {
+              50: '#FDFBF7',
+              100: '#F8F4EB',
+              200: '#EFE8D8',
+              300: '#E4D8BE'
+            },
+            gold: {
+              400: '#DDB35D',
+              500: '#C59B4B',
+              600: '#A97F33'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- PWA App Manifest & Theme Color -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#181E1A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col bg-[#F8F5EE] text-[#181E1A] selection:bg-amber-200 selection:text-emerald-950 font-ui">
+
+  <!-- Reading Scroll Progress Bar -->
+  <div id="reading-scroll-progress" class="fixed top-0 left-0 h-1 bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-600 z-50 transition-all duration-150" style="width: 0%;"></div>
+
+  <!-- ==================== TOP ANNOUNCEMENT BANNER ==================== -->
+  <div class="bg-[#11261B] text-amber-200 text-[11px] py-1.5 px-4 text-center border-b border-amber-600/30 flex items-center justify-center gap-3">
+    <span class="inline-flex items-center gap-1.5 font-medium">
+      <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+      <span>Sophia Codex: Thư viện triết học mở toàn văn • Tích hợp Giọng Đọc Studio, Nhạc Nền Thiền & Hiền Triết AI Socrates</span>
+    </span>
+    <span class="hidden md:inline text-stone-400">|</span>
+    <span class="hidden md:inline text-stone-300">100% Miễn phí & Đầy đủ nội dung</span>
+  </div>
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <header class="sticky top-0 z-40 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-[#E4D9C0] dark:bg-[#0E1A13]/95 dark:border-emerald-900/60 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Mobile Toggle -->
+      <div class="flex items-center gap-3">
+        <button id="mobile-menu-toggle" class="p-2 -ml-2 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900 md:hidden">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+
+        <a href="javascript:void(0)" onclick="if(window.readerEngine) window.readerEngine.closeReader()" class="flex items-center gap-2.5 group">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-950 to-[#0A1610] border border-amber-500/50 flex items-center justify-center text-amber-400 shadow-md group-hover:scale-105 transition-transform">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="font-display font-bold text-lg md:text-xl tracking-wider text-emerald-950 dark:text-amber-300">SOPHIA</span>
+            <span class="font-serif italic text-[11px] block text-stone-500 -mt-1 dark:text-stone-400">CODEX • Thư Viện Minh Triết</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Quick Library Stats (Desktop) -->
+      <div class="hidden lg:flex items-center gap-4 text-xs text-stone-600 dark:text-stone-400 border-x border-stone-200 dark:border-emerald-900/60 px-4">
+        <div class="flex items-center gap-1.5 font-medium">
+          <i data-lucide="library" class="w-4 h-4 text-amber-600"></i>
+          <span id="stat-books-count">5 Tác Phẩm Toàn Văn</span>
+        </div>
+        <div class="flex items-center gap-1.5 font-medium">
+          <i data-lucide="layers" class="w-4 h-4 text-emerald-700"></i>
+          <span id="stat-chapters-count">24 Chương Kinh Điển</span>
+        </div>
+      </div>
+
+      <!-- Live Search Bar Desktop -->
+      <div class="flex-1 max-w-sm hidden md:block">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="search-input" placeholder="Tìm tác phẩm, triết gia, hoặc trường phái... (/)" 
+                 class="w-full pl-10 pr-10 py-2 rounded-full text-xs md:text-sm bg-white/90 dark:bg-emerald-950/60 border border-stone-200 dark:border-emerald-800/60 focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-inner">
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-stone-400 bg-stone-100 dark:bg-emerald-900 px-1.5 py-0.5 rounded border border-stone-200 dark:border-emerald-800 font-mono">/</span>
+        </div>
+      </div>
+
+      <!-- Action Items: Theme & AI Companion Trigger -->
+      <div class="flex items-center gap-2">
+        <!-- Theme Controls -->
+        <div class="flex items-center bg-stone-200/70 dark:bg-emerald-950 p-1 rounded-full border border-stone-300/60 dark:border-emerald-800/60 text-xs">
+          <button class="theme-btn px-2.5 py-1 rounded-full font-medium transition-all" data-theme="light" title="Giấy ngà ban ngày">☀️</button>
+          <button class="theme-btn px-2.5 py-1 rounded-full font-medium transition-all" data-theme="sepia" title="Giấy cổ Sepia">📜</button>
+          <button class="theme-btn px-2.5 py-1 rounded-full font-medium transition-all" data-theme="dark" title="Đêm học viện">🌙</button>
+        </div>
+
+        <!-- Admin Portal Link -->
+        <a href="admin.html" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-600/30 transition-all" title="Trang Quản Trị Hệ Thống">
+          <i data-lucide="shield" class="w-3.5 h-3.5 text-amber-500"></i>
+          <span>Quản Trị</span>
+        </a>
+
+        <!-- AI Companion Sidebar Toggle -->
+        <button id="ai-toggle-btn" 
+                class="flex items-center gap-2 bg-gradient-to-r from-emerald-950 to-[#10241A] hover:opacity-95 text-amber-200 px-3.5 py-2 rounded-full text-xs md:text-sm font-semibold shadow-md border border-amber-500/40 transition-all hover:scale-[1.02]">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+          </span>
+          <i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i>
+          <span class="hidden sm:inline">Hiền Triết AI</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Mobile Quick Search Bar -->
+  <div class="px-4 pt-3 pb-1 md:hidden max-w-7xl mx-auto w-full">
+    <div class="relative">
+      <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+      <input type="text" id="mobile-search-input" placeholder="Tìm kiếm tác phẩm, triết gia..." 
+             class="w-full pl-10 pr-4 py-2 rounded-full text-xs bg-white dark:bg-emerald-950/60 border border-stone-200 dark:border-emerald-800/60 focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-sm">
+    </div>
+  </div>
+
+  <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+  <div class="flex-1 flex max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 gap-6 relative">
+
+    <!-- Mobile Drawer Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden"></div>
+
+    <!-- LEFT SIDEBAR / NAVIGATION DOCK (Giống ảnh tham khảo.jpg) -->
+    <aside id="left-sidebar" 
+           class="fixed md:static inset-y-0 left-0 z-50 md:z-10 w-64 md:w-20 lg:w-56 bg-white dark:bg-[#0E1A13] md:bg-transparent -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shrink-0 flex flex-col justify-between py-4 md:py-0 border-r md:border-none border-stone-200 dark:border-emerald-900">
+      
+      <div class="space-y-6 px-3">
+        <!-- User Profile badge -->
+        <div class="flex items-center gap-3 p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/25">
+          <div class="w-10 h-10 rounded-full bg-emerald-950 text-amber-300 flex items-center justify-center font-bold text-sm shadow-sm border border-amber-600/30">
+            <i data-lucide="user" class="w-5 h-5"></i>
+          </div>
+          <div class="md:hidden lg:block">
+            <div class="text-xs font-semibold text-stone-900 dark:text-stone-100">Độc Giả Tri Thức</div>
+            <div class="text-[10px] text-amber-700 dark:text-amber-400 font-medium">Cấp độ: Chiêm Nghiệm</div>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="space-y-1.5 text-sm font-medium">
+          <button onclick="if(window.readerEngine) window.readerEngine.closeReader()" 
+                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-emerald-950 text-amber-200 font-semibold shadow-sm border border-amber-600/30">
+            <i data-lucide="compass" class="w-5 h-5 text-amber-400"></i>
+            <span class="md:hidden lg:inline">Khám Phá Sách</span>
+          </button>
+
+          <button onclick="filterBooks('stoicism')" 
+                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 transition-colors">
+            <i data-lucide="shield" class="w-5 h-5 text-amber-700 dark:text-amber-400"></i>
+            <span class="md:hidden lg:inline">Chủ Nghĩa Khắc Kỷ</span>
+          </button>
+
+          <button onclick="filterBooks('eastern')" 
+                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 transition-colors">
+            <i data-lucide="sun" class="w-5 h-5 text-emerald-700 dark:text-emerald-400"></i>
+            <span class="md:hidden lg:inline">Minh Triết Đông Phương</span>
+          </button>
+
+          <button onclick="filterBooks('existentialism')" 
+                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 transition-colors">
+            <i data-lucide="flame" class="w-5 h-5 text-rose-700 dark:text-rose-400"></i>
+            <span class="md:hidden lg:inline">Chủ Nghĩa Hiện Sinh</span>
+          </button>
+
+          <button onclick="window.audioEngine?.togglePlay()" 
+                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 transition-colors">
+            <i data-lucide="headphones" class="w-5 h-5 text-indigo-600 dark:text-indigo-400"></i>
+            <span class="md:hidden lg:inline">Sách Nói (Audio Studio)</span>
+          </button>
+
+          <a href="admin.html" 
+             class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-amber-500/15 hover:text-amber-800 dark:hover:text-amber-300 transition-colors">
+            <i data-lucide="shield" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
+            <span class="md:hidden lg:inline font-semibold">Xưởng Quản Trị</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Quick Philosophy Insight Box -->
+      <div class="px-3 md:hidden lg:block">
+        <div class="p-3.5 rounded-2xl bg-gradient-to-br from-[#EFE8D8] to-[#E2D5BD] dark:from-emerald-950 dark:to-[#06100B] border border-amber-600/30 text-xs">
+          <div class="flex items-center gap-1.5 text-amber-900 dark:text-amber-400 font-display font-bold mb-1">
+            <i data-lucide="feather" class="w-3.5 h-3.5"></i> Chiêm Nghiệm
+          </div>
+          <p class="text-[11px] text-stone-700 dark:text-stone-300 italic leading-relaxed font-reading">
+            "Không phải sự vật làm ta phiền lòng, mà chính cách ta nhìn nhận chúng."
+          </p>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CENTRAL MAIN DISPLAY AREA -->
+    <main class="flex-1 min-w-0">
+
+      <!-- ==================== VIEW 1: CATALOG VIEW ==================== -->
+      <section id="view-catalog" class="space-y-10 animate-fade-in">
+        
+        <!-- SPOTLIGHT HERO BANNER (Tác phẩm của tháng: SUY TƯỞNG) -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0F2218] via-[#152E21] to-[#0A1610] text-white p-6 md:p-10 shadow-2xl border border-amber-500/40">
+          <div class="absolute -right-16 -top-16 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+          <div class="absolute right-0 bottom-0 opacity-10 font-display text-9xl select-none pointer-events-none">SOPHIA</div>
+
+          <div class="relative z-10 flex flex-col md:flex-row items-center gap-8 justify-between">
+            <div class="max-w-xl space-y-4 text-center md:text-left">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                <i data-lucide="crown" class="w-3.5 h-3.5 text-amber-400"></i> Kiệt Tác Triết Học Toàn Văn Của Tháng
+              </div>
+
+              <h1 class="font-display font-bold text-2xl sm:text-3xl md:text-4xl text-stone-100 leading-tight">
+                Suy Tưởng (Meditations)
+              </h1>
+              
+              <p class="font-serif italic text-amber-300/90 text-sm md:text-base">
+                — Marcus Aurelius (Hoàng đế Triết gia La Mã • 170 SCN)
+              </p>
+
+              <p class="text-xs md:text-sm text-stone-300 leading-relaxed font-ui line-clamp-3 md:line-clamp-none">
+                Những trang nhật ký tự vấn sâu kín của vị hoàng đế quyền lực nhất thế giới cổ đại. Học cách làm chủ tâm trí, phân biệt điều kiểm soát được và không kiểm soát được để đạt sự bình thản tuyệt đối trước mọi giông bão cuộc đời.
+              </p>
+
+              <!-- Hero Feature Chips -->
+              <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-1 text-[11px] text-stone-300">
+                <span class="bg-black/30 px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-amber-400"></i> Đầy đủ 12 Quyển toàn văn
+                </span>
+                <span class="bg-black/30 px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1">
+                  <i data-lucide="headphones" class="w-3.5 h-3.5 text-emerald-400"></i> Giọng đọc Studio Podcast
+                </span>
+                <span class="bg-black/30 px-2.5 py-1 rounded-lg border border-white/10 flex items-center gap-1">
+                  <i data-lucide="music" class="w-3.5 h-3.5 text-amber-400"></i> Nhạc thiền Sa trường
+                </span>
+              </div>
+
+              <!-- Hero CTAs -->
+              <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-3">
+                <button onclick="openBookReader('suy-tuong')" 
+                        class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 px-5 py-3 rounded-2xl text-xs md:text-sm font-bold flex items-center gap-2 shadow-lg hover:shadow-amber-500/25 transition-all">
+                  <i data-lucide="book-open" class="w-4 h-4"></i> Đọc Toàn Bộ Nội Dung
+                </button>
+
+                <button onclick="playBookAudio('suy-tuong')" 
+                        class="bg-white/10 hover:bg-white/20 text-stone-100 border border-white/20 px-5 py-3 rounded-2xl text-xs md:text-sm font-medium flex items-center gap-2 transition-all">
+                  <i data-lucide="headphones" class="w-4 h-4 text-amber-300"></i> Nghe Audio Studio
+                </button>
+
+                <button onclick="openAIChatWithBook('suy-tuong')" 
+                        class="bg-emerald-950/80 hover:bg-emerald-900 text-amber-300 border border-amber-500/40 px-4 py-3 rounded-2xl text-xs md:text-sm font-medium flex items-center gap-2 transition-all">
+                  <i data-lucide="message-square" class="w-4 h-4 text-amber-300"></i> Hỏi AI Về Sách Này
+                </button>
+              </div>
+            </div>
+
+            <!-- Real Authentic 3D Book Showcase (Bản Bìa Da Thuần Cổ Điển Dát Vàng) -->
+            <div class="shrink-0 w-48 md:w-56 real-book-cover cursor-pointer hover:shadow-2xl transition-all" onclick="openBookReader('suy-tuong')" title="Nhấp để mở đọc toàn văn">
+              <div class="bookmark-ribbon"></div>
+              <div class="book-foil-frame"></div>
+              <img src="assets/covers/suy-tuong.svg" 
+                   alt="Suy Tưởng - Marcus Aurelius (Bìa Cổ Dát Vàng)" 
+                   class="book-art shadow-2xl">
+            </div>
+          </div>
+        </div>
+
+        <!-- CATEGORY PILLS BAR -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="font-display font-bold text-lg md:text-xl text-stone-900 dark:text-stone-100 flex items-center gap-2">
+              <i data-lucide="library" class="w-5 h-5 text-amber-600"></i> Các Trường Phái Triết Học
+            </h2>
+            <span class="text-xs text-stone-500">Lọc tác phẩm theo tư tưởng</span>
+          </div>
+
+          <!-- Pills container -->
+          <div id="category-pills" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- BOOKS GRID -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-display font-bold text-base md:text-lg text-stone-900 dark:text-stone-100">
+                Tủ Sách Kinh Điển Toàn Văn
+              </h3>
+              <p class="text-xs text-stone-500 mt-0.5">Đầy đủ các chương mục dịch thuật, sách nói Studio & Trợ lý phản biện AI</p>
+            </div>
+            <span class="text-xs text-emerald-900 dark:text-amber-400 font-semibold bg-amber-500/10 dark:bg-amber-500/20 px-3 py-1 rounded-full border border-amber-600/30">
+              5 Kiệt Tác Có Sẵn
+            </span>
+          </div>
+
+          <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Rendered by js/app.js -->
+          </div>
+        </div>
+
+        <!-- SECTION: BỨC TƯỜNG TRIẾT GIA TIÊU BIỂU (Philosopher Wisdom Wall) -->
+        <div class="p-6 md:p-8 rounded-3xl bg-white/80 dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 space-y-4 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-display font-bold text-lg text-stone-900 dark:text-stone-100">Những Bậc Thầy Triết Học</h3>
+              <p class="text-xs text-stone-500 mt-0.5">Những bộ óc vĩ đại khai sinh nền văn minh và tư tưởng nhân loại</p>
+            </div>
+            <button class="text-xs font-semibold text-emerald-900 dark:text-amber-400 hover:underline">
+              Xem chân dung →
+            </button>
+          </div>
+
+          <div id="philosophers-container" class="flex items-stretch gap-4 overflow-x-auto pb-2 scrollbar-none">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- 3 CORE PILLARS SECTION (Theo Spec Bước 3) -->
+        <div class="p-6 md:p-10 rounded-3xl bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0A1128] text-white border border-amber-500/30 shadow-xl space-y-6">
+          <div class="text-center max-w-xl mx-auto space-y-2">
+            <span class="text-xs font-display uppercase tracking-widest text-amber-400 font-bold">
+              Triết Lý Trải Nghiệm Sophia Codex
+            </span>
+            <h3 class="font-display font-bold text-xl md:text-2xl text-stone-100">
+              Vì Sao Nên Đọc Minh Triết Tại Đây?
+            </h3>
+            <p class="text-xs text-stone-300">
+              Chúng tôi không tóm tắt hời hợt. Chúng tôi mang đến không gian đọc chuyên sâu và phương pháp ứng dụng thực tế vào đời sống.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
+            <!-- Trụ Cột 1 -->
+            <div class="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-400/50 transition-all space-y-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-lg border border-amber-400/30">
+                <i data-lucide="book-open" class="w-5 h-5 text-amber-400"></i>
+              </div>
+              <h4 class="font-display font-bold text-base text-stone-100">Toàn Văn 100% Nguyên Bản</h4>
+              <p class="text-xs text-stone-300 leading-relaxed font-ui">
+                Đủ 81 chương Đạo Đức Kinh và 12 quyển Suy Tưởng. Không cắt xén, giữ trọn vẹn văn phong cổ điển với kiểu chữ Lora êm dịu, không quảng cáo.
+              </p>
+            </div>
+
+            <!-- Trụ Cột 2 -->
+            <div class="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-400/50 transition-all space-y-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-lg border border-emerald-400/30">
+                <i data-lucide="compass" class="w-5 h-5 text-emerald-400"></i>
+              </div>
+              <h4 class="font-display font-bold text-base text-stone-100">Hộp Bài Học Thực Tiễn</h4>
+              <p class="text-xs text-stone-300 leading-relaxed font-ui">
+                Cuối mỗi chương đều đúc kết 3 hành động cụ thể cho công việc, tâm lý và các mối quan hệ đời thường. Tích hợp nút tạo thiệp chia sẻ Facebook.
+              </p>
+            </div>
+
+            <!-- Trụ Cột 3 -->
+            <div class="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-400/50 transition-all space-y-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold text-lg border border-indigo-400/30">
+                <i data-lucide="sparkles" class="w-5 h-5 text-indigo-400"></i>
+              </div>
+              <h4 class="font-display font-bold text-base text-stone-100">Đàm Đạo Socrates AI</h4>
+              <p class="text-xs text-stone-300 leading-relaxed font-ui">
+                Bôi đen bất kỳ đoạn văn nào để giải thích nghĩa cổ và ẩn dụ lịch sử. Đối thoại truy vấn ngược theo phương pháp Socratic để mở rộng tư duy.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION: DAILY PHILOSOPHY QUOTE -->
+        <div class="relative p-6 md:p-8 rounded-3xl bg-gradient-to-r from-amber-500/10 via-emerald-900/10 to-amber-500/10 border border-amber-600/30 text-center space-y-4 shadow-sm">
+          <span class="text-xs font-display uppercase tracking-widest text-amber-800 dark:text-amber-400 font-bold flex items-center justify-center gap-1.5">
+            <i data-lucide="sun" class="w-4 h-4 text-amber-500"></i> Danh Ngôn Khai Sáng Hôm Nay
+          </span>
+          <blockquote id="daily-quote-text" class="font-reading italic text-lg md:text-xl text-stone-800 dark:text-stone-100 max-w-2xl mx-auto leading-relaxed">
+            "Hạnh phúc của cuộc đời không phụ thuộc vào những gì xảy đến với bạn, mà vào cách bạn lựa chọn phản ứng với chúng."
+          </blockquote>
+          <div class="text-xs text-stone-600 dark:text-stone-300 font-medium">
+            <span id="daily-quote-author" class="font-bold text-emerald-950 dark:text-amber-300">Epictetus</span> — <span id="daily-quote-school">Chủ nghĩa Khắc Kỷ</span>
+          </div>
+          <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+            <button id="daily-quote-share-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold shadow-md transition-all hover:scale-105">
+              <i data-lucide="image" class="w-3.5 h-3.5"></i> Tạo Thiệp Ảnh Facebook (1:1 & Story)
+            </button>
+            <button id="random-quote-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs bg-white dark:bg-emerald-950 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 shadow-sm hover:bg-stone-100 transition-colors">
+              <i data-lucide="refresh-cw" class="w-3 h-3"></i> Đổi danh ngôn khác
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================== VIEW 2: DISTRACTION-FREE FULL READER ==================== -->
+      <section id="view-reader" class="hidden space-y-6 animate-fade-in">
+        
+        <!-- Reader Navigation Toolbar -->
+        <div class="sticky top-16 z-30 bg-[#FAF7F2]/95 dark:bg-[#0E1A13]/95 backdrop-blur-md py-3 px-4 rounded-2xl border border-stone-200 dark:border-emerald-900 flex flex-wrap items-center justify-between gap-3 shadow-md">
+          
+          <div class="flex items-center gap-3">
+            <button id="reader-back-btn" 
+                    class="p-2 rounded-xl bg-stone-200/80 hover:bg-stone-300/80 dark:bg-emerald-950 dark:hover:bg-emerald-900 text-stone-800 dark:text-stone-200 transition-colors flex items-center gap-1.5 text-xs font-semibold">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i>
+              <span>Về Thư Viện</span>
+            </button>
+
+            <div>
+              <h2 id="reader-book-title" class="font-display font-bold text-sm md:text-base text-stone-900 dark:text-stone-100 leading-tight">
+                Suy Tưởng
+              </h2>
+              <div class="flex items-center gap-2 text-[11px] text-stone-500">
+                <span id="reader-book-author">Marcus Aurelius</span>
+                <span>•</span>
+                <span id="reader-book-school" class="text-amber-700 dark:text-amber-400 font-medium">Khắc Kỷ</span>
+                <span>•</span>
+                <span id="reader-reading-progress" class="text-emerald-800 dark:text-emerald-400 font-semibold">0% đã đọc</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reader Controls: Font Family, Font Size, BGM, TTS, AI Chat -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Font Family Chooser -->
+            <div class="flex items-center bg-stone-200/70 dark:bg-emerald-950 rounded-xl p-1 text-xs gap-1 border border-stone-300/50 dark:border-emerald-800/40">
+              <button class="font-choice-btn px-2.5 py-1 rounded-lg text-[11px] bg-emerald-950 text-amber-300 font-bold transition-all shadow-sm font-reading" data-font="Lora" title="Font Lora văn học cổ điển mượt mà">Lora</button>
+              <button class="font-choice-btn px-2.5 py-1 rounded-lg text-[11px] text-stone-600 dark:text-stone-300 hover:bg-stone-300/60 dark:hover:bg-emerald-900 transition-all font-ui" data-font="Inter" title="Font Inter sắc nét hiện đại">Inter</button>
+              <button class="font-choice-btn px-2.5 py-1 rounded-lg text-[11px] text-stone-600 dark:text-stone-300 hover:bg-stone-300/60 dark:hover:bg-emerald-900 transition-all font-display" data-font="Playfair" title="Font Playfair Display hàn lâm">Playfair</button>
+            </div>
+
+            <!-- Font Sizer -->
+            <div class="flex items-center bg-stone-200/70 dark:bg-emerald-950 rounded-xl p-1 text-xs border border-stone-300/50 dark:border-emerald-800/40">
+              <button id="font-decrease-btn" class="w-7 h-7 flex items-center justify-center hover:bg-white dark:hover:bg-emerald-900 rounded-lg font-bold" title="Giảm cỡ chữ">A-</button>
+              <button id="font-increase-btn" class="w-7 h-7 flex items-center justify-center hover:bg-white dark:hover:bg-emerald-900 rounded-lg font-bold" title="Tăng cỡ chữ">A+</button>
+            </div>
+
+            <!-- Ambient BGM Controller in Reader -->
+            <div class="flex items-center gap-1.5 bg-amber-500/10 dark:bg-amber-500/15 border border-amber-600/30 px-3 py-1.5 rounded-xl text-xs">
+              <button id="reader-bgm-toggle" class="bgm-toggle-btn flex items-center gap-1.5 font-medium text-amber-800 dark:text-amber-300 hover:opacity-85" title="Bật/Tắt nhạc nền minh họa">
+                <i data-lucide="music" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"></i>
+                <span id="reader-bgm-name" class="bgm-current-title truncate max-w-[120px] hidden sm:inline">Nhạc nền</span>
+              </button>
+              <input type="range" id="reader-bgm-volume" min="0" max="1" step="0.05" value="0.35" class="w-14 accent-amber-600 cursor-pointer hidden md:inline" title="Âm lượng nhạc nền">
+            </div>
+
+            <!-- Audio Listen Button in Reader -->
+            <button id="reader-audio-btn" 
+                    onclick="window.audioEngine?.togglePlay()" 
+                    class="p-2 px-3 rounded-xl bg-emerald-950 text-amber-300 border border-amber-500/40 hover:bg-emerald-900 transition-all flex items-center gap-1.5 text-xs font-semibold shadow-sm"
+                    title="Bật/Tạm dừng giọng đọc học giả">
+              <i data-lucide="headphones" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Nghe Giọng Đọc</span>
+            </button>
+
+            <!-- Ask AI Button in Reader -->
+            <button onclick="window.aiChat?.openPanel()" 
+                    class="p-2 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-stone-950 hover:opacity-90 transition-opacity flex items-center gap-1.5 text-xs font-bold shadow-sm">
+              <i data-lucide="sparkles" class="w-4 h-4 text-stone-950"></i>
+              <span class="hidden sm:inline">Hỏi Hiền Triết AI</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Reader Main Dual Column: Table of Contents + Reading Canvas -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+          
+          <!-- Table of Contents (TOC) -->
+          <div class="lg:col-span-1 bg-white dark:bg-[#111E17] p-4 rounded-3xl border border-stone-200 dark:border-emerald-900 space-y-3 sticky top-36 shadow-sm">
+            <h4 class="font-display font-bold text-xs uppercase tracking-wider text-stone-500 flex items-center gap-2">
+              <i data-lucide="list" class="w-4 h-4 text-amber-600"></i> Mục Lục Các Chương
+            </h4>
+            <div id="reader-toc-list" class="space-y-1.5 max-h-[60vh] overflow-y-auto pr-1">
+              <!-- Rendered by js/reader.js -->
+            </div>
+          </div>
+
+          <!-- Reading Canvas -->
+          <div id="reader-scroll-container" class="lg:col-span-3 bg-white dark:bg-[#111E17] p-6 md:p-14 rounded-3xl border border-stone-200 dark:border-emerald-900 shadow-sm relative">
+            
+            <!-- Chapter Header -->
+            <div class="border-b border-stone-200/80 dark:border-emerald-900 pb-6 mb-8 text-center space-y-2.5">
+              <p id="reader-chapter-sub" class="text-xs uppercase tracking-widest text-amber-800 dark:text-amber-400 font-display font-semibold">
+                Tác phẩm: Suy Tưởng — Marcus Aurelius
+              </p>
+              <h2 id="reader-chapter-heading" class="font-display font-bold text-2xl md:text-3xl text-stone-900 dark:text-stone-100">
+                Quyển I: Những bài học ân nghĩa và tu dưỡng nhân cách
+              </h2>
+              <div class="flex items-center justify-center gap-3 pt-2 text-xs text-stone-500 dark:text-stone-400">
+                <span id="reader-time-left" class="bg-amber-500/10 px-3 py-1 rounded-full text-amber-900 dark:text-amber-300 font-medium">Ước tính: ~12 phút đọc</span>
+                <span>•</span>
+                <span>💡 Bôi đen đoạn bất kỳ để hỏi AI hoặc nghe</span>
+              </div>
+            </div>
+
+            <!-- Chapter Paragraphs Body -->
+            <div id="reader-body" class="reader-content text-stone-800 dark:text-stone-200 max-w-2xl mx-auto text-base md:text-[19px]">
+              <!-- Paragraphs rendered by js/reader.js -->
+            </div>
+
+            <!-- Reader End-of-chapter Action -->
+            <div class="mt-14 pt-8 border-t border-stone-200 dark:border-emerald-900 flex flex-wrap items-center justify-between gap-4 pb-10">
+              <button id="reader-prev-chapter-btn" onclick="window.readerEngine?.prevChapter()" 
+                      class="px-4 py-2.5 rounded-xl border border-stone-300 dark:border-emerald-800 text-xs font-semibold text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-emerald-900/50 flex items-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                ← Chương Trước
+              </button>
+
+              <button onclick="window.aiChat?.openPanel(); window.aiChat?.askPresetQuestion('phan-bien', 'Đặt cho tôi 1 câu hỏi phản biện về chương này')" 
+                      class="px-4 py-2.5 rounded-xl bg-amber-500/15 border border-amber-600/30 text-amber-900 dark:text-amber-300 text-xs font-semibold flex items-center gap-1.5 hover:bg-amber-500/25 transition-all">
+                <i data-lucide="help-circle" class="w-4 h-4"></i> Tự Đố Phản Biện Cùng AI
+              </button>
+
+              <button id="reader-next-chapter-btn" onclick="window.readerEngine?.nextChapter()" 
+                      class="px-4 py-2.5 rounded-xl bg-emerald-950 text-amber-200 text-xs font-semibold hover:bg-emerald-900 flex items-center gap-2 shadow-sm border border-amber-600/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                Chương Tiếp Theo →
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ==================== RIGHT SIDEBAR: AI PHILOSOPHY COMPANION (Ảnh tham khảo.jpg) ==================== -->
+    <aside id="ai-chat-sidebar" 
+           class="fixed top-0 right-0 h-full w-full sm:w-[410px] lg:w-[430px] bg-white dark:bg-[#0B1510] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col border-l border-stone-200 dark:border-emerald-900">
+      
+      <!-- AI Sidebar Header -->
+      <div class="p-4 border-b border-stone-200 dark:border-emerald-900 bg-[#FAF7F2] dark:bg-[#0E1A13] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-emerald-950 text-amber-300 border border-amber-500/50 flex items-center justify-center font-display font-bold shadow-md">
+            <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-display font-bold text-sm text-stone-900 dark:text-stone-100">Hiền Triết AI (Socrates)</h3>
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            </div>
+            <p id="ai-context-badge" class="text-[11px] text-stone-500 line-clamp-1">Trợ lý đàm đạo triết học</p>
+          </div>
+        </div>
+
+        <button id="ai-close-btn" class="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-200 dark:hover:bg-emerald-900">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Quick AI Chips / Presets -->
+      <div class="p-3 bg-stone-100/60 dark:bg-emerald-950/40 border-b border-stone-200 dark:border-emerald-900/60 flex items-center gap-2 overflow-x-auto text-xs scrollbar-none">
+        <button class="ai-chip-prompt px-3 py-1.5 rounded-full bg-white dark:bg-emerald-900 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-emerald-800 whitespace-nowrap hover:border-amber-500 transition-colors" data-prompt-key="tom-tat">
+          ⚡ Tóm tắt 3 cốt lõi
+        </button>
+        <button class="ai-chip-prompt px-3 py-1.5 rounded-full bg-white dark:bg-emerald-900 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-emerald-800 whitespace-nowrap hover:border-amber-500 transition-colors" data-prompt-key="amor-fati">
+          🏛️ Amor Fati là gì?
+        </button>
+        <button class="ai-chip-prompt px-3 py-1.5 rounded-full bg-white dark:bg-emerald-900 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-emerald-800 whitespace-nowrap hover:border-amber-500 transition-colors" data-prompt-key="phan-bien">
+          💡 Đặt câu hỏi phản biện
+        </button>
+      </div>
+
+      <!-- Chat Messages Container -->
+      <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4">
+        <div class="flex gap-3 animate-fade-in">
+          <div class="w-8 h-8 rounded-full bg-emerald-950 text-amber-300 flex items-center justify-center shrink-0 text-xs font-display font-bold shadow-sm border border-amber-600/40">
+            S
+          </div>
+          <div class="max-w-[85%] chat-ai-bubble px-4 py-3 rounded-2xl text-sm text-stone-800 dark:text-stone-200 leading-relaxed font-ui">
+            <p>Chào bạn, hỡi người bạn đồng hành của tri thức! Tôi là <strong>Hiền Triết AI</strong> của Sophia Codex.</p>
+            <p class="mt-2 text-stone-600 dark:text-stone-400 text-xs">
+              Tôi sẵn sàng giúp bạn:
+              <br/>• Giải nghĩa các khái niệm triết học trừu tượng.
+              <br/>• Phản biện và đối thoại theo phương pháp Socrates.
+              <br/>• Phân tích sâu bất kỳ đoạn trích nào bạn bôi đen trong sách!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="p-3 border-t border-stone-200 dark:border-emerald-900 bg-[#FAF7F2] dark:bg-[#0E1A13]">
+        <div class="relative flex items-center">
+          <input type="text" id="ai-chat-input" placeholder="Hỏi AI bất kỳ điều gì về triết học..." 
+                 class="w-full pl-4 pr-12 py-3 rounded-2xl text-xs md:text-sm bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-inner">
+          <button id="ai-chat-send" 
+                  class="absolute right-2 p-2 rounded-xl bg-emerald-950 hover:bg-emerald-900 text-amber-300 transition-all shadow-sm">
+            <i data-lucide="send" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <p class="text-[10px] text-stone-400 text-center mt-2 font-ui">
+          Sophia AI Companion • Tự do suy ngẫm và phản biện triết học
+        </p>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- ==================== FLOATING TEXT SELECTION POPUP ==================== -->
+  <div id="text-selection-popup" class="hidden">
+    <button id="popup-ask-ai" class="flex items-center gap-1.5 text-xs text-amber-300 hover:text-white font-medium">
+      <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> Hỏi AI
+    </button>
+    <div class="w-px h-3 bg-white/20"></div>
+    <button id="popup-quote-card" class="flex items-center gap-1.5 text-xs text-amber-300 hover:text-white font-medium" title="Tạo thiệp ảnh Facebook Feed & Story">
+      <i data-lucide="image" class="w-3.5 h-3.5 text-amber-400"></i> Tạo ảnh Facebook
+    </button>
+    <div class="w-px h-3 bg-white/20"></div>
+    <button id="popup-listen" class="flex items-center gap-1.5 text-xs text-stone-200 hover:text-white font-medium">
+      <i data-lucide="volume-2" class="w-3.5 h-3.5 text-stone-300"></i> Đọc đoạn này
+    </button>
+    <div class="w-px h-3 bg-white/20"></div>
+    <button id="popup-copy" class="text-xs text-stone-300 hover:text-white">
+      <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+    </button>
+  </div>
+
+  <!-- ==================== FLOATING AUDIO DOCK (Text-to-Speech & BGM Player) ==================== -->
+  <div id="audio-player-dock" 
+       class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-3xl bg-emerald-950/95 text-stone-100 backdrop-blur-md rounded-2xl p-3 md:p-4 shadow-2xl border border-amber-600/40 translate-y-full opacity-0 pointer-events-none transition-all duration-300 flex flex-col gap-2.5">
+    
+    <!-- Top Player Row -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Book & Chapter info -->
+      <div class="flex items-center gap-3 min-w-0 flex-1">
+        <div id="audio-equalizer" class="flex items-end h-5 w-6 audio-paused shrink-0">
+          <span class="equalizer-bar"></span>
+          <span class="equalizer-bar"></span>
+          <span class="equalizer-bar"></span>
+          <span class="equalizer-bar"></span>
+          <span class="equalizer-bar"></span>
+        </div>
+
+        <div class="min-w-0">
+          <h5 id="audio-book-title" class="font-display font-bold text-xs md:text-sm text-amber-300 truncate">
+            Suy Tưởng (Meditations)
+          </h5>
+          <p id="audio-chapter-title" class="text-[11px] text-stone-300 truncate">
+            Quyển I: Những bài học ân nghĩa và tu dưỡng nhân cách
+          </p>
+        </div>
+      </div>
+
+      <!-- Audio Mode Selector: AI Scholar Voice vs Studio -->
+      <div class="hidden sm:flex items-center gap-1.5 text-xs bg-black/40 px-2.5 py-1 rounded-xl border border-white/10">
+        <select id="audio-mode-selector" class="bg-transparent text-amber-200 text-xs focus:outline-none cursor-pointer">
+          <option value="tts" selected>🎙️ Giọng Đọc Học Giả (Deep Scholar AI)</option>
+          <option value="studio">📻 Giọng Thu Âm Studio</option>
+        </select>
+      </div>
+
+      <!-- BGM Ambient Soundscape Toggle in Dock -->
+      <div class="flex items-center gap-1.5 bg-amber-500/15 border border-amber-500/30 px-2.5 py-1 rounded-xl text-xs">
+        <button id="dock-bgm-toggle" class="bgm-toggle-btn flex items-center gap-1 text-amber-300 hover:text-white" title="Bật/Tắt nhạc nền minh họa">
+          <i data-lucide="music" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span class="text-[11px] font-medium hidden md:inline">Nhạc Nền</span>
+        </button>
+        <input type="range" id="dock-bgm-slider" min="0" max="1" step="0.05" value="0.35" class="w-14 accent-amber-500 cursor-pointer" title="Âm lượng nhạc nền">
+      </div>
+
+      <!-- Playback Controls -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button id="audio-prev-btn" class="p-1.5 text-stone-300 hover:text-white" title="Lùi 15s">
+          <i data-lucide="skip-back" class="w-4 h-4"></i>
+        </button>
+
+        <button id="audio-play-btn" 
+                class="w-10 h-10 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 flex items-center justify-center shadow-lg transition-transform hover:scale-105">
+          <i id="audio-play-icon" data-lucide="play" class="w-5 h-5 fill-current"></i>
+        </button>
+
+        <button id="audio-next-btn" class="p-1.5 text-stone-300 hover:text-white" title="Tua 15s">
+          <i data-lucide="skip-forward" class="w-4 h-4"></i>
+        </button>
+
+        <button id="audio-speed-btn" 
+                class="px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-[11px] font-bold text-amber-300 border border-white/10" title="Tốc độ đọc">
+          0.86x
+        </button>
+
+        <button id="audio-close-btn" class="p-1.5 text-stone-400 hover:text-white -mr-1" title="Tắt audio">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Progress Scrubber & Indicator -->
+    <div class="flex items-center gap-2 text-[10px] text-stone-400">
+      <span id="audio-time-current">0:00</span>
+      <div class="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
+        <div id="audio-progress-bar" class="h-full bg-amber-400 transition-all duration-300" style="width: 0%;"></div>
+      </div>
+      <span id="audio-time-total">3:45</span>
+    </div>
+
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="mt-16 bg-[#0B1510] text-stone-300 border-t border-emerald-900/60 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="space-y-3 md:col-span-2">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-950 border border-amber-600/40 flex items-center justify-center text-amber-400">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+          </div>
+          <span class="font-display font-bold text-lg text-amber-300">SOPHIA CODEX</span>
+        </div>
+        <p class="text-xs text-stone-400 max-w-sm leading-relaxed font-ui">
+          Nền tảng thư viện triết học toàn cầu mở, cung cấp toàn văn các kiệt tác triết học cổ kim, kết hợp trợ lý AI đối thoại Socratic và hệ thống sách nói Studio Audio chân thực.
+        </p>
+        <p class="text-[11px] text-stone-500 font-ui">© 2026 Sophia Codex. Thiết kế dành cho người đi làm và sinh viên yêu tri thức.</p>
+      </div>
+
+      <div class="space-y-2 text-xs font-ui">
+        <h5 class="font-display font-bold text-amber-300 uppercase tracking-wider">Trường Phái Triết Học</h5>
+        <ul class="space-y-1 text-stone-400">
+          <li><a href="javascript:void(0)" onclick="filterBooks('stoicism')" class="hover:text-amber-200">Chủ nghĩa Khắc Kỷ (Stoicism)</a></li>
+          <li><a href="javascript:void(0)" onclick="filterBooks('eastern')" class="hover:text-amber-200">Đạo Gia & Phương Đông</a></li>
+          <li><a href="javascript:void(0)" onclick="filterBooks('existentialism')" class="hover:text-amber-200">Chủ nghĩa Hiện sinh</a></li>
+          <li><a href="javascript:void(0)" onclick="filterBooks('classical')" class="hover:text-amber-200">Hy Lạp & La Mã Cổ Đại</a></li>
+        </ul>
+      </div>
+
+      <div class="space-y-2 text-xs font-ui">
+        <h5 class="font-display font-bold text-amber-300 uppercase tracking-wider">Tính Năng Đẳng Cấp</h5>
+        <ul class="space-y-1 text-stone-400">
+          <li>📖 Đọc toàn văn font Merriweather, Lora & Be Vietnam</li>
+          <li>🎵 Nhạc nền minh họa thiền định cho từng tác phẩm</li>
+          <li>🎙️ Giọng thu âm Studio Podcast trầm ấm, truyền cảm</li>
+          <li>🤖 Trợ lý Hiền Triết AI phản biện Socratic</li>
+          <li>✍️ Bôi đen tra cứu & đàm đạo AI tức thì</li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL: FACEBOOK QUOTE CARD GENERATOR ==================== -->
+  <div id="quote-card-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+    <!-- Backdrop -->
+    <div id="quote-modal-backdrop" class="absolute inset-0 bg-black/75 backdrop-blur-sm cursor-pointer"></div>
+
+    <!-- Modal Content Window -->
+    <div class="relative z-10 w-full max-w-4xl bg-[#FAF8F5] dark:bg-[#0D1812] rounded-3xl shadow-2xl border border-stone-300 dark:border-emerald-800 overflow-hidden flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 border-b border-stone-200 dark:border-emerald-900 bg-white/70 dark:bg-emerald-950/60 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm">📸</span>
+          <div>
+            <h3 class="font-bold text-stone-900 dark:text-stone-100 text-sm md:text-base leading-tight">Tạo Thiệp Danh Ngôn Chia Sẻ Facebook</h3>
+            <p class="text-[11px] text-stone-500 dark:text-stone-400">Xuất ảnh nghệ thuật độ phân giải cao 1080p chuẩn Feed & Story</p>
+          </div>
+        </div>
+        <button id="quote-modal-close" class="p-2 rounded-xl text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-emerald-900 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Dual Column: Preview + Settings) -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <!-- Left: Live Visual Preview -->
+        <div class="lg:col-span-7 flex flex-col items-center justify-center">
+          <div class="relative max-h-[460px] max-w-full flex items-center justify-center p-2 rounded-2xl bg-black/5 dark:bg-black/30 border border-stone-200 dark:border-emerald-900/60 shadow-inner">
+            <img id="quote-preview-image" alt="Quote Card Preview" class="max-h-[440px] max-w-full rounded-xl shadow-2xl object-contain">
+          </div>
+          <!-- Hidden Native Canvas for Rendering -->
+          <canvas id="quote-canvas" class="hidden"></canvas>
+        </div>
+
+        <!-- Right: Controls & Customization -->
+        <div class="lg:col-span-5 space-y-4 text-xs">
+          
+          <!-- Format Selector (Feed 1:1 vs Story 9:16) -->
+          <div>
+            <label class="font-bold text-stone-700 dark:text-stone-300 block mb-1.5 uppercase tracking-wider text-[10px]">Định Dạng Mạng Xã Hội:</label>
+            <div class="grid grid-cols-2 gap-2 bg-stone-200/70 dark:bg-emerald-950 p-1 rounded-2xl border border-stone-300/60 dark:border-emerald-800">
+              <button class="quote-format-btn py-2 px-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-1.5 bg-amber-500 text-stone-950 font-bold" data-format="feed">
+                <span>🖼️ Feed Post (1:1)</span>
+              </button>
+              <button class="quote-format-btn py-2 px-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-1.5 text-stone-600 dark:text-stone-300 hover:bg-white/10" data-format="story">
+                <span>📱 Story Tin (9:16)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Theme Palette Selector -->
+          <div>
+            <label class="font-bold text-stone-700 dark:text-stone-300 block mb-1.5 uppercase tracking-wider text-[10px]">Tông Màu Bìa Thiệp:</label>
+            <div class="flex items-center gap-2">
+              <button class="quote-theme-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-300 dark:border-emerald-800 bg-[#0E1B15] text-amber-200 ring-2 ring-amber-400 font-medium" data-theme="navy">
+                <span class="w-3 h-3 rounded-full bg-[#0E1B15] border border-amber-400"></span>
+                <span>Hàn Lâm Viện</span>
+              </button>
+              <button class="quote-theme-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-300 dark:border-emerald-800 bg-[#F8F4EB] text-stone-800 font-medium" data-theme="parchment">
+                <span class="w-3 h-3 rounded-full bg-[#F8F4EB] border border-stone-400"></span>
+                <span>Giấy Ngà Cổ</span>
+              </button>
+              <button class="quote-theme-btn flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-300 dark:border-emerald-800 bg-[#0D261B] text-teal-200 font-medium" data-theme="jade">
+                <span class="w-3 h-3 rounded-full bg-[#0D261B] border border-teal-400"></span>
+                <span>Ngọc Bích</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Edit Quote Text -->
+          <div>
+            <label class="font-bold text-stone-700 dark:text-stone-300 block mb-1 uppercase tracking-wider text-[10px]">Nội Dung Trích Dẫn:</label>
+            <textarea id="quote-input-text" rows="4" class="w-full p-3 rounded-2xl bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-inner font-serif italic"></textarea>
+            <div id="quote-input-author" class="text-[11px] text-stone-500 dark:text-stone-400 mt-1 italic font-medium"></div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="pt-2 space-y-2">
+            <button id="quote-download-btn" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold shadow-lg flex items-center justify-center gap-2 text-xs transition-transform hover:scale-[1.01]">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Tải Ảnh PNG (Chuẩn 1080p Facebook)</span>
+            </button>
+            <button id="quote-copy-text-btn" class="w-full py-2.5 px-4 rounded-2xl bg-stone-200/80 hover:bg-stone-300/80 dark:bg-emerald-900/60 dark:hover:bg-emerald-900 text-stone-800 dark:text-stone-200 font-medium border border-stone-300/50 dark:border-emerald-800 flex items-center justify-center gap-2 text-xs transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Sao Chép Trích Dẫn Kèm Link Web</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="js/books-data/suy-tuong.js"></script>
+  <script src="js/books-data/dao-duc-kinh.js"></script>
+  <script src="js/books-data/cong-hoa.js"></script>
+  <script src="js/books-data/zarathustra.js"></script>
+  <script src="js/books-data/ban-ve-tu-do.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/bgm.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/quote-card.js"></script>
+  <script src="js/ai-chat.js"></script>
+  <script src="js/reader.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+          console.log('🏛️ Sophia Codex PWA Service Worker đã sẵn sàng:', reg.scope);
+        }).catch(err => {
+          console.warn('⚠️ Service Worker không thể đăng ký:', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

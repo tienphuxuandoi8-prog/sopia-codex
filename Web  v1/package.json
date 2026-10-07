@@ -1,0 +1,24 @@
+{
+  "name": "sophia-codex",
+  "version": "1.0.0",
+  "description": "Thư Viện Triết Học Toàn Văn & Chiêm Nghiệm Thông Minh",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node scripts/test-e2e.js",
+    "test:admin": "node scripts/test-admin-e2e.js",
+    "test:prod": "node scripts/test-production-ready.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "philosophy",
+    "sophia-codex",
+    "sqlite",
+    "socrates-ai",
+    "audiobook"
+  ],
+  "author": "Sophia Codex",
+  "license": "MIT"
+}

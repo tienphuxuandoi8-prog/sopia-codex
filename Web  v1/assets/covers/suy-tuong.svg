@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="100%" height="100%">
+  <defs>
+    <!-- Leather Texture Gradient -->
+    <radialGradient id="leatherBg" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#3B1214"/>
+      <stop offset="60%" stop-color="#240A0C"/>
+      <stop offset="100%" stop-color="#120405"/>
+    </radialGradient>
+    <!-- Antique Gold Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F3E7C4"/>
+      <stop offset="25%" stop-color="#D4AF37"/>
+      <stop offset="50%" stop-color="#AA8022"/>
+      <stop offset="75%" stop-color="#E5C158"/>
+      <stop offset="100%" stop-color="#8C6615"/>
+    </linearGradient>
+    <!-- Spine Shadow -->
+    <linearGradient id="spineShadow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.7"/>
+      <stop offset="25%" stop-color="#ffffff" stop-opacity="0.15"/>
+      <stop offset="50%" stop-color="#000000" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="embossFilter">
+      <feDropShadow dx="1" dy="1.5" stdDeviation="1" flood-color="#000000" flood-opacity="0.9"/>
+    </filter>
+  </defs>
+
+  <!-- Base Leather Cover -->
+  <rect width="400" height="560" rx="8" fill="url(#leatherBg)"/>
+
+  <!-- Leather Spine Ribs on Left -->
+  <rect x="0" y="0" width="22" height="560" fill="url(#spineShadow)"/>
+  <line x1="0" y1="80" x2="22" y2="80" stroke="#000000" stroke-width="3" opacity="0.6"/>
+  <line x1="0" y1="180" x2="22" y2="180" stroke="#000000" stroke-width="3" opacity="0.6"/>
+  <line x1="0" y1="280" x2="22" y2="280" stroke="#000000" stroke-width="3" opacity="0.6"/>
+  <line x1="0" y1="380" x2="22" y2="380" stroke="#000000" stroke-width="3" opacity="0.6"/>
+  <line x1="0" y1="480" x2="22" y2="480" stroke="#000000" stroke-width="3" opacity="0.6"/>
+
+  <!-- Outer Gilt Filigree Border -->
+  <rect x="30" y="24" width="344" height="512" rx="4" fill="none" stroke="url(#goldGrad)" stroke-width="3" filter="url(#embossFilter)"/>
+  <rect x="36" y="30" width="332" height="500" rx="3" fill="none" stroke="url(#goldGrad)" stroke-width="1" stroke-dasharray="6,3" opacity="0.8"/>
+  <rect x="42" y="36" width="320" height="488" rx="2" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.9"/>
+
+  <!-- 4 Antique Corner Ornaments -->
+  <g fill="url(#goldGrad)" filter="url(#embossFilter)">
+    <!-- Top-Left -->
+    <path d="M 46 46 L 70 46 L 70 50 L 50 50 L 50 70 L 46 70 Z M 54 54 L 62 54 L 62 56 L 56 56 L 56 62 L 54 62 Z"/>
+    <!-- Top-Right -->
+    <path d="M 354 46 L 330 46 L 330 50 L 350 50 L 350 70 L 354 70 Z M 346 54 L 338 54 L 338 56 L 344 56 L 344 62 L 346 62 Z"/>
+    <!-- Bottom-Left -->
+    <path d="M 46 514 L 70 514 L 70 510 L 50 510 L 50 490 L 46 490 Z M 54 506 L 62 506 L 62 504 L 56 504 L 56 498 L 54 498 Z"/>
+    <!-- Bottom-Right -->
+    <path d="M 354 514 L 330 514 L 330 510 L 350 510 L 350 490 L 354 490 Z M 346 506 L 338 506 L 338 504 L 344 504 L 344 498 L 346 498 Z"/>
+  </g>
+
+  <!-- Top Latin Header -->
+  <text x="202" y="80" text-anchor="middle" fill="url(#goldGrad)" font-family="'Cinzel', 'Times New Roman', serif" font-size="11" letter-spacing="4" font-weight="bold" filter="url(#embossFilter)">
+    EX EDITIONE CLASSICA
+  </text>
+  <line x1="140" y1="92" x2="264" y2="92" stroke="url(#goldGrad)" stroke-width="1" opacity="0.7"/>
+
+  <!-- Author Name -->
+  <text x="202" y="145" text-anchor="middle" fill="url(#goldGrad)" font-family="'Cinzel', 'Times New Roman', serif" font-size="16" letter-spacing="4" font-weight="bold" filter="url(#embossFilter)">
+    MARCUS AURELIUS
+  </text>
+  <text x="202" y="168" text-anchor="middle" fill="url(#goldGrad)" font-family="'Cinzel', 'Times New Roman', serif" font-size="10" letter-spacing="3" opacity="0.85">
+    ANTONINUS AUGUSTUS
+  </text>
+
+  <!-- Central Roman Laurel Wreath Medallion -->
+  <g transform="translate(202, 260)" filter="url(#embossFilter)">
+    <circle cx="0" cy="0" r="56" fill="none" stroke="url(#goldGrad)" stroke-width="2"/>
+    <circle cx="0" cy="0" r="50" fill="none" stroke="url(#goldGrad)" stroke-width="1" stroke-dasharray="4,2"/>
+    <!-- Laurel Wreath Leaves -->
+    <path d="M -36 12 C -42 -10 -25 -38 0 -44 C 25 -38 42 -10 36 12 C 28 32 0 44 0 44 C 0 44 -28 32 -36 12 Z" fill="none" stroke="url(#goldGrad)" stroke-width="2"/>
+    <!-- SPQR & Roman Eagle Emblem -->
+    <text x="0" y="-12" text-anchor="middle" fill="url(#goldGrad)" font-family="'Cinzel', serif" font-size="9" letter-spacing="2" font-weight="bold">S • P • Q • R</text>
+    <!-- Emperor Profile Cameo Silhouette -->
+    <path d="M -8 18 C -14 12 -12 -4 -6 -10 C -2 -14 8 -14 12 -8 C 16 -2 14 10 8 16 C 4 20 -4 20 -8 18 Z" fill="url(#goldGrad)" opacity="0.9"/>
+    <circle cx="0" cy="2" r="16" fill="none" stroke="url(#goldGrad)" stroke-width="1.5"/>
+  </g>
+
+  <!-- Main Title -->
+  <text x="202" y="375" text-anchor="middle" fill="url(#goldGrad)" font-family="'Cinzel', 'Times New Roman', serif" font-size="30" letter-spacing="3" font-weight="bold" filter="url(#embossFilter)">
+    SUY TƯỞNG
+  </text>
+  
+  <text x="202" y="405" text-anchor="middle" fill="url(#goldGrad)" font-family="'Times New Roman', serif" font-style="italic" font-size="14" letter-spacing="2" opacity="0.9">
+    Τὰ εἰς ἑαυτόν • Meditations
+  </text>
+
+  <line x1="120" y1="422" x2="284" y2="422" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.75"/>
+  <circle cx="202" cy="422" r="3" fill="url(#goldGrad)"/>
+
+  <!-- Bottom Description & Date -->
+  <text x="202" y="460" text-anchor="middle" fill="url(#goldGrad)" font-family="'Cinzel', serif" font-size="10" letter-spacing="2" opacity="0.85">
+    CHỦ NGHĨA KHẮC KỶ
+  </text>
+  <text x="202" y="495" text-anchor="middle" fill="url(#goldGrad)" font-family="'Cinzel', serif" font-size="9" letter-spacing="3" opacity="0.75">
+    ROMA • ANNO CLXXX SCN
+  </text>
+</svg>
