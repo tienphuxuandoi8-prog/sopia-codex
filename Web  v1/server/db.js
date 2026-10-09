@@ -319,7 +319,7 @@ function seedInitialDataIfEmpty(force = false) {
     INSERT INTO reading_logs (book_id, chapter_id, duration_seconds, scroll_depth, device, created_at)
     VALUES (?, ?, ?, ?, ?, datetime('now', ?))
   `);
-  const sampleBooks = ['suy-tuong', 'dao-duc-kinh', 'cong-hoa', 'zarathustra'];
+  const sampleBooks = ['suy-tuong', 'dao-duc-kinh', 'cong-hoa', 'zarathustra', 'ban-ve-tu-do'];
   for (let i = 0; i < 60; i++) {
     const bk = sampleBooks[i % sampleBooks.length];
     const dur = Math.floor(Math.random() * 1200) + 180;
