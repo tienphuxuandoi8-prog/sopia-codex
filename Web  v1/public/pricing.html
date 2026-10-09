@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đặc Quyền Hội Viên - Sophia Codex</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            ui: ['"Be Vietnam Pro"', 'sans-serif'],
+            display: ['"Playfair Display"', 'serif'],
+            reading: ['Lora', 'serif'],
+          },
+          colors: {
+            scholar: {
+              50: '#F5F8F6',
+              100: '#E4ECE7',
+              800: '#2A4339',
+              900: '#1D3028',
+            },
+            gold: {
+              400: '#D4AF37',
+              500: '#C5A028',
+              600: '#B08E20',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #F5F8F6; color: #1f2937; }
+    .font-display { font-family: 'Playfair Display', serif; }
+  </style>
+</head>
+<body class="bg-scholar-50 min-h-screen flex flex-col">
+
+  <!-- Nav -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-scholar-100 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 bg-scholar-900 rounded-sm flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300">
+          <i data-lucide="book-open" class="text-white w-5 h-5"></i>
+        </div>
+        <span class="font-display font-bold text-xl text-scholar-900 tracking-tight group-hover:text-gold-600 transition-colors">Sophia Codex</span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="/" class="text-sm font-medium text-gray-600 hover:text-scholar-900 transition-colors">Tủ Sách</a>
+        <a href="/account.html" class="text-sm font-medium text-gray-600 hover:text-scholar-900 transition-colors" id="navAccountBtn" style="display: none;">Tài Khoản</a>
+        <a href="/login.html" class="text-sm font-medium text-white bg-scholar-900 px-4 py-2 rounded hover:bg-scholar-800 transition-colors" id="navLoginBtn">Đăng Nhập</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center mb-16">
+      <h1 class="font-display text-4xl md:text-5xl font-bold text-scholar-900 mb-4">Đặc Quyền Hội Viên Sophia Codex</h1>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto font-ui">Mở khóa toàn bộ kho tàng triết học nhân loại và người bạn đồng hành trí tuệ Socrates AI.</p>
+    </div>
+
+    <!-- Pricing Cards -->
+    <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-start">
+      
+      <!-- Free Card -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <h2 class="text-2xl font-display font-bold text-gray-900 mb-2">Độc Giả Thường</h2>
+        <div class="text-gray-500 text-sm mb-6 uppercase tracking-wider font-semibold">Miễn Phí</div>
+        <div class="flex items-baseline gap-1 mb-8">
+          <span class="text-4xl font-bold text-gray-900">0đ</span>
+          <span class="text-gray-500">/ Mãi mãi</span>
+        </div>
+        <ul class="space-y-4 mb-8 text-gray-700">
+          <li class="flex gap-3 items-start"><i data-lucide="check" class="w-5 h-5 text-gray-400 mt-0.5"></i> <span>Đọc các tác phẩm kinh điển mở rộng</span></li>
+          <li class="flex gap-3 items-start"><i data-lucide="check" class="w-5 h-5 text-gray-400 mt-0.5"></i> <span>10 câu hỏi đàm đạo AI mỗi ngày</span></li>
+          <li class="flex gap-3 items-start"><i data-lucide="check" class="w-5 h-5 text-gray-400 mt-0.5"></i> <span>Lưu tiến độ đọc & tủ sách cơ bản</span></li>
+        </ul>
+        <button disabled class="w-full py-3 px-4 rounded-lg bg-gray-100 text-gray-500 font-medium cursor-not-allowed border border-gray-200">Gói Hiện Tại</button>
+      </div>
+
+      <!-- Premium Card -->
+      <div class="bg-white rounded-xl shadow-xl border-2 border-gold-400 p-8 relative transform md:-translate-y-4">
+        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gold-500 text-white text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full flex items-center gap-1 shadow-sm">
+          <i data-lucide="star" class="w-3 h-3 fill-current"></i> Được Đề Xuất
+        </div>
+        <h2 class="text-2xl font-display font-bold text-scholar-900 mb-2">Sophia Premium</h2>
+        <div class="text-gold-600 text-sm mb-6 uppercase tracking-wider font-semibold">Thượng Hạng</div>
+        
+        <div class="flex items-center gap-2 mb-6">
+          <div class="bg-gray-100 p-1 rounded-lg flex gap-1 w-full relative">
+            <button class="flex-1 py-1 text-sm font-medium rounded-md transition-colors w-1/2 z-10" id="btnPlanMonth" onclick="selectPlan('month')">Gói Tháng</button>
+            <button class="flex-1 py-1 text-sm font-medium rounded-md transition-colors w-1/2 z-10" id="btnPlanYear" onclick="selectPlan('year')">Gói Năm</button>
+            <div id="planIndicator" class="absolute top-1 left-1 bottom-1 w-[calc(50%-0.25rem)] bg-white shadow-sm rounded-md transition-all duration-300 ease-in-out"></div>
+          </div>
+        </div>
+
+        <div id="priceMonth" class="mb-8">
+          <div class="flex items-baseline gap-1">
+            <span class="text-4xl font-bold text-scholar-900">49.000đ</span>
+            <span class="text-gray-500">/ tháng</span>
+          </div>
+        </div>
+
+        <div id="priceYear" class="mb-8 hidden">
+          <div class="flex items-baseline gap-1">
+            <span class="text-4xl font-bold text-scholar-900">399.000đ</span>
+            <span class="text-gray-500">/ năm</span>
+          </div>
+          <div class="text-sm text-green-600 font-medium mt-1">Tiết kiệm 32% (Chỉ ~33.000đ/tháng)</div>
+        </div>
+
+        <ul class="space-y-4 mb-8 text-gray-800">
+          <li class="flex gap-3 items-start"><i data-lucide="sparkles" class="w-5 h-5 text-gold-500 mt-0.5 shrink-0"></i> <span>Mở khóa 100% toàn văn mọi kiệt tác triết học (Cộng Hòa, Zarathustra, Suy Tưởng...)</span></li>
+          <li class="flex gap-3 items-start"><i data-lucide="brain" class="w-5 h-5 text-gold-500 mt-0.5 shrink-0"></i> <span>100 câu đàm đạo sâu sắc với Socrates AI mỗi ngày</span></li>
+          <li class="flex gap-3 items-start"><i data-lucide="headphones" class="w-5 h-5 text-gold-500 mt-0.5 shrink-0"></i> <span>Audio narration & nhạc thiền định nền</span></li>
+          <li class="flex gap-3 items-start"><i data-lucide="pen-tool" class="w-5 h-5 text-gold-500 mt-0.5 shrink-0"></i> <span>Trích dẫn & highlight không giới hạn, xuất sổ tay Markdown</span></li>
+          <li class="flex gap-3 items-start"><i data-lucide="shield-check" class="w-5 h-5 text-gold-500 mt-0.5 shrink-0"></i> <span>Không quảng cáo, trải nghiệm đọc thuần khiết</span></li>
+        </ul>
+        <button onclick="openCheckout()" class="w-full py-3 px-4 rounded-lg bg-scholar-900 text-white font-medium hover:bg-scholar-800 transition-colors shadow-md shadow-scholar-900/20" id="btnUpgrade">Nâng Cấp Gói Tháng</button>
+      </div>
+
+    </div>
+
+    <!-- FAQ -->
+    <div class="mt-24 max-w-3xl mx-auto">
+      <h3 class="text-2xl font-display font-bold text-center text-scholar-900 mb-8">Câu Hỏi Thường Gặp</h3>
+      <div class="space-y-6">
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <h4 class="font-bold text-gray-900 mb-2">Gói có tự động gia hạn không?</h4>
+          <p class="text-gray-600">Không, Sophia Codex không tự động trừ tiền của bạn. Khi gói hết hạn, chúng tôi sẽ gửi thông báo để bạn quyết định có tiếp tục gia hạn hay không.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <h4 class="font-bold text-gray-900 mb-2">Tôi có thể thanh toán bằng những hình thức nào?</h4>
+          <p class="text-gray-600">Chúng tôi hỗ trợ thanh toán qua VNPay (Thẻ ATM, Visa/Mastercard, VietQR) và Ví MoMo (quét mã cực kỳ tiện lợi).</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <h4 class="font-bold text-gray-900 mb-2">Có chính sách hoàn tiền không?</h4>
+          <p class="text-gray-600">Do tính chất sản phẩm nội dung số, chúng tôi không hỗ trợ hoàn tiền sau khi đã kích hoạt gói thành công. Bạn có thể sử dụng bản miễn phí trước khi quyết định nâng cấp.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform scale-95 transition-transform duration-300 relative overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-6 border-b border-gray-100">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xl font-display font-bold text-scholar-900">Chọn Phương Thức Thanh Toán</h3>
+          <button onclick="closeCheckout()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+        <p class="text-sm text-gray-500 mt-2">Thanh toán cho <span id="modalPlanName" class="font-semibold text-scholar-900">Sophia Premium - Gói Tháng</span></p>
+        <p class="text-lg font-bold text-gold-600 mt-1" id="modalPlanPrice">49.000đ</p>
+      </div>
+
+      <div class="p-6 overflow-y-auto">
+        <div class="space-y-4">
+          <!-- VNPay -->
+          <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-scholar-900 transition-colors peer-checked:border-scholar-900 peer-checked:bg-scholar-50 group">
+            <input type="radio" name="provider" value="VNPAY" class="hidden peer" checked>
+            <div class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center mr-4 group-[.peer-checked]:border-scholar-900 group-[.peer-checked]:bg-scholar-900">
+              <div class="w-2 h-2 rounded-full bg-white opacity-0 group-[.peer-checked]:opacity-100"></div>
+            </div>
+            <div class="flex-1">
+              <div class="font-semibold text-gray-900">Cổng thanh toán VNPay</div>
+              <div class="text-xs text-gray-500 mt-1">ATM nội địa, VietQR, Visa/Mastercard</div>
+            </div>
+            <img src="https://vnpay.vn/s1/statics.vnpay.vn/2023/9/06ncktiwd6dc1694418196384.png" alt="VNPay" class="h-8 object-contain">
+          </label>
+
+          <!-- MoMo -->
+          <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-scholar-900 transition-colors peer-checked:border-scholar-900 peer-checked:bg-scholar-50 group">
+            <input type="radio" name="provider" value="MOMO" class="hidden peer">
+            <div class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center mr-4 group-[.peer-checked]:border-scholar-900 group-[.peer-checked]:bg-scholar-900">
+              <div class="w-2 h-2 rounded-full bg-white opacity-0 group-[.peer-checked]:opacity-100"></div>
+            </div>
+            <div class="flex-1">
+              <div class="font-semibold text-gray-900">Ví điện tử MoMo</div>
+              <div class="text-xs text-gray-500 mt-1">Quét mã QR MoMo nhanh chóng</div>
+            </div>
+            <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" class="h-8 object-contain">
+          </label>
+        </div>
+      </div>
+      
+      <div class="p-6 border-t border-gray-100 bg-gray-50">
+        <button id="btnProceedCheckout" onclick="proceedCheckout()" class="w-full py-3 px-4 rounded-lg bg-scholar-900 text-white font-medium hover:bg-scholar-800 transition-colors shadow-md flex justify-center items-center gap-2 disabled:opacity-70">
+          <span>Tiến Hành Thanh Toán</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+        <p id="checkoutError" class="text-red-500 text-sm mt-3 text-center hidden"></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { API } from './js/api.js';
+    import { Auth } from './js/auth.js';
+
+    lucide.createIcons();
+
+    // UI state
+    let selectedPlan = 'month'; // 'month' or 'year'
+    
+    // Elements
+    const btnPlanMonth = document.getElementById('btnPlanMonth');
+    const btnPlanYear = document.getElementById('btnPlanYear');
+    const planIndicator = document.getElementById('planIndicator');
+    const priceMonth = document.getElementById('priceMonth');
+    const priceYear = document.getElementById('priceYear');
+    const btnUpgrade = document.getElementById('btnUpgrade');
+    const modalPlanName = document.getElementById('modalPlanName');
+    const modalPlanPrice = document.getElementById('modalPlanPrice');
+    
+    window.selectPlan = (plan) => {
+      selectedPlan = plan;
+      
+      if (plan === 'month') {
+        btnPlanMonth.classList.add('text-scholar-900');
+        btnPlanMonth.classList.remove('text-gray-500');
+        btnPlanYear.classList.add('text-gray-500');
+        btnPlanYear.classList.remove('text-scholar-900');
+        planIndicator.style.transform = 'translateX(0)';
+        
+        priceMonth.classList.remove('hidden');
+        priceYear.classList.add('hidden');
+        btnUpgrade.innerText = 'Nâng Cấp Gói Tháng';
+      } else {
+        btnPlanYear.classList.add('text-scholar-900');
+        btnPlanYear.classList.remove('text-gray-500');
+        btnPlanMonth.classList.add('text-gray-500');
+        btnPlanMonth.classList.remove('text-scholar-900');
+        planIndicator.style.transform = 'translateX(100%)';
+        
+        priceYear.classList.remove('hidden');
+        priceMonth.classList.add('hidden');
+        btnUpgrade.innerText = 'Nâng Cấp Gói Năm';
+      }
+    };
+    
+    // Init state
+    selectPlan('month');
+
+    // Authentication UI update
+    async function updateAuthUI() {
+      const user = await Auth.getCurrentUser();
+      if (user) {
+        document.getElementById('navLoginBtn').style.display = 'none';
+        document.getElementById('navAccountBtn').style.display = 'block';
+      } else {
+        document.getElementById('navLoginBtn').style.display = 'block';
+        document.getElementById('navAccountBtn').style.display = 'none';
+      }
+    }
+    
+    updateAuthUI();
+
+    // Checkout Modal Logic
+    const modal = document.getElementById('checkoutModal');
+    
+    window.openCheckout = async () => {
+      const user = await Auth.getCurrentUser();
+      if (!user) {
+        window.location.href = `/login.html?next=${encodeURIComponent('/pricing.html')}`;
+        return;
+      }
+      
+      // Update modal info
+      if (selectedPlan === 'month') {
+        modalPlanName.innerText = 'Sophia Premium - Gói Tháng';
+        modalPlanPrice.innerText = '49.000đ';
+      } else {
+        modalPlanName.innerText = 'Sophia Premium - Gói Năm';
+        modalPlanPrice.innerText = '399.000đ';
+      }
+      
+      modal.classList.remove('hidden');
+      // small delay for transition
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modal.querySelector('div').classList.remove('scale-95');
+      }, 10);
+    };
+
+    window.closeCheckout = () => {
+      modal.classList.add('opacity-0');
+      modal.querySelector('div').classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        document.getElementById('checkoutError').classList.add('hidden');
+      }, 300);
+    };
+
+    // Radios change visual class
+    document.querySelectorAll('input[name="provider"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        // Handled by CSS peer-checked, but we could add extra logic if needed
+      });
+    });
+
+    window.proceedCheckout = async () => {
+      const btn = document.getElementById('btnProceedCheckout');
+      const errorEl = document.getElementById('checkoutError');
+      const provider = document.querySelector('input[name="provider"]:checked').value;
+      const planCode = selectedPlan === 'month' ? 'PREMIUM_1M' : 'PREMIUM_1Y';
+      
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>Đang xử lý...</span>`;
+      lucide.createIcons();
+      errorEl.classList.add('hidden');
+
+      try {
+        const result = await API.post('/payments/checkout', { planCode, provider });
+        if (result && result.data && result.data.payUrl) {
+          window.location.href = result.data.payUrl;
+        } else {
+          throw new Error('Không nhận được đường dẫn thanh toán.');
+        }
+      } catch (error) {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Tiến Hành Thanh Toán</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+        lucide.createIcons();
+        errorEl.textContent = error.message || 'Có lỗi xảy ra khi tạo giao dịch thanh toán.';
+        errorEl.classList.remove('hidden');
+      }
+    };
+  </script>
+</body>
+</html>

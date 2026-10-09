@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tủ Sách Tri Thức & Sổ Tay Chiêm Nghiệm - Sophia Codex</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        parchment: { 50: '#fdfbf7', 100: '#f6f2e6', 200: '#ebe3c8', 300: '#dfd1a1', 400: '#d1ba74', 500: '#c5a350', 600: '#b7893d', 700: '#996932', 800: '#80562e', 900: '#684728', 950: '#3c2714' },
+                        forest: { 50: '#f2f8f5', 100: '#e1f0e8', 200: '#c3dfd1', 300: '#95c6b1', 400: '#60a68a', 500: '#418b6f', 600: '#306e57', 700: '#285847', 800: '#22473a', 900: '#1d3b31', 950: '#0f211c' },
+                        gold: { 500: '#d4af37', 600: '#aa8c2c' }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', '"Merriweather"', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body { background-color: #fdfbf7; color: #1a202c; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-btn.active { 
+            border-bottom-color: #d4af37;
+            color: #d4af37;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-forest-900 text-parchment-100 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="flex items-center space-x-2 group">
+                        <i class="fas fa-book-open text-gold-500 text-xl group-hover:scale-110 transition-transform"></i>
+                        <span class="font-serif text-xl font-bold tracking-wider text-gold-500">Sophia Codex</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <a href="/" class="hover:text-gold-500 transition-colors"><i class="fas fa-compass mr-1"></i> Khám Phá</a>
+                    <a href="/account.html" class="hover:text-gold-500 transition-colors"><i class="fas fa-user-circle mr-1"></i> Tài Khoản</a>
+                    <button id="logoutBtn" class="text-sm border border-parchment-300 hover:bg-parchment-200 hover:text-forest-900 px-3 py-1 rounded transition-colors">Đăng xuất</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-b from-parchment-100 to-parchment-50 py-12 border-b border-parchment-200">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-serif text-forest-900 font-bold mb-4">Tủ Sách Tri Thức & Sổ Tay Chiêm Nghiệm</h1>
+            <p class="text-lg text-forest-700 italic font-serif max-w-2xl mx-auto">"Đọc sách không cốt lấy nhiều, quan trọng nhất là chọn cho tinh, đọc cho kỹ." — Chu Hy</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <!-- Tabs Navigation -->
+        <div class="border-b border-parchment-300 mb-8">
+            <nav class="flex space-x-8" aria-label="Tabs">
+                <button onclick="switchTab('shelves')" class="tab-btn active whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-lg text-forest-700 hover:text-forest-900 hover:border-parchment-400 transition-colors" data-target="tab-shelves">
+                    <i class="fas fa-layer-group mr-2"></i>Tủ Sách
+                </button>
+                <button onclick="switchTab('highlights')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-lg text-forest-700 hover:text-forest-900 hover:border-parchment-400 transition-colors" data-target="tab-highlights">
+                    <i class="fas fa-highlighter mr-2"></i>Sổ Tay Trích Dẫn & Ghi Chú
+                </button>
+                <button onclick="switchTab('stats')" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-lg text-forest-700 hover:text-forest-900 hover:border-parchment-400 transition-colors" data-target="tab-stats">
+                    <i class="fas fa-chart-line mr-2"></i>Thống Kê Đọc Sâu
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab Content: Tủ Sách -->
+        <div id="tab-shelves" class="tab-content active">
+            <!-- Filter -->
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button onclick="filterBooks('all')" class="px-4 py-2 rounded-full text-sm font-medium bg-forest-900 text-parchment-50 filter-btn" data-filter="all">Tất cả</button>
+                <button onclick="filterBooks('reading')" class="px-4 py-2 rounded-full text-sm font-medium bg-parchment-200 text-forest-800 hover:bg-parchment-300 filter-btn" data-filter="reading">Đang đọc</button>
+                <button onclick="filterBooks('wantToRead')" class="px-4 py-2 rounded-full text-sm font-medium bg-parchment-200 text-forest-800 hover:bg-parchment-300 filter-btn" data-filter="wantToRead">Muốn đọc</button>
+                <button onclick="filterBooks('completed')" class="px-4 py-2 rounded-full text-sm font-medium bg-parchment-200 text-forest-800 hover:bg-parchment-300 filter-btn" data-filter="completed">Đã xong</button>
+                <button onclick="filterBooks('favorite')" class="px-4 py-2 rounded-full text-sm font-medium bg-parchment-200 text-forest-800 hover:bg-parchment-300 filter-btn" data-filter="favorite">Yêu thích ❤️</button>
+            </div>
+            
+            <div id="bookshelfGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Book Cards will be injected here -->
+                <div class="col-span-full text-center py-12 text-gray-500" id="bookshelfLoading">
+                    <i class="fas fa-circle-notch fa-spin text-3xl mb-3"></i>
+                    <p>Đang tải tủ sách...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Sổ Tay -->
+        <div id="tab-highlights" class="tab-content">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div class="flex-grow flex gap-4 w-full sm:w-auto">
+                    <div class="relative flex-grow max-w-md">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="highlightSearch" placeholder="Tìm kiếm trích dẫn, ghi chú..." class="w-full pl-10 pr-4 py-2 border border-parchment-300 rounded-lg bg-white focus:ring-2 focus:ring-forest-500 focus:border-forest-500 outline-none">
+                    </div>
+                    <select id="highlightBookFilter" class="border border-parchment-300 rounded-lg bg-white px-4 py-2 outline-none focus:ring-2 focus:ring-forest-500">
+                        <option value="">Tất cả sách</option>
+                    </select>
+                </div>
+                <button onclick="exportHighlights()" class="bg-forest-800 hover:bg-forest-900 text-parchment-50 px-4 py-2 rounded-lg flex items-center transition-colors shadow-sm whitespace-nowrap">
+                    <i class="fas fa-file-export mr-2"></i> Xuất Markdown
+                </button>
+            </div>
+
+            <div id="highlightsList" class="space-y-6">
+                <!-- Highlights will be injected here -->
+                <div class="text-center py-12 text-gray-500" id="highlightsLoading">
+                    <i class="fas fa-circle-notch fa-spin text-3xl mb-3"></i>
+                    <p>Đang tải sổ tay...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Thống Kê -->
+        <div id="tab-stats" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="statsGrid">
+                <!-- Stats will be injected here -->
+                <div class="col-span-full text-center py-12 text-gray-500" id="statsLoading">
+                    <i class="fas fa-circle-notch fa-spin text-3xl mb-3"></i>
+                    <p>Đang tải thống kê...</p>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-parchment-200">
+                <h3 class="text-xl font-serif font-bold text-forest-900 mb-4">Hành trình Độc giả</h3>
+                <div class="flex items-center">
+                    <div class="w-20 h-20 rounded-full bg-parchment-200 flex items-center justify-center border-4 border-gold-500 shadow-inner mr-6">
+                        <i class="fas fa-crown text-3xl text-gold-500"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <h4 class="text-lg font-bold text-gray-800" id="levelName">Học giả Khai tâm</h4>
+                        <p class="text-sm text-gray-500 mb-2">Cấp độ <span id="levelNumber">1</span> - <span id="xpValue">0</span> XP</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-gold-500 h-2.5 rounded-full" style="width: 45%" id="xpBar"></div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2 text-right">Cần <span id="xpToNextLevel">100</span> XP để lên cấp tiếp theo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-forest-950 text-parchment-200 py-8 mt-12 border-t border-forest-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="font-serif text-gold-500 text-xl mb-4">Sophia Codex</p>
+            <p class="text-sm opacity-75">Nơi lưu giữ tri thức và nuôi dưỡng tâm hồn.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-forest-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center">
+        <i class="fas fa-check-circle text-green-400 mr-2"></i>
+        <span id="toastMessage">Thông báo</span>
+    </div>
+
+    <script>
+        // Check Auth
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html?next=/library.html';
+        }
+
+        // Setup API Config
+        const apiHeaders = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        // Utility: Show Toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toastMessage');
+            const iconEl = toast.querySelector('i');
+            
+            msgEl.textContent = message;
+            if (type === 'error') {
+                iconEl.className = 'fas fa-exclamation-circle text-red-400 mr-2';
+                toast.className = 'fixed bottom-4 right-4 bg-red-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-0 opacity-100 transition-all duration-300 z-50 flex items-center';
+            } else {
+                iconEl.className = 'fas fa-check-circle text-green-400 mr-2';
+                toast.className = 'fixed bottom-4 right-4 bg-forest-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-0 opacity-100 transition-all duration-300 z-50 flex items-center';
+            }
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+
+        // Tab Switching
+        function switchTab(tabId) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-d4af37', 'text-d4af37');
+                if(btn.dataset.target === `tab-${tabId}`) {
+                    btn.classList.add('active');
+                    btn.style.borderBottomColor = '#d4af37';
+                    btn.style.color = '#d4af37';
+                } else {
+                    btn.style.borderBottomColor = 'transparent';
+                    btn.style.color = '';
+                }
+            });
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+        }
+
+        // State
+        let allBooks = [];
+        let allHighlights = [];
+        let currentFilter = 'all';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBookshelf();
+            loadHighlights();
+            loadStats();
+        });
+
+        // 1. Load Bookshelf
+        async function loadBookshelf() {
+            try {
+                // Mock API call if real endpoint doesn't exist yet, but let's try real one
+                const res = await fetch('/api/v1/reader/bookshelf', { headers: apiHeaders });
+                if (!res.ok) throw new Error('Không thể tải dữ liệu tủ sách');
+                
+                const data = await res.json();
+                allBooks = data.books || [];
+                renderBookshelf();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('bookshelfGrid').innerHTML = `<div class="col-span-full text-center py-8 text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i> ${err.message}</div>`;
+            }
+        }
+
+        function filterBooks(status) {
+            currentFilter = status;
+            
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if(btn.dataset.filter === status) {
+                    btn.classList.replace('bg-parchment-200', 'bg-forest-900');
+                    btn.classList.replace('text-forest-800', 'text-parchment-50');
+                } else {
+                    btn.classList.replace('bg-forest-900', 'bg-parchment-200');
+                    btn.classList.replace('text-parchment-50', 'text-forest-800');
+                }
+            });
+
+            renderBookshelf();
+        }
+
+        function renderBookshelf() {
+            const grid = document.getElementById('bookshelfGrid');
+            
+            let filteredBooks = allBooks;
+            if (currentFilter !== 'all') {
+                if (currentFilter === 'favorite') {
+                    filteredBooks = allBooks.filter(b => b.isFavorite);
+                } else {
+                    filteredBooks = allBooks.filter(b => b.status === currentFilter);
+                }
+            }
+
+            if (filteredBooks.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500 italic">Chưa có sách nào trong mục này.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filteredBooks.map(book => {
+                const progress = book.progressPct || 0;
+                const chapterQuery = book.currentChapterId ? `&chapter=${book.currentChapterId}` : '';
+                
+                return `
+                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col group border border-parchment-200">
+                    <div class="relative aspect-[2/3] overflow-hidden bg-parchment-100">
+                        <img src="${book.coverUrl || '/img/default-cover.jpg'}" alt="Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        ${book.isFavorite ? `<div class="absolute top-2 right-2 text-red-500 drop-shadow-md text-lg"><i class="fas fa-heart"></i></div>` : ''}
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="font-bold font-serif text-gray-900 line-clamp-2 mb-1" title="${book.title}">${book.title}</h3>
+                        <p class="text-sm text-gray-600 mb-3 line-clamp-1">${book.author}</p>
+                        
+                        <div class="mt-auto">
+                            <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>Tiến độ</span>
+                                <span>${progress}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5 mb-3">
+                                <div class="bg-forest-600 h-1.5 rounded-full" style="width: ${progress}%"></div>
+                            </div>
+                            <a href="/index.html?book=${book.bookId}${chapterQuery}" class="block w-full text-center bg-parchment-200 hover:bg-gold-500 hover:text-white text-forest-800 font-medium py-2 rounded transition-colors text-sm">
+                                Đọc tiếp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // 2. Load Highlights
+        async function loadHighlights() {
+            try {
+                const res = await fetch('/api/v1/reader/highlights', { headers: apiHeaders });
+                if (!res.ok) throw new Error('Không thể tải sổ tay');
+                
+                const data = await res.json();
+                allHighlights = data.highlights || [];
+                
+                // Populate Book Filter
+                const bookFilter = document.getElementById('highlightBookFilter');
+                const books = [...new Set(allHighlights.map(h => h.bookTitle))].filter(Boolean);
+                bookFilter.innerHTML = '<option value="">Tất cả sách</option>' + books.map(b => `<option value="${b}">${b}</option>`).join('');
+
+                renderHighlights();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('highlightsList').innerHTML = `<div class="text-center py-8 text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i> ${err.message}</div>`;
+            }
+        }
+
+        function renderHighlights() {
+            const list = document.getElementById('highlightsList');
+            const searchQ = document.getElementById('highlightSearch').value.toLowerCase();
+            const bookF = document.getElementById('highlightBookFilter').value;
+
+            const filtered = allHighlights.filter(h => {
+                const matchSearch = h.quoteText.toLowerCase().includes(searchQ) || (h.note && h.note.toLowerCase().includes(searchQ));
+                const matchBook = bookF ? h.bookTitle === bookF : true;
+                return matchSearch && matchBook;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="text-center py-12 text-gray-500 italic">Không tìm thấy trích dẫn nào.</div>`;
+                return;
+            }
+
+            const colorMap = {
+                'gold': 'bg-amber-100 border-amber-300 text-amber-900',
+                'emerald': 'bg-emerald-100 border-emerald-300 text-emerald-900',
+                'rose': 'bg-rose-100 border-rose-300 text-rose-900',
+                'default': 'bg-parchment-100 border-parchment-300 text-forest-900'
+            };
+
+            list.innerHTML = filtered.map(h => {
+                const cStyle = colorMap[h.color] || colorMap['default'];
+                const date = new Date(h.createdAt).toLocaleDateString('vi-VN');
+                
+                return `
+                <div class="bg-white rounded-xl shadow-sm border border-parchment-200 overflow-hidden" id="hl-${h.id}">
+                    <div class="${cStyle} px-6 py-4 border-l-4">
+                        <blockquote class="font-serif text-lg leading-relaxed italic mb-2">
+                            "${h.quoteText}"
+                        </blockquote>
+                        ${h.note ? `<div class="text-sm bg-white/50 p-3 rounded mt-3 border border-white/40"><i class="fas fa-pen-nib mr-2 opacity-50"></i>${h.note}</div>` : ''}
+                    </div>
+                    <div class="px-6 py-3 bg-gray-50 border-t border-parchment-200 flex justify-between items-center text-sm text-gray-600">
+                        <div>
+                            <span class="font-medium text-forest-800">${h.bookTitle || 'Sách'}</span> 
+                            ${h.chapterTitle ? `<span class="mx-2">•</span> <span>${h.chapterTitle}</span>` : ''}
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-xs text-gray-400">${date}</span>
+                            <button onclick="copyToClipboard('${h.quoteText.replace(/'/g, "\\'")}')" class="text-gray-400 hover:text-forest-600 transition-colors" title="Sao chép">
+                                <i class="far fa-copy"></i>
+                            </button>
+                            <button onclick="deleteHighlight('${h.id}')" class="text-gray-400 hover:text-red-500 transition-colors" title="Xóa">
+                                <i class="far fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('highlightSearch').addEventListener('input', renderHighlights);
+        document.getElementById('highlightBookFilter').addEventListener('change', renderHighlights);
+
+        async function copyToClipboard(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast('Đã sao chép vào clipboard');
+            } catch (err) {
+                console.error('Failed to copy', err);
+            }
+        }
+
+        async function deleteHighlight(id) {
+            if(!confirm('Bạn có chắc chắn muốn xóa trích dẫn này?')) return;
+            try {
+                const res = await fetch(`/api/v1/reader/highlights/${id}`, { method: 'DELETE', headers: apiHeaders });
+                if(res.ok) {
+                    allHighlights = allHighlights.filter(h => h.id != id);
+                    renderHighlights();
+                    showToast('Đã xóa trích dẫn');
+                } else {
+                    throw new Error('Lỗi server');
+                }
+            } catch(e) {
+                showToast('Không thể xóa: ' + e.message, 'error');
+            }
+        }
+
+        function exportHighlights() {
+            if (allHighlights.length === 0) return showToast('Không có dữ liệu để xuất', 'error');
+            
+            let mdContent = `# Sổ Tay Trích Dẫn & Ghi Chú - Sophia Codex\n*Ngày xuất: ${new Date().toLocaleDateString('vi-VN')}*\n\n---\n\n`;
+            
+            // Group by book
+            const grouped = {};
+            allHighlights.forEach(h => {
+                const book = h.bookTitle || 'Không xác định';
+                if(!grouped[book]) grouped[book] = [];
+                grouped[book].push(h);
+            });
+
+            for(const [book, hls] of Object.entries(grouped)) {
+                mdContent += `## 📖 ${book}\n\n`;
+                hls.forEach(h => {
+                    mdContent += `> "${h.quoteText}"\n`;
+                    if(h.note) mdContent += `\n**Ghi chú:** ${h.note}\n`;
+                    if(h.chapterTitle) mdContent += `\n*— ${h.chapterTitle}*\n`;
+                    mdContent += `\n---\n\n`;
+                });
+            }
+
+            const blob = new Blob([mdContent], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SophiaCodex_Highlights_${new Date().toISOString().split('T')[0]}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Đã xuất file Markdown');
+        }
+
+        // 3. Load Stats
+        async function loadStats() {
+            try {
+                // Fetch profile/stats
+                const res = await fetch('/api/v1/account/profile', { headers: apiHeaders });
+                if(!res.ok) throw new Error('Không thể tải dữ liệu profile');
+                const data = await res.json();
+                
+                const stats = data.stats || {};
+                
+                const statsGrid = document.getElementById('statsGrid');
+                statsGrid.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-parchment-200 text-center">
+                        <div class="text-3xl text-orange-500 mb-2"><i class="fas fa-fire"></i></div>
+                        <div class="text-3xl font-bold font-serif text-gray-800 mb-1">${stats.streakDays || 0}</div>
+                        <div class="text-sm text-gray-500 uppercase tracking-wide">Chuỗi ngày đọc</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-parchment-200 text-center">
+                        <div class="text-3xl text-blue-500 mb-2"><i class="far fa-clock"></i></div>
+                        <div class="text-3xl font-bold font-serif text-gray-800 mb-1">${Math.floor((stats.totalReadingTimeMinutes || 0)/60)}h ${(stats.totalReadingTimeMinutes || 0)%60}m</div>
+                        <div class="text-sm text-gray-500 uppercase tracking-wide">Tổng thời gian</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-parchment-200 text-center">
+                        <div class="text-3xl text-emerald-500 mb-2"><i class="fas fa-book-reader"></i></div>
+                        <div class="text-3xl font-bold font-serif text-gray-800 mb-1">${stats.booksCompleted || 0}</div>
+                        <div class="text-sm text-gray-500 uppercase tracking-wide">Sách hoàn thành</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-parchment-200 text-center">
+                        <div class="text-3xl text-purple-500 mb-2"><i class="fas fa-highlighter"></i></div>
+                        <div class="text-3xl font-bold font-serif text-gray-800 mb-1">${allHighlights.length || stats.totalHighlights || 0}</div>
+                        <div class="text-sm text-gray-500 uppercase tracking-wide">Trích dẫn đã lưu</div>
+                    </div>
+                `;
+
+                // Update Level
+                const xp = stats.xp || 0;
+                const level = Math.floor(xp / 100) + 1; // Simplistic level logic
+                const xpNext = level * 100;
+                const progress = (xp % 100) / 100 * 100;
+                
+                document.getElementById('levelNumber').textContent = level;
+                document.getElementById('xpValue').textContent = xp;
+                document.getElementById('xpToNextLevel').textContent = xpNext - xp;
+                document.getElementById('xpBar').style.width = `${progress}%`;
+                
+                const levelNames = ['Người Mới', 'Học giả Khai tâm', 'Người Tầm đạo', 'Mọt Sách', 'Triết Gia', 'Bậc Thầy'];
+                document.getElementById('levelName').textContent = levelNames[Math.min(level-1, levelNames.length-1)] || 'Học giả Uyên bác';
+
+            } catch(e) {
+                console.error(e);
+                document.getElementById('statsGrid').innerHTML = `<div class="col-span-full text-center py-8 text-red-500"><i class="fas fa-exclamation-triangle mr-2"></i> ${e.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

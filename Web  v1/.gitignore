@@ -1,8 +1,30 @@
+# Dependencies
 node_modules/
-.DS_Store
-Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Archives & Temporary files
+*.zip
 *.log
 *.tmp
+.DS_Store
+Thumbs.db
+
+# SQLite (legacy, will be removed after migration)
+*.db
 *.db-shm
 *.db-wal
 data/backups/
+
+# Prisma
+prisma/*.db
+
+# Build output
+public/css/app.css
+
+# IDE
+.vscode/
+.idea/

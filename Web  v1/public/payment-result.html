@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kết Quả Thanh Toán - Sophia Codex</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            ui: ['"Be Vietnam Pro"', 'sans-serif'],
+            display: ['"Playfair Display"', 'serif'],
+          },
+          colors: {
+            scholar: {
+              50: '#F5F8F6',
+              100: '#E4ECE7',
+              800: '#2A4339',
+              900: '#1D3028',
+            },
+            gold: {
+              400: '#D4AF37',
+              500: '#C5A028',
+              600: '#B08E20',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #F5F8F6; color: #1f2937; }
+    .font-display { font-family: 'Playfair Display', serif; }
+  </style>
+</head>
+<body class="bg-scholar-50 min-h-screen flex flex-col items-center justify-center p-4">
+
+  <div class="bg-white max-w-md w-full rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative">
+    <!-- Header Decor -->
+    <div class="h-2 w-full bg-gradient-to-r from-scholar-900 via-gold-500 to-scholar-900"></div>
+    
+    <div class="p-8 text-center" id="resultContainer">
+      <!-- Loading State -->
+      <div id="loadingState" class="flex flex-col items-center justify-center py-8">
+        <div class="relative w-16 h-16 mb-6">
+          <div class="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
+          <div class="absolute inset-0 border-4 border-scholar-900 rounded-full border-t-transparent animate-spin"></div>
+        </div>
+        <h2 class="text-xl font-display font-bold text-gray-900 mb-2">Đang xử lý giao dịch</h2>
+        <p class="text-gray-500 text-sm">Đang xác nhận kết quả thanh toán từ cổng giao dịch...</p>
+      </div>
+
+      <!-- Success State -->
+      <div id="successState" class="hidden flex-col items-center py-4">
+        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+          <i data-lucide="check" class="w-10 h-10 text-green-600"></i>
+        </div>
+        <h2 class="text-2xl font-display font-bold text-gray-900 mb-2">Thanh Toán Thành Công!</h2>
+        <p class="text-gold-600 font-semibold mb-6">Chúc Mừng Bạn Đã Trở Thành Hội Viên Sophia Premium!</p>
+        
+        <div class="w-full bg-gray-50 rounded-lg p-4 mb-8 text-left space-y-3 border border-gray-100">
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-gray-500">Mã đơn hàng:</span>
+            <span class="font-semibold text-gray-900" id="successOrderCode">...</span>
+          </div>
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-gray-500">Gói dịch vụ:</span>
+            <span class="font-semibold text-gray-900" id="successPlanName">Sophia Premium</span>
+          </div>
+          <div class="flex justify-between items-center text-sm">
+            <span class="text-gray-500">Ngày kích hoạt:</span>
+            <span class="font-semibold text-gray-900" id="successDate">...</span>
+          </div>
+        </div>
+
+        <div class="space-y-3 w-full">
+          <a href="/" class="block w-full py-3 px-4 rounded-lg bg-scholar-900 text-white font-medium hover:bg-scholar-800 transition-colors shadow-md text-center">Vào Tủ Sách Bắt Đầu Đọc Ngay</a>
+          <a href="/account.html" class="block w-full py-3 px-4 rounded-lg bg-white border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors text-center">Quản Lý Tài Khoản</a>
+        </div>
+      </div>
+
+      <!-- Failed State -->
+      <div id="failedState" class="hidden flex-col items-center py-4">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6">
+          <i data-lucide="x" class="w-10 h-10 text-red-600"></i>
+        </div>
+        <h2 class="text-2xl font-display font-bold text-gray-900 mb-2">Thanh Toán Thất Bại</h2>
+        <p class="text-gray-600 mb-8" id="failedMessage">Thanh toán chưa hoàn tất hoặc đã bị hủy.</p>
+        
+        <a href="/pricing.html" class="block w-full py-3 px-4 rounded-lg bg-scholar-900 text-white font-medium hover:bg-scholar-800 transition-colors shadow-md text-center">Thử Lại</a>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module">
+    import { API } from './js/api.js';
+
+    lucide.createIcons();
+
+    const loadingState = document.getElementById('loadingState');
+    const successState = document.getElementById('successState');
+    const failedState = document.getElementById('failedState');
+    
+    // UI elements
+    const successOrderCode = document.getElementById('successOrderCode');
+    const successPlanName = document.getElementById('successPlanName');
+    const successDate = document.getElementById('successDate');
+    const failedMessage = document.getElementById('failedMessage');
+
+    // Get order code from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderCode = urlParams.get('code');
+    
+    // Also handle vnPay return parameters if needed by backend, though usually handled by callback, 
+    // we assume backend updates order status and we just poll by code.
+
+    function showState(state) {
+      loadingState.classList.add('hidden');
+      successState.classList.add('hidden');
+      failedState.classList.add('hidden');
+      
+      loadingState.classList.remove('flex');
+      successState.classList.remove('flex');
+      failedState.classList.remove('flex');
+      
+      if (state === 'loading') {
+        loadingState.classList.remove('hidden');
+        loadingState.classList.add('flex');
+      } else if (state === 'success') {
+        successState.classList.remove('hidden');
+        successState.classList.add('flex');
+      } else if (state === 'failed') {
+        failedState.classList.remove('hidden');
+        failedState.classList.add('flex');
+      }
+    }
+
+    async function checkOrderStatus(code, attempts = 0) {
+      if (!code) {
+        failedMessage.textContent = 'Không tìm thấy mã đơn hàng.';
+        showState('failed');
+        return;
+      }
+
+      if (attempts >= 10) {
+        failedMessage.textContent = 'Quá thời gian chờ xác nhận thanh toán. Vui lòng kiểm tra lại tài khoản sau.';
+        showState('failed');
+        return;
+      }
+
+      try {
+        const response = await API.get(`/payments/orders/${code}/status`);
+        const status = response.data?.status;
+
+        if (status === 'PAID') {
+          // Success
+          successOrderCode.textContent = code;
+          if (response.data?.planCode === 'PREMIUM_1Y') {
+            successPlanName.textContent = 'Sophia Premium (Gói Năm)';
+          } else if (response.data?.planCode === 'PREMIUM_1M') {
+             successPlanName.textContent = 'Sophia Premium (Gói Tháng)';
+          }
+          
+          const date = new Date();
+          successDate.textContent = date.toLocaleDateString('vi-VN');
+          
+          showState('success');
+        } else if (status === 'FAILED' || status === 'CANCELLED') {
+          // Failed
+          showState('failed');
+        } else {
+          // Pending, poll again
+          setTimeout(() => checkOrderStatus(code, attempts + 1), 2000);
+        }
+      } catch (error) {
+        console.error('Error checking order status:', error);
+        // If 404 or other error, assume failure after max attempts, but keep polling just in case it's network blip
+        if (attempts >= 5) {
+          failedMessage.textContent = 'Không thể lấy thông tin giao dịch.';
+          showState('failed');
+        } else {
+          setTimeout(() => checkOrderStatus(code, attempts + 1), 2000);
+        }
+      }
+    }
+
+    // Start polling
+    showState('loading');
+    checkOrderStatus(orderCode);
+    
+  </script>
+</body>
+</html>

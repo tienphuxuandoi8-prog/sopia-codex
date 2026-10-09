@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="100%" height="100%">
+  <defs>
+    <radialGradient id="greekNavyBg" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#182E47"/>
+      <stop offset="60%" stop-color="#0E1C2E"/>
+      <stop offset="100%" stop-color="#060C14"/>
+    </radialGradient>
+    <linearGradient id="goldGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDF4D4"/>
+      <stop offset="30%" stop-color="#DEB841"/>
+      <stop offset="60%" stop-color="#A57A18"/>
+      <stop offset="100%" stop-color="#F2D16B"/>
+    </linearGradient>
+    <linearGradient id="spineShadow2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.75"/>
+      <stop offset="25%" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="embossFilter2">
+      <feDropShadow dx="1" dy="1.5" stdDeviation="1" flood-color="#000000" flood-opacity="0.9"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="560" rx="8" fill="url(#greekNavyBg)"/>
+  <rect x="0" y="0" width="22" height="560" fill="url(#spineShadow2)"/>
+
+  <!-- Spine Ribs -->
+  <line x1="0" y1="90" x2="22" y2="90" stroke="#000000" stroke-width="3" opacity="0.6"/>
+  <line x1="0" y1="190" x2="22" y2="190" stroke="#000000" stroke-width="3" opacity="0.6"/>
+  <line x1="0" y1="290" x2="22" y2="290" stroke="#000000" stroke-width="3" opacity="0.6"/>
+  <line x1="0" y1="390" x2="22" y2="390" stroke="#000000" stroke-width="3" opacity="0.6"/>
+  <line x1="0" y1="490" x2="22" y2="490" stroke="#000000" stroke-width="3" opacity="0.6"/>
+
+  <!-- Outer Frame -->
+  <rect x="30" y="24" width="344" height="512" rx="4" fill="none" stroke="url(#goldGrad2)" stroke-width="3" filter="url(#embossFilter2)"/>
+  <rect x="38" y="32" width="328" height="496" rx="2" fill="none" stroke="url(#goldGrad2)" stroke-width="1.5" opacity="0.85"/>
+
+  <!-- Classical Greek Meander Pattern Accent Lines -->
+  <g stroke="url(#goldGrad2)" stroke-width="1" fill="none" opacity="0.75" filter="url(#embossFilter2)">
+    <path d="M 44 48 L 74 48 L 74 54 L 50 54 L 50 64 L 64 64 L 64 58 L 56 58"/>
+    <path d="M 356 48 L 326 48 L 326 54 L 350 54 L 350 64 L 336 64 L 336 58 L 344 58"/>
+    <path d="M 44 512 L 74 512 L 74 506 L 50 506 L 50 496 L 64 496 L 64 502 L 56 502"/>
+    <path d="M 356 512 L 326 512 L 326 506 L 350 506 L 350 496 L 336 496 L 336 502 L 344 502"/>
+  </g>
+
+  <!-- Top Header -->
+  <text x="202" y="80" text-anchor="middle" fill="url(#goldGrad2)" font-family="'Cinzel', serif" font-size="11" letter-spacing="4" font-weight="bold" filter="url(#embossFilter2)">
+    BIBLIOTHECA GRAECA
+  </text>
+  <line x1="145" y1="92" x2="259" y2="92" stroke="url(#goldGrad2)" stroke-width="1" opacity="0.7"/>
+
+  <!-- Author Name -->
+  <text x="202" y="145" text-anchor="middle" fill="url(#goldGrad2)" font-family="'Cinzel', serif" font-size="22" letter-spacing="6" font-weight="bold" filter="url(#embossFilter2)">
+    PLATO
+  </text>
+  <text x="202" y="168" text-anchor="middle" fill="url(#goldGrad2)" font-family="'Times New Roman', serif" font-style="italic" font-size="12" letter-spacing="4" opacity="0.9">
+    ΠΛΑΤΩΝ • SOCRATES
+  </text>
+
+  <!-- Central Greek Temple & Owl of Wisdom Medallion -->
+  <g transform="translate(202, 255)" filter="url(#embossFilter2)">
+    <circle cx="0" cy="0" r="54" fill="none" stroke="url(#goldGrad2)" stroke-width="2"/>
+    <circle cx="0" cy="0" r="48" fill="none" stroke="url(#goldGrad2)" stroke-width="1" stroke-dasharray="3,3"/>
+    
+    <!-- Greek Parthenon Temple Facade -->
+    <path d="M -30 -10 L 0 -26 L 30 -10 Z" fill="none" stroke="url(#goldGrad2)" stroke-width="2"/>
+    <line x1="-32" y1="-10" x2="32" y2="-10" stroke="url(#goldGrad2)" stroke-width="2"/>
+    <!-- 4 Columns -->
+    <line x1="-24" y1="-8" x2="-24" y2="22" stroke="url(#goldGrad2)" stroke-width="2"/>
+    <line x1="-8" y1="-8" x2="-8" y2="22" stroke="url(#goldGrad2)" stroke-width="2"/>
+    <line x1="8" y1="-8" x2="8" y2="22" stroke="url(#goldGrad2)" stroke-width="2"/>
+    <line x1="24" y1="-8" x2="24" y2="22" stroke="url(#goldGrad2)" stroke-width="2"/>
+    <line x1="-30" y1="22" x2="30" y2="22" stroke="url(#goldGrad2)" stroke-width="3"/>
+    
+    <!-- Athena Sacred Owl Silhouette under pediment -->
+    <circle cx="0" cy="5" r="5" fill="url(#goldGrad2)"/>
+  </g>
+
+  <!-- Title -->
+  <text x="202" y="375" text-anchor="middle" fill="url(#goldGrad2)" font-family="'Cinzel', serif" font-size="30" letter-spacing="3" font-weight="bold" filter="url(#embossFilter2)">
+    CỘNG HÒA
+  </text>
+  <text x="202" y="405" text-anchor="middle" fill="url(#goldGrad2)" font-family="'Times New Roman', serif" font-style="italic" font-size="14" letter-spacing="2" opacity="0.9">
+    The Republic • Πολιτεία
+  </text>
+
+  <line x1="120" y1="422" x2="284" y2="422" stroke="url(#goldGrad2)" stroke-width="1.5" opacity="0.75"/>
+  <circle cx="202" cy="422" r="3" fill="url(#goldGrad2)"/>
+
+  <text x="202" y="460" text-anchor="middle" fill="url(#goldGrad2)" font-family="'Cinzel', serif" font-size="10" letter-spacing="2" opacity="0.85">
+    TRIẾT HỌC CỔ ĐIỂN HY LẠP
+  </text>
+  <text x="202" y="495" text-anchor="middle" fill="url(#goldGrad2)" font-family="'Cinzel', serif" font-size="9" letter-spacing="3" opacity="0.75">
+    ATHENAE • CCCLXXV A.C.
+  </text>
+</svg>

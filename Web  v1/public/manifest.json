@@ -1,0 +1,25 @@
+{
+  "name": "Sophia Codex — Thư Viện Triết Học Toàn Cầu",
+  "short_name": "Sophia Codex",
+  "description": "Thư viện triết học mở toàn văn, tích hợp Giọng Đọc Studio, Nhạc Nền Thiền & Hiền Triết AI Socrates",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#F8F5EE",
+  "theme_color": "#181E1A",
+  "orientation": "any",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "assets/covers/suy-tuong.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/covers/dao-duc-kinh.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,660 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  MUTED
+  BANNED
+}
+
+enum TokenType {
+  VERIFY
+  RESET
+}
+
+enum BookAccessLevel {
+  FREE
+  PREMIUM
+}
+
+enum BookStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ChapterAccessLevel {
+  INHERIT
+  FREE
+  PREMIUM
+}
+
+enum ChapterStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum ShelfType {
+  WANT
+  READING
+  FINISHED
+}
+
+enum ReviewStatus {
+  VISIBLE
+  HIDDEN
+}
+
+enum CommentStatus {
+  VISIBLE
+  HIDDEN
+  DELETED
+}
+
+enum AiRole {
+  USER
+  MODEL
+}
+
+enum PaymentProvider {
+  VNPAY
+  MOMO
+  MANUAL
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  EXPIRED
+}
+
+enum SubscriptionSource {
+  PAYMENT
+  MANUAL
+}
+
+model User {
+  id               String            @id @default(cuid())
+  email            String            @unique @db.Citext
+  passwordHash     String            @map("password_hash")
+  displayName      String            @map("display_name")
+  avatarUrl        String?           @map("avatar_url")
+  bio              String?
+  status           UserStatus        @default(PENDING)
+  emailVerifiedAt  DateTime?         @map("email_verified_at")
+  xp               Int               @default(0)
+  level            Int               @default(1)
+  currentStreak    Int               @default(0) @map("current_streak")
+  longestStreak    Int               @default(0) @map("longest_streak")
+  lastReadDate     DateTime?         @map("last_read_date")
+  failedLoginCount Int               @default(0) @map("failed_login_count")
+  lockedUntil      DateTime?         @map("locked_until")
+  lastLoginAt      DateTime?         @map("last_login_at")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  deletedAt        DateTime?         @map("deleted_at")
+  sessions         Session[]
+  emailTokens      EmailToken[]
+  roles            UserRole[]
+  readingProgress  ReadingProgress[]
+  readingDays      ReadingDay[]
+  readingSessions  ReadingSession[]
+  bookshelfItems   BookshelfItem[]
+  highlights       Highlight[]
+  reviews          Review[]
+  comments         Comment[]
+  commentReports   CommentReport[]
+  userBadges       UserBadge[]
+  xpEvents         XpEvent[]
+  aiThreads        AiThread[]
+  aiUsageDaily     AiUsageDaily[]
+  orders           Order[]
+  subscriptions    Subscription[]
+
+  @@map("users")
+}
+
+model Session {
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  tokenHash  String    @unique @map("token_hash")
+  ip         String?
+  userAgent  String?   @map("user_agent")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastSeenAt DateTime  @updatedAt @map("last_seen_at")
+  expiresAt  DateTime  @map("expires_at")
+  revokedAt  DateTime? @map("revoked_at")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model EmailToken {
+  id        Int       @id @default(autoincrement())
+  userId    String    @map("user_id")
+  type      TokenType
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("email_tokens")
+}
+
+model Role {
+  id          Int              @id @default(autoincrement())
+  key         String           @unique
+  name        String
+  description String?
+  isSystem    Boolean          @default(false) @map("is_system")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  permissions RolePermission[]
+  users       UserRole[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          Int              @id @default(autoincrement())
+  key         String           @unique
+  group       String
+  description String?
+  roles       RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       Int        @map("role_id")
+  permissionId Int        @map("permission_id")
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  userId     String   @map("user_id")
+  roleId     Int      @map("role_id")
+  assignedBy String?  @map("assigned_by")
+  assignedAt DateTime @default(now()) @map("assigned_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  actorId    String?  @map("actor_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  before     Json?
+  after      Json?
+  ip         String?
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+model RateLimit {
+  key         String   @id
+  windowStart DateTime @map("window_start")
+  count       Int
+
+  @@map("rate_limits")
+}
+
+model Category {
+  id        String  @id
+  name      String
+  icon      String?
+  sortOrder Int     @default(0) @map("sort_order")
+  books     Book[]
+
+  @@map("categories")
+}
+
+model Philosopher {
+  id             String   @id
+  name           String
+  title          String?
+  era            String?
+  school         String?
+  avatarUrl      String?  @map("avatar_url")
+  fallbackAvatar String?  @map("fallback_avatar")
+  quote          String?
+  bio            String?
+  color          String?
+  createdBy      String?  @map("created_by")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  books          Book[]
+
+  @@map("philosophers")
+}
+
+model Book {
+  id                String            @id
+  slug              String            @unique
+  title             String
+  originalTitle     String?           @map("original_title")
+  author            String
+  authorRole        String?           @map("author_role")
+  school            String?
+  categoryId        String?           @map("category_id")
+  philosopherId     String?           @map("philosopher_id")
+  readTime          Int?              @map("read_time")
+  audioDuration     Int?              @map("audio_duration")
+  year              String?
+  rating            Float             @default(5.0)
+  ratingAvg         Float?            @map("rating_avg")
+  ratingCount       Int               @default(0) @map("rating_count")
+  readersCount      String            @default("0") @map("readers_count")
+  featured          Boolean           @default(false)
+  accessLevel       BookAccessLevel   @default(FREE) @map("access_level")
+  previewParagraphs Int               @default(3) @map("preview_paragraphs")
+  tagline           String?
+  coverImage        String?           @map("cover_image")
+  fallbackCover     String?           @map("fallback_cover")
+  bgmTheme          String?           @map("bgm_theme")
+  studioAudioUrl    String?           @map("studio_audio_url")
+  coverThemeJson    Json?             @map("cover_theme_json")
+  summary           String?
+  status            BookStatus        @default(DRAFT)
+  createdBy         String?           @map("created_by")
+  updatedBy         String?           @map("updated_by")
+  publishedAt       DateTime?         @map("published_at")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  category          Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  philosopher       Philosopher?      @relation(fields: [philosopherId], references: [id], onDelete: SetNull)
+  chapters          Chapter[]
+  quotes            Quote[]
+  readingProgress   ReadingProgress[]
+  readingSessions   ReadingSession[]
+  bookshelfItems    BookshelfItem[]
+  reviews           Review[]
+  comments          Comment[]
+  aiThreads         AiThread[]
+
+  @@index([categoryId])
+  @@index([philosopherId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("books")
+}
+
+model Chapter {
+  id                 String             @id
+  bookId             String             @map("book_id")
+  chapterIndex       Int                @map("chapter_index")
+  chapterNumber      String?            @map("chapter_number")
+  title              String
+  subtitle           String?
+  content            Json
+  readingTimeMinutes Int                @default(5) @map("reading_time_minutes")
+  audioUrl           String?            @map("audio_url")
+  takeaways          Json?
+  accessLevel        ChapterAccessLevel @default(INHERIT) @map("access_level")
+  status             ChapterStatus      @default(DRAFT)
+  isPublished        Boolean            @default(true) @map("is_published")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+  book               Book               @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  readingProgress    ReadingProgress[]
+  readingSessions    ReadingSession[]
+  highlights         Highlight[]
+  comments           Comment[]
+  aiThreads          AiThread[]
+
+  @@unique([bookId, chapterIndex])
+  @@index([bookId])
+  @@index([status])
+  @@map("chapters")
+}
+
+model Quote {
+  id           Int      @id @default(autoincrement())
+  quote        String
+  author       String
+  school       String?
+  context      String?
+  bookId       String?  @map("book_id")
+  isDailyQuote Boolean  @default(false) @map("is_daily_quote")
+  sharesCount  Int      @default(0) @map("shares_count")
+  createdBy    String?  @map("created_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+  book         Book?    @relation(fields: [bookId], references: [id], onDelete: SetNull)
+
+  @@index([bookId])
+  @@map("quotes")
+}
+
+model SystemSetting {
+  key   String @id
+  value Json
+
+  @@map("system_settings")
+}
+
+model ReadingProgress {
+  userId         String   @map("user_id")
+  bookId         String   @map("book_id")
+  chapterId      String?  @map("chapter_id")
+  paragraphIndex Int?     @map("paragraph_index")
+  progressPct    Int      @default(0) @map("progress_pct")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book           Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  chapter        Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  @@id([userId, bookId])
+  @@index([userId])
+  @@index([bookId])
+  @@map("reading_progress")
+}
+
+model ReadingDay {
+  userId      String   @map("user_id")
+  date        DateTime @db.Date
+  secondsRead Int      @default(0) @map("seconds_read")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, date])
+  @@index([userId])
+  @@map("reading_days")
+}
+
+model ReadingSession {
+  id              Int      @id @default(autoincrement())
+  userId          String?  @map("user_id")
+  bookId          String   @map("book_id")
+  chapterId       String?  @map("chapter_id")
+  durationSeconds Int      @map("duration_seconds")
+  scrollDepth     Int?     @map("scroll_depth")
+  device          String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  book            Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  chapter         Chapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([bookId])
+  @@map("reading_sessions")
+}
+
+model BookshelfItem {
+  userId     String    @map("user_id")
+  bookId     String    @map("book_id")
+  shelf      ShelfType
+  isFavorite Boolean   @default(false) @map("is_favorite")
+  addedAt    DateTime  @default(now()) @map("added_at")
+  finishedAt DateTime? @map("finished_at")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book       Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@id([userId, bookId])
+  @@index([userId])
+  @@index([bookId])
+  @@map("bookshelf_items")
+}
+
+model Highlight {
+  id             String   @id @default(cuid())
+  userId         String   @map("user_id")
+  chapterId      String   @map("chapter_id")
+  paragraphIndex Int      @map("paragraph_index")
+  startOffset    Int      @map("start_offset")
+  endOffset      Int      @map("end_offset")
+  quoteText      String   @map("quote_text")
+  color          String   @default("yellow")
+  note           String?
+  isPrivate      Boolean  @default(true) @map("is_private")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chapter        Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([chapterId])
+  @@map("highlights")
+}
+
+model Review {
+  id        Int          @id @default(autoincrement())
+  userId    String       @map("user_id")
+  bookId    String       @map("book_id")
+  rating    Int
+  content   String?
+  status    ReviewStatus @default(VISIBLE)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book         @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@index([userId])
+  @@index([bookId])
+  @@index([status])
+  @@map("reviews")
+}
+
+model Comment {
+  id          Int             @id @default(autoincrement())
+  userId      String          @map("user_id")
+  bookId      String          @map("book_id")
+  chapterId   String?         @map("chapter_id")
+  parentId    Int?            @map("parent_id")
+  content     String
+  status      CommentStatus   @default(VISIBLE)
+  reportCount Int             @default(0) @map("report_count")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  editedAt    DateTime?       @map("edited_at")
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book        Book            @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  chapter     Chapter?        @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  parent      Comment?        @relation("CommentToComment", fields: [parentId], references: [id], onDelete: SetNull)
+  replies     Comment[]       @relation("CommentToComment")
+  reports     CommentReport[]
+
+  @@index([userId])
+  @@index([bookId])
+  @@index([parentId])
+  @@index([status])
+  @@map("comments")
+}
+
+model CommentReport {
+  id         Int       @id @default(autoincrement())
+  commentId  Int       @map("comment_id")
+  reporterId String    @map("reporter_id")
+  reason     String?
+  createdAt  DateTime  @default(now()) @map("created_at")
+  resolvedBy String?   @map("resolved_by")
+  resolvedAt DateTime? @map("resolved_at")
+  comment    Comment   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reporter   User      @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, reporterId])
+  @@index([commentId])
+  @@index([reporterId])
+  @@map("comment_reports")
+}
+
+model BannedWord {
+  id        Int     @id @default(autoincrement())
+  word      String  @unique
+  createdBy String? @map("created_by")
+
+  @@map("banned_words")
+}
+
+model Badge {
+  id          Int         @id @default(autoincrement())
+  key         String      @unique
+  name        String
+  description String?
+  icon        String?
+  rule        Json?
+  userBadges  UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  userId   String   @map("user_id")
+  badgeId  Int      @map("badge_id")
+  earnedAt DateTime @default(now()) @map("earned_at")
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, badgeId])
+  @@map("user_badges")
+}
+
+model XpEvent {
+  id        Int      @id @default(autoincrement())
+  userId    String   @map("user_id")
+  type      String
+  amount    Int
+  refKey    String   @unique @map("ref_key")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("xp_events")
+}
+
+model AiThread {
+  id        String      @id @default(cuid())
+  userId    String      @map("user_id")
+  bookId    String?     @map("book_id")
+  chapterId String?     @map("chapter_id")
+  title     String?
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book?       @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  chapter   Chapter?    @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  messages  AiMessage[]
+
+  @@index([userId])
+  @@index([bookId])
+  @@map("ai_threads")
+}
+
+model AiMessage {
+  id        Int      @id @default(autoincrement())
+  threadId  String   @map("thread_id")
+  role      AiRole
+  content   String
+  tokensIn  Int?     @map("tokens_in")
+  tokensOut Int?     @map("tokens_out")
+  createdAt DateTime @default(now()) @map("created_at")
+  thread    AiThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@map("ai_messages")
+}
+
+model AiUsageDaily {
+  userId String   @map("user_id")
+  date   DateTime @db.Date
+  count  Int      @default(0)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, date])
+  @@index([userId])
+  @@map("ai_usage_daily")
+}
+
+model Plan {
+  id            Int            @id @default(autoincrement())
+  code          String         @unique
+  name          String
+  durationDays  Int            @map("duration_days")
+  priceVnd      Int            @map("price_vnd")
+  isActive      Boolean        @default(true) @map("is_active")
+  features      Json?
+  orders        Order[]
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Order {
+  id            String               @id @default(cuid())
+  code          String               @unique
+  userId        String               @map("user_id")
+  planId        Int                  @map("plan_id")
+  amountVnd     Int                  @map("amount_vnd")
+  provider      PaymentProvider
+  status        OrderStatus          @default(PENDING)
+  createdAt     DateTime             @default(now()) @map("created_at")
+  paidAt        DateTime?            @map("paid_at")
+  expiresAt     DateTime?            @map("expires_at")
+  user          User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan          Plan                 @relation(fields: [planId], references: [id], onDelete: Cascade)
+  transactions  PaymentTransaction[]
+  subscriptions Subscription[]
+
+  @@index([userId])
+  @@index([planId])
+  @@index([status])
+  @@map("orders")
+}
+
+model PaymentTransaction {
+  id             Int             @id @default(autoincrement())
+  orderId        String          @map("order_id")
+  provider       PaymentProvider
+  providerTxnId  String?         @map("provider_txn_id")
+  event          String
+  payload        Json?
+  signatureValid Boolean?        @map("signature_valid")
+  resultCode     String?         @map("result_code")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  order          Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("payment_transactions")
+}
+
+model Subscription {
+  id        Int                @id @default(autoincrement())
+  userId    String             @map("user_id")
+  planId    Int?               @map("plan_id")
+  orderId   String?            @map("order_id")
+  startsAt  DateTime           @map("starts_at")
+  expiresAt DateTime           @map("expires_at")
+  source    SubscriptionSource @default(PAYMENT)
+  grantedBy String?            @map("granted_by")
+  createdAt DateTime           @default(now()) @map("created_at")
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan      Plan?              @relation(fields: [planId], references: [id], onDelete: SetNull)
+  order     Order?             @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([planId])
+  @@index([orderId])
+  @@map("subscriptions")
+}

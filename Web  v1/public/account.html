@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài khoản - Sopia Codex</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        parchment: { 50: '#fbfaf8', 100: '#f6f3eb', 200: '#eee8d5', 300: '#e1d5b3', 400: '#d2be8c', 500: '#c5a86a', 600: '#b78f4f', 700: '#99713e', 800: '#7f5e38', 900: '#674d30' },
+                        emerald: { 800: '#065f46', 900: '#064e3b', 950: '#022c22' },
+                        gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Source Serif 4', 'serif'],
+                        display: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .tab-btn.active { color: #064e3b; border-bottom-color: #064e3b; font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-parchment-100 text-slate-800 font-serif antialiased min-h-screen">
+    <!-- Navigation (simplified for account page) -->
+    <header class="bg-white/90 backdrop-blur border-b border-parchment-300 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 group">
+                <div class="w-8 h-8 rounded-full bg-emerald-950 text-parchment-100 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <i data-lucide="feather" class="w-4 h-4"></i>
+                </div>
+                <span class="font-display font-bold text-xl text-emerald-950">Sophia Codex</span>
+            </a>
+            <div class="flex items-center gap-4 font-sans text-sm">
+                <a href="/" class="text-slate-600 hover:text-emerald-900 transition-colors">Về Trang chủ</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex text-sm font-sans text-slate-500 mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="/" class="hover:text-emerald-900 transition-colors">Trang chủ</a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i data-lucide="chevron-right" class="w-4 h-4 mx-1"></i>
+                        <span class="text-slate-800 font-medium">Tài khoản</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <h1 class="font-display text-3xl font-bold text-emerald-950 mb-8">Quản lý Tài khoản</h1>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-2xl shadow-sm border border-parchment-200 overflow-hidden">
+            <div class="border-b border-parchment-200 bg-parchment-50 overflow-x-auto">
+                <nav class="flex px-4 font-sans text-sm" id="tabsNav">
+                    <button class="tab-btn active px-4 py-4 border-b-2 border-transparent text-slate-500 hover:text-emerald-900 transition-colors whitespace-nowrap" data-target="tab-profile">
+                        <i data-lucide="user" class="w-4 h-4 inline-block mr-2 align-text-bottom"></i>Hồ sơ cá nhân
+                    </button>
+                    <button class="tab-btn px-4 py-4 border-b-2 border-transparent text-slate-500 hover:text-emerald-900 transition-colors whitespace-nowrap" data-target="tab-security">
+                        <i data-lucide="shield" class="w-4 h-4 inline-block mr-2 align-text-bottom"></i>Bảo mật & Đăng nhập
+                    </button>
+                    <button class="tab-btn px-4 py-4 border-b-2 border-transparent text-slate-500 hover:text-emerald-900 transition-colors whitespace-nowrap" data-target="tab-subscription">
+                        <i data-lucide="crown" class="w-4 h-4 inline-block mr-2 align-text-bottom"></i>Gói đọc & Hội viên
+                    </button>
+                </nav>
+            </div>
+
+            <div class="p-6 md:p-8">
+                <!-- Tab 1: Profile -->
+                <div id="tab-profile" class="tab-content active">
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <div class="flex-shrink-0 flex flex-col items-center">
+                            <div class="w-32 h-32 rounded-full bg-parchment-300 border-4 border-white shadow-md overflow-hidden relative mb-4">
+                                <img src="https://ui-avatars.com/api/?name=Reader&background=c5a86a&color=fff&size=128" alt="Avatar" id="userAvatar" class="w-full h-full object-cover">
+                            </div>
+                            <button class="text-sm font-sans text-emerald-800 hover:text-emerald-950 font-medium">Thay đổi Ảnh</button>
+                            
+                            <div class="mt-6 w-full bg-parchment-100 rounded-xl p-4 text-center">
+                                <span class="block text-xs font-sans text-slate-500 uppercase tracking-wider font-semibold mb-1">Cấp độ Độc giả</span>
+                                <span class="font-display text-lg text-emerald-950 font-bold" id="userLevel">Cấp 3: Chiêm Nghiệm</span>
+                                <div class="w-full bg-parchment-300 h-2 rounded-full mt-2 mb-1 overflow-hidden">
+                                    <div class="bg-gold-500 h-full rounded-full" style="width: 65%"></div>
+                                </div>
+                                <span class="text-xs font-sans text-slate-500">650 / 1000 XP</span>
+                            </div>
+                            
+                            <div class="mt-4 w-full bg-white border border-parchment-200 rounded-xl p-4 flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="flame" class="w-5 h-5 text-orange-500"></i>
+                                    <span class="text-sm font-sans font-medium">Chuỗi đọc</span>
+                                </div>
+                                <span class="font-display font-bold text-lg">12 ngày</span>
+                            </div>
+                        </div>
+
+                        <div class="flex-grow">
+                            <h2 class="font-display text-xl font-bold text-emerald-950 mb-4 border-b border-parchment-200 pb-2">Thông tin chung</h2>
+                            
+                            <form id="profileForm" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 font-sans mb-1">Họ tên hiển thị</label>
+                                    <input type="text" id="displayName" class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm bg-white">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 font-sans mb-1">Email</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="email" id="userEmail" disabled class="block w-full px-3 py-2 border border-parchment-300 rounded-lg bg-parchment-50 font-sans sm:text-sm text-slate-500">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 whitespace-nowrap" id="emailBadge">Đã xác thực</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 font-sans mb-1">Tiểu sử (Sự quan tâm)</label>
+                                    <textarea id="bio" rows="4" class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm bg-white" placeholder="Triết học cổ đại, Stoicism..."></textarea>
+                                </div>
+
+                                <div class="pt-2">
+                                    <button type="submit" class="inline-flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-emerald-900 hover:bg-emerald-950 font-sans transition-colors">
+                                        Lưu thay đổi
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Security -->
+                <div id="tab-security" class="tab-content">
+                    <div class="max-w-2xl">
+                        <h2 class="font-display text-xl font-bold text-emerald-950 mb-4 border-b border-parchment-200 pb-2">Đổi mật khẩu</h2>
+                        <form id="passwordForm" class="space-y-4 mb-10">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 font-sans mb-1">Mật khẩu hiện tại</label>
+                                <input type="password" required class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 font-sans mb-1">Mật khẩu mới</label>
+                                <input type="password" required class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 font-sans mb-1">Xác nhận mật khẩu mới</label>
+                                <input type="password" required class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm">
+                            </div>
+                            <div class="pt-2">
+                                <button type="submit" class="inline-flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-emerald-900 hover:bg-emerald-950 font-sans transition-colors">
+                                    Cập nhật mật khẩu
+                                </button>
+                            </div>
+                        </form>
+
+                        <h2 class="font-display text-xl font-bold text-emerald-950 mb-4 border-b border-parchment-200 pb-2">Thiết bị & Phiên đăng nhập</h2>
+                        <div class="space-y-3 mb-6">
+                            <!-- Current session -->
+                            <div class="flex items-center justify-between p-3 border border-parchment-300 rounded-lg bg-parchment-50">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-emerald-100 text-emerald-900 rounded-lg">
+                                        <i data-lucide="laptop" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-sans text-sm font-medium text-slate-800">Windows • Chrome <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">Phiên này</span></p>
+                                        <p class="font-sans text-xs text-slate-500">IP: 192.168.1.1 • Mới đây</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Other session -->
+                            <div class="flex items-center justify-between p-3 border border-parchment-200 rounded-lg bg-white">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-slate-100 text-slate-600 rounded-lg">
+                                        <i data-lucide="smartphone" class="w-5 h-5"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-sans text-sm font-medium text-slate-800">iPhone • Safari</p>
+                                        <p class="font-sans text-xs text-slate-500">IP: 114.12.x.x • Hôm qua</p>
+                                    </div>
+                                </div>
+                                <button class="text-sm font-sans font-medium text-red-600 hover:text-red-800">Đăng xuất</button>
+                            </div>
+                        </div>
+                        <button class="text-sm font-sans font-medium text-emerald-800 hover:text-emerald-950 border border-emerald-800 rounded-lg px-4 py-2 hover:bg-emerald-50 transition-colors">
+                            Đăng xuất khỏi tất cả thiết bị khác
+                        </button>
+
+                        <div class="mt-12 p-4 border border-red-200 bg-red-50 rounded-xl">
+                            <h3 class="text-red-800 font-medium font-sans mb-1">Khu vực Nguy hiểm</h3>
+                            <p class="text-sm font-sans text-red-600 mb-3">Xóa vĩnh viễn tài khoản và mọi dữ liệu đọc (dấu trang, ghi chú). Không thể khôi phục.</p>
+                            <button class="text-sm font-sans font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg px-4 py-2 transition-colors">
+                                Xóa tài khoản
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Subscription -->
+                <div id="tab-subscription" class="tab-content">
+                    <div class="bg-gradient-to-br from-emerald-900 to-emerald-950 rounded-2xl p-6 md:p-8 text-white relative overflow-hidden mb-8">
+                        <div class="absolute -top-24 -right-24 w-64 h-64 bg-gold-500 rounded-full mix-blend-multiply opacity-20 filter blur-3xl"></div>
+                        
+                        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div>
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur border border-white/30 text-xs font-medium mb-3">
+                                    <i data-lucide="star" class="w-3.5 h-3.5 text-gold-400"></i> Gói hiện tại
+                                </div>
+                                <h2 class="font-display text-3xl font-bold mb-1">Hội viên Thường</h2>
+                                <p class="font-sans text-emerald-100 text-sm">Truy cập giới hạn thư viện triết học cơ bản.</p>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <a href="/pricing.html" class="inline-flex items-center justify-center py-2.5 px-6 border border-transparent rounded-lg shadow-lg text-sm font-medium text-emerald-950 bg-gold-500 hover:bg-gold-400 font-sans transition-colors">
+                                    Nâng cấp Premium
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="font-display text-xl font-bold text-emerald-950 mb-4 border-b border-parchment-200 pb-2">Lịch sử giao dịch</h3>
+                    <div class="text-center py-8 text-slate-500 font-sans text-sm bg-parchment-50 rounded-lg border border-parchment-200 border-dashed">
+                        Chưa có giao dịch nào.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/core/api.js"></script>
+    <script src="/js/core/auth.js"></script>
+    <script src="/js/core/dom.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Tabs Logic
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.getAttribute('data-target')).classList.add('active');
+            });
+        });
+
+        // Auth Logic
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof Auth === 'undefined') {
+                console.warn("Auth module not loaded. Using demo mode.");
+                return;
+            }
+
+            try {
+                const user = await Auth.loadMe();
+                if (!user) {
+                    window.location.href = '/login.html?next=/account.html';
+                    return;
+                }
+                
+                // Populate data
+                document.getElementById('displayName').value = user.name || '';
+                document.getElementById('userEmail').value = user.email || '';
+                
+                // Example handling of verified badge
+                const badge = document.getElementById('emailBadge');
+                if (user.isVerified) {
+                    badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 whitespace-nowrap";
+                    badge.innerText = "Đã xác thực";
+                } else {
+                    badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap";
+                    badge.innerText = "Chưa xác thực";
+                }
+
+            } catch (err) {
+                console.error("Auth check failed", err);
+                window.location.href = '/login.html?next=/account.html';
+            }
+        });
+    </script>
+</body>
+</html>

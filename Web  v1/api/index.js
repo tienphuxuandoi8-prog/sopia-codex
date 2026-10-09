@@ -1,16 +1,5 @@
-/**
- * VERCEL SERVERLESS FUNCTION HANDLER
- * Chuyển tiếp các yêu cầu /api/* sang Node.js HTTP server handler
- */
+// Vercel serverless function entry point
+const app = require('../src/app');
 
-const server = require('../server/index.js');
-
-module.exports = (req, res) => {
-  const handler = server.listeners('request')[0];
-  if (handler) {
-    handler(req, res);
-  } else {
-    res.statusCode = 500;
-    res.end('Server handler not initialized');
-  }
-};
+// Xuất app Express như là một hàm xử lý để Vercel sử dụng
+module.exports = app;

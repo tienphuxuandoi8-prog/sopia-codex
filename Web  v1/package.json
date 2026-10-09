@@ -1,23 +1,55 @@
 {
   "name": "sophia-codex",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Thư Viện Triết Học Toàn Văn & Chiêm Nghiệm Thông Minh",
-  "main": "server/index.js",
-  "scripts": {
-    "start": "node server/index.js",
-    "test": "node scripts/test-e2e.js",
-    "test:admin": "node scripts/test-admin-e2e.js",
-    "test:prod": "node scripts/test-production-ready.js"
-  },
+  "main": "src/server.local.js",
   "engines": {
     "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"node --watch src/server.local.js\" \"npx tailwindcss -i src/styles/tailwind.css -o public/css/app.css --watch\"",
+    "start": "node src/server.local.js",
+    "build:css": "npx tailwindcss -i src/styles/tailwind.css -o public/css/app.css --minify",
+    "db:migrate": "npx prisma migrate deploy",
+    "db:migrate:dev": "npx prisma migrate dev",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "npx prisma studio",
+    "db:generate": "npx prisma generate",
+    "postinstall": "npx prisma generate",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "echo TODO"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "@node-rs/argon2": "^2.0.2",
+    "@prisma/client": "^6.5.0",
+    "@supabase/supabase-js": "^2.49.4",
+    "compression": "^1.8.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.6",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "multer": "^2.4.0",
+    "pino": "^9.6.0",
+    "resend": "^4.5.1",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prisma": "^6.5.0",
+    "supertest": "^7.1.0",
+    "tailwindcss": "^3.4.17",
+    "vitest": "^3.1.1"
   },
   "keywords": [
     "philosophy",
     "sophia-codex",
-    "sqlite",
+    "postgres",
     "socrates-ai",
-    "audiobook"
+    "audiobook",
+    "rbac"
   ],
   "author": "Sophia Codex",
   "license": "MIT"
