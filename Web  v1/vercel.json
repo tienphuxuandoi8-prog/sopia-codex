@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:css && npx prisma generate",
+  "buildCommand": "npm run build",
   "outputDirectory": "public",
   "functions": {
     "api/index.js": {

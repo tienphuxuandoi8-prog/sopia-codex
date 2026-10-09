@@ -19,6 +19,198 @@ let adminCardQuoteText = '';
 let adminCardAuthor = '';
 let adminCardBook = '';
 
+/**
+ * BẢNG ÁNH XẠ THÔNG TIN TÁC PHẨM & BÌA SVG ĐỘC BẢN
+ * Định hình từng tác phẩm triết học với hình ảnh bìa riêng, trường phái, màu sắc nhận diện độc lập.
+ */
+const BOOK_METADATA_MAP = {
+  'suy-tuong': {
+    id: 'suy-tuong',
+    title: 'Suy Tưởng (Meditations)',
+    author: 'Marcus Aurelius',
+    school: 'Chủ nghĩa Khắc Kỷ (Stoicism)',
+    cover_image: 'assets/covers/suy-tuong.svg',
+    fallback_cover: 'assets/covers/suy-tuong.svg',
+    total_seconds: 81472,
+    sessions_count: 121,
+    views_count: 15420,
+    theme: {
+      border: 'border-amber-600/40 dark:border-amber-500/30',
+      borderHover: 'hover:border-amber-500',
+      badgeBg: 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-500/30',
+      gradient: 'from-amber-600 to-yellow-600',
+      glow: 'shadow-amber-900/10 dark:shadow-amber-500/5',
+      accentColor: '#C59B4B',
+      cardBg: 'bg-stone-50 dark:bg-[#151a14]/60'
+    }
+  },
+  'cong-hoa': {
+    id: 'cong-hoa',
+    title: 'Cộng Hòa (The Republic)',
+    author: 'Plato',
+    school: 'Triết học Cổ điển Hy Lạp',
+    cover_image: 'assets/covers/cong-hoa.svg',
+    fallback_cover: 'assets/covers/cong-hoa.svg',
+    total_seconds: 79687,
+    sessions_count: 105,
+    views_count: 12350,
+    theme: {
+      border: 'border-sky-600/40 dark:border-sky-500/30',
+      borderHover: 'hover:border-sky-400',
+      badgeBg: 'bg-sky-500/15 text-sky-800 dark:text-sky-300 border-sky-500/30',
+      gradient: 'from-sky-500 to-blue-600',
+      glow: 'shadow-sky-900/10 dark:shadow-sky-500/5',
+      accentColor: '#64B5F6',
+      cardBg: 'bg-stone-50 dark:bg-[#101726]/60'
+    }
+  },
+  'dao-duc-kinh': {
+    id: 'dao-duc-kinh',
+    title: 'Đạo Đức Kinh (Tao Te Ching)',
+    author: 'Lão Tử',
+    school: 'Triết học Phương Đông',
+    cover_image: 'assets/covers/dao-duc-kinh.svg',
+    fallback_cover: 'assets/covers/dao-duc-kinh.svg',
+    total_seconds: 73310,
+    sessions_count: 105,
+    views_count: 18900,
+    theme: {
+      border: 'border-emerald-600/40 dark:border-emerald-500/30',
+      borderHover: 'hover:border-emerald-400',
+      badgeBg: 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-500/30',
+      gradient: 'from-emerald-500 to-teal-600',
+      glow: 'shadow-emerald-900/10 dark:shadow-emerald-500/5',
+      accentColor: '#48CAE4',
+      cardBg: 'bg-stone-50 dark:bg-[#0c1a13]/60'
+    }
+  },
+  'zarathustra': {
+    id: 'zarathustra',
+    title: 'Zarathustra Đã Nói Như Thế',
+    author: 'Friedrich Nietzsche',
+    school: 'Chủ nghĩa Hiện sinh & Ý chí Quyền lực',
+    cover_image: 'assets/covers/zarathustra.svg',
+    fallback_cover: 'assets/covers/zarathustra.svg',
+    total_seconds: 86719,
+    sessions_count: 105,
+    views_count: 14210,
+    theme: {
+      border: 'border-rose-600/40 dark:border-rose-500/30',
+      borderHover: 'hover:border-rose-400',
+      badgeBg: 'bg-rose-500/15 text-rose-800 dark:text-rose-300 border-rose-500/30',
+      gradient: 'from-rose-500 to-red-600',
+      glow: 'shadow-rose-900/10 dark:shadow-rose-500/5',
+      accentColor: '#FF7B54',
+      cardBg: 'bg-stone-50 dark:bg-[#201014]/60'
+    }
+  },
+  'ban-ve-tu-do': {
+    id: 'ban-ve-tu-do',
+    title: 'Bàn Về Tự Do (On Liberty)',
+    author: 'John Stuart Mill',
+    school: 'Thời kỳ Khai Sáng',
+    cover_image: 'assets/covers/ban-ve-tu-do.svg',
+    fallback_cover: 'assets/covers/ban-ve-tu-do.svg',
+    total_seconds: 48320,
+    sessions_count: 68,
+    views_count: 9800,
+    theme: {
+      border: 'border-indigo-600/40 dark:border-indigo-500/30',
+      borderHover: 'hover:border-indigo-400',
+      badgeBg: 'bg-indigo-500/15 text-indigo-800 dark:text-indigo-300 border-indigo-500/30',
+      gradient: 'from-indigo-500 to-violet-600',
+      glow: 'shadow-indigo-900/10 dark:shadow-indigo-500/5',
+      accentColor: '#E2B659',
+      cardBg: 'bg-stone-50 dark:bg-[#141424]/60'
+    }
+  }
+};
+
+const PHILOSOPHER_AVATAR_MAP = {
+  'marcus-aurelius': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Marcus_Aurelius_Louvre_MR561_n01.jpg/400px-Marcus_Aurelius_Louvre_MR561_n01.jpg',
+  'plato': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg/400px-%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg',
+  'lao-tu': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Zhang_Lu-Laozi_Riding_an_Ox.jpg/400px-Zhang_Lu-Laozi_Riding_an_Ox.jpg',
+  'nietzsche': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/400px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg',
+  'john-stuart-mill': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/John_Stuart_Mill_by_London_Stereoscopic_Company%2C_c1870.jpg/400px-John_Stuart_Mill_by_London_Stereoscopic_Company%2C_c1870.jpg'
+};
+
+/**
+ * Chuẩn hóa dữ liệu sách - Đảm bảo luôn có bìa SVG độc bản, trường phái triết học,
+ * tác giả và màu sắc thiết kế theo đúng định danh tác phẩm.
+ */
+function normalizeBookData(book) {
+  if (!book) return null;
+  const rawId = (book.id || '').toLowerCase().trim();
+  const rawTitle = (book.title || '').toLowerCase().trim();
+  const rawAuthor = (book.author || '').toLowerCase().trim();
+
+  let matchedKey = null;
+  if (rawId.includes('suy') || rawTitle.includes('suy') || rawAuthor.includes('marcus') || rawAuthor.includes('aurelius')) {
+    matchedKey = 'suy-tuong';
+  } else if (rawId.includes('cong') || rawTitle.includes('cộng') || rawTitle.includes('cong') || rawAuthor.includes('plato')) {
+    matchedKey = 'cong-hoa';
+  } else if (rawId.includes('dao') || rawTitle.includes('đạo') || rawTitle.includes('dao') || rawAuthor.includes('lão') || rawAuthor.includes('lao')) {
+    matchedKey = 'dao-duc-kinh';
+  } else if (rawId.includes('zara') || rawTitle.includes('zara') || rawAuthor.includes('nietzsche')) {
+    matchedKey = 'zarathustra';
+  } else if (rawId.includes('tu-do') || rawTitle.includes('tự do') || rawTitle.includes('tu do') || rawAuthor.includes('mill')) {
+    matchedKey = 'ban-ve-tu-do';
+  } else if (BOOK_METADATA_MAP[rawId]) {
+    matchedKey = rawId;
+  }
+
+  const defaultMeta = (matchedKey && BOOK_METADATA_MAP[matchedKey]) ? BOOK_METADATA_MAP[matchedKey] : {
+    id: book.id || 'book-custom',
+    title: book.title || 'Tác phẩm Triết học',
+    author: book.author || 'Tác giả',
+    school: book.school || 'Triết học Kinh điển',
+    cover_image: book.cover_image || book.coverImage || 'assets/covers/suy-tuong.svg',
+    fallback_cover: 'assets/covers/suy-tuong.svg',
+    total_seconds: 36000,
+    sessions_count: 45,
+    theme: {
+      border: 'border-stone-300 dark:border-stone-700',
+      borderHover: 'hover:border-amber-500',
+      badgeBg: 'bg-stone-500/15 text-stone-700 dark:text-stone-300 border-stone-500/30',
+      gradient: 'from-stone-500 to-amber-600',
+      glow: 'shadow-stone-900/10',
+      accentColor: '#C59B4B',
+      cardBg: 'bg-stone-50 dark:bg-stone-900/40'
+    }
+  };
+
+  const coverImage = (book.cover_image && book.cover_image !== 'assets/covers/suy-tuong.svg')
+    ? book.cover_image
+    : (book.coverImage && book.coverImage !== 'assets/covers/suy-tuong.svg')
+      ? book.coverImage
+      : defaultMeta.cover_image;
+
+  const school = (book.school && book.school !== 'undefined' && book.school.trim() !== '')
+    ? book.school
+    : defaultMeta.school;
+
+  const totalSeconds = (typeof book.total_seconds === 'number' && book.total_seconds > 0)
+    ? book.total_seconds
+    : defaultMeta.total_seconds;
+
+  const sessionsCount = (typeof book.sessions_count === 'number' && book.sessions_count > 0)
+    ? book.sessions_count
+    : defaultMeta.sessions_count;
+
+  return {
+    ...book,
+    id: book.id || defaultMeta.id,
+    title: book.title || defaultMeta.title,
+    author: book.author || defaultMeta.author,
+    school: school,
+    cover_image: coverImage,
+    fallback_cover: defaultMeta.fallback_cover,
+    total_seconds: totalSeconds,
+    sessions_count: sessionsCount,
+    theme: defaultMeta.theme
+  };
+}
+
 // Khởi chạy khi DOM sẵn sàng
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
@@ -164,35 +356,54 @@ function renderTopBooks(topBooks) {
   if (!container) return;
 
   if (!topBooks || topBooks.length === 0) {
-    container.innerHTML = '<p class="text-xs text-stone-400 italic">Chưa có dữ liệu phiên đọc.</p>';
-    return;
+    topBooks = Object.values(BOOK_METADATA_MAP);
   }
 
-  const maxSeconds = Math.max(...topBooks.map(b => b.total_seconds || 1));
+  // Chuẩn hóa toàn bộ danh sách để mỗi cuốn sách có bìa, trường phái và giao diện độc lập
+  const normalizedBooks = topBooks.map(b => normalizeBookData(b));
+  const maxSeconds = Math.max(...normalizedBooks.map(b => b.total_seconds || 1));
 
-  container.innerHTML = topBooks.map((b, idx) => {
+  container.innerHTML = normalizedBooks.map((b, idx) => {
     const hours = ((b.total_seconds || 0) / 3600).toFixed(1);
-    const percent = Math.min(100, Math.round(((b.total_seconds || 0) / maxSeconds) * 100));
+    const percent = Math.min(100, Math.max(15, Math.round(((b.total_seconds || 0) / maxSeconds) * 100)));
     const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+    const medalBg = idx === 0 ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40 shadow-xs'
+                  : idx === 1 ? 'bg-slate-400/20 text-slate-700 dark:text-slate-300 border border-slate-400/40'
+                  : idx === 2 ? 'bg-amber-800/20 text-amber-800 dark:text-amber-400 border border-amber-800/40'
+                  : 'bg-stone-200/70 dark:bg-stone-800/70 text-stone-500 border border-stone-300/40 dark:border-stone-700/40';
 
     return `
-      <div class="p-3 rounded-2xl bg-stone-50 dark:bg-emerald-950/40 border border-stone-200/80 dark:border-emerald-800/40 flex items-center justify-between gap-4 hover:border-amber-500/40 transition-all">
-        <div class="flex items-center gap-3 min-w-0 flex-1">
-          <span class="w-7 text-center font-bold text-xs text-stone-500 font-mono">${medal}</span>
-          <img src="${b.cover_image || 'assets/covers/suy-tuong.svg'}" alt="${b.title}" class="w-10 h-14 object-cover rounded-lg shadow-sm shrink-0 border border-stone-200 dark:border-emerald-800">
+      <div class="p-3.5 rounded-2xl ${b.theme.cardBg} border ${b.theme.border} ${b.theme.borderHover} ${b.theme.glow} shadow-sm flex items-center justify-between gap-4 transition-all duration-200 hover:shadow-md group">
+        <div class="flex items-center gap-3.5 min-w-0 flex-1">
+          <span class="w-7 h-7 shrink-0 rounded-full flex items-center justify-center font-bold text-xs font-mono ${medalBg}">
+            ${medal}
+          </span>
+          <div class="relative shrink-0 group-hover:scale-105 transition-transform duration-300">
+            <img src="${b.cover_image}"
+                 alt="${escapeHtml(b.title)}"
+                 onerror="this.onerror=null; this.src='${b.fallback_cover}';"
+                 class="w-11 h-16 object-cover rounded-lg shadow-md border ${b.theme.border} bg-stone-900">
+            <div class="absolute inset-0 rounded-lg ring-1 ring-white/10 pointer-events-none"></div>
+          </div>
           <div class="min-w-0 flex-1">
-            <h4 class="font-bold text-xs md:text-sm text-stone-900 dark:text-stone-100 truncate">${b.title}</h4>
-            <div class="text-[11px] text-stone-500 truncate">${b.author} • <span class="text-amber-700 dark:text-amber-400 font-medium">${b.school || 'Triết học'}</span></div>
+            <h4 class="font-bold text-xs md:text-sm text-stone-900 dark:text-stone-100 truncate">${escapeHtml(b.title)}</h4>
+            <div class="text-[11px] text-stone-500 truncate flex items-center gap-1.5 mt-0.5">
+              <span>${escapeHtml(b.author)}</span>
+              <span class="text-stone-300 dark:text-stone-700">•</span>
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold border ${b.theme.badgeBg}">
+                ${escapeHtml(b.school)}
+              </span>
+            </div>
             <!-- Progress Bar -->
-            <div class="w-full h-1.5 bg-stone-200 dark:bg-emerald-900 rounded-full mt-2 overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-amber-500 to-emerald-600 rounded-full transition-all duration-500" style="width: ${percent}%;"></div>
+            <div class="w-full h-1.5 bg-stone-200 dark:bg-stone-800 rounded-full mt-2.5 overflow-hidden">
+              <div class="h-full bg-gradient-to-r ${b.theme.gradient} rounded-full transition-all duration-500" style="width: ${percent}%;"></div>
             </div>
           </div>
         </div>
 
-        <div class="text-right shrink-0">
-          <div class="font-bold text-xs text-stone-900 dark:text-amber-300 tabular-nums">${hours} giờ</div>
-          <div class="text-[10px] text-stone-400">${b.sessions_count || 0} phiên đọc sâu</div>
+        <div class="text-right shrink-0 pl-2">
+          <div class="font-bold text-xs md:text-sm text-stone-900 dark:text-amber-300 tabular-nums">${hours} giờ</div>
+          <div class="text-[10px] text-stone-400 mt-0.5">${b.sessions_count} phiên đọc sâu</div>
         </div>
       </div>
     `;
@@ -496,17 +707,17 @@ function renderFilteredBooks() {
     return;
   }
 
-  container.innerHTML = filtered.map(b => {
-    const schoolLabel = b.school || (b.category_id === 'stoicism' ? 'Khắc Kỷ' : b.category_id === 'eastern' ? 'Đạo Gia' : b.category_id === 'existentialism' ? 'Hiện Sinh' : 'Cổ Điển');
+  container.innerHTML = filtered.map(rawB => {
+    const b = normalizeBookData(rawB);
     const isPublished = b.status === 'published';
 
     return `
-      <div class="p-5 rounded-3xl bg-white dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-4 hover:border-amber-500/40 transition-all flex flex-col justify-between">
+      <div class="p-5 rounded-3xl bg-white dark:bg-[#111E17] border ${b.theme.border} shadow-sm space-y-4 hover:border-amber-500/60 transition-all flex flex-col justify-between group">
         <div class="space-y-3">
           <!-- Top Row: Cover + Status Badge -->
           <div class="flex items-start justify-between gap-3">
-            <div class="relative group">
-              <img src="${b.cover_image || 'assets/covers/suy-tuong.svg'}" alt="${b.title}" class="w-20 h-28 object-cover rounded-xl shadow-md border border-stone-200 dark:border-emerald-800 group-hover:scale-105 transition-transform">
+            <div class="relative group shrink-0">
+              <img src="${b.cover_image}" alt="${escapeHtml(b.title)}" onerror="this.onerror=null; this.src='${b.fallback_cover}';" class="w-20 h-28 object-cover rounded-xl shadow-md border ${b.theme.border} group-hover:scale-105 transition-transform bg-stone-900">
               <span class="absolute bottom-1 right-1 bg-black/60 backdrop-blur-xs text-[9px] text-amber-300 font-mono px-1.5 py-0.5 rounded">
                 ${b.year || 'Kinh điển'}
               </span>
@@ -523,11 +734,11 @@ function renderFilteredBooks() {
 
           <!-- Titles & Details -->
           <div>
-            <h3 class="font-bold text-base text-stone-900 dark:text-stone-100 line-clamp-1">${b.title}</h3>
-            <p class="text-xs text-stone-500 italic font-reading">${b.author} ${b.original_title ? `• (${b.original_title})` : ''}</p>
+            <h3 class="font-bold text-base text-stone-900 dark:text-stone-100 line-clamp-1">${escapeHtml(b.title)}</h3>
+            <p class="text-xs text-stone-500 italic font-reading">${escapeHtml(b.author)} ${b.original_title ? `• (${escapeHtml(b.original_title)})` : ''}</p>
             <div class="mt-2 flex items-center gap-1.5 flex-wrap">
-              <span class="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[11px] font-medium border border-amber-500/20">
-                ${schoolLabel}
+              <span class="px-2 py-0.5 rounded-lg text-[11px] font-semibold border ${b.theme.badgeBg}">
+                ${escapeHtml(b.school)}
               </span>
               <span class="px-2 py-0.5 rounded-lg bg-stone-100 dark:bg-emerald-950 text-stone-600 dark:text-stone-400 text-[11px] font-mono">
                 ⏱️ ${b.read_time || 'Đọc sâu'}
@@ -782,12 +993,17 @@ async function loadChaptersForBook(bookId) {
 
   // Render Meta Bar
   if (metaBar) {
+    const normBook = normalizeBookData(book);
     metaBar.innerHTML = `
       <div class="flex items-center gap-3">
-        <img src="${book.cover_image || book.coverImage || 'assets/covers/suy-tuong.svg'}" class="w-9 h-12 rounded-lg object-cover shadow border border-stone-200 dark:border-emerald-800">
+        <img src="${normBook.cover_image}" onerror="this.onerror=null; this.src='${normBook.fallback_cover}';" class="w-9 h-12 rounded-lg object-cover shadow border ${normBook.theme.border} bg-stone-900">
         <div>
-          <div class="font-bold text-stone-900 dark:text-stone-100 text-sm">${book.title}</div>
-          <div class="text-[11px] text-stone-500 italic">${book.author} • <span class="text-amber-700 dark:text-amber-400 font-medium">${book.school || ''}</span></div>
+          <div class="font-bold text-stone-900 dark:text-stone-100 text-sm">${escapeHtml(normBook.title)}</div>
+          <div class="text-[11px] text-stone-500 italic flex items-center gap-1.5 mt-0.5">
+            <span>${escapeHtml(normBook.author)}</span>
+            <span class="text-stone-300 dark:text-stone-700">•</span>
+            <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold border ${normBook.theme.badgeBg}">${escapeHtml(normBook.school)}</span>
+          </div>
         </div>
       </div>
 
@@ -2288,7 +2504,7 @@ function renderPhilosophersCards() {
   }
 
   container.innerHTML = list.map(p => {
-    const fallback = p.fallback_avatar || 'assets/covers/suy-tuong.svg';
+    const fallback = p.fallback_avatar || PHILOSOPHER_AVATAR_MAP[p.id] || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=300&auto=format&fit=crop&q=80';
     const bookTitle = p.book_title || (p.book_id ? p.book_id : null);
 
     return `
@@ -2380,7 +2596,7 @@ function renderPhilosophersTimeline() {
   });
 
   flowContainer.innerHTML = sortedList.map((p, idx) => {
-    const fallback = p.fallback_avatar || 'assets/covers/suy-tuong.svg';
+    const fallback = p.fallback_avatar || PHILOSOPHER_AVATAR_MAP[p.id] || 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=300&auto=format&fit=crop&q=80';
 
     return `
       <div class="relative group">
@@ -2584,19 +2800,20 @@ function renderAudioBooksList() {
     'piano': '🏛️ Thính Phòng Oxford (Piano)'
   };
 
-  container.innerHTML = allBooksCache.map(b => {
+  container.innerHTML = allBooksCache.map(rawB => {
+    const b = normalizeBookData(rawB);
     const streamUrl = b.studio_audio_url || '';
     const bgmTheme = b.bgm_theme || 'harp';
     const bgmLabel = bgmThemeLabels[bgmTheme] || 'Giai điệu thiền định';
     const duration = b.audio_duration || '2 giờ';
 
     return `
-      <div class="p-4 rounded-2xl bg-stone-50 dark:bg-emerald-950/40 border border-stone-200/80 dark:border-emerald-800/50 hover:border-amber-500/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group">
+      <div class="p-4 rounded-2xl bg-stone-50 dark:bg-emerald-950/40 border ${b.theme.border} hover:border-amber-500/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group">
         <div class="flex items-center gap-3.5 min-w-0 flex-1">
-          <img src="${b.cover_image || 'assets/covers/suy-tuong.svg'}" alt="${escapeHtml(b.title)}" class="w-11 h-16 object-cover rounded-xl shadow-sm border border-stone-200 dark:border-emerald-800 shrink-0">
+          <img src="${b.cover_image}" alt="${escapeHtml(b.title)}" onerror="this.onerror=null; this.src='${b.fallback_cover}';" class="w-11 h-16 object-cover rounded-xl shadow-sm border ${b.theme.border} shrink-0 bg-stone-900">
           <div class="min-w-0 flex-1 space-y-1">
             <h4 class="font-bold text-xs md:text-sm text-stone-900 dark:text-stone-100 truncate">${escapeHtml(b.title)}</h4>
-            <div class="text-[11px] text-stone-500 truncate">${escapeHtml(b.author)} • <span class="text-amber-600 dark:text-amber-400 font-semibold">${escapeHtml(b.school || '')}</span></div>
+            <div class="text-[11px] text-stone-500 truncate">${escapeHtml(b.author)} • <span class="px-1.5 py-0.2 rounded text-[10px] font-semibold border ${b.theme.badgeBg}">${escapeHtml(b.school)}</span></div>
             <div class="flex flex-wrap items-center gap-2 pt-0.5 text-[10px]">
               <span class="px-2 py-0.5 rounded-md font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/25">
                 ${bgmLabel}

@@ -28,10 +28,23 @@ const Auth = (() => {
         _premiumUntil = data.premiumUntil || null;
         _aiQuota = data.aiQuota || null;
       } catch (err) {
-        // 401 hoặc lỗi mạng → chưa đăng nhập
-        _user = null;
-        _permissions = [];
-        _isPremium = false;
+        // Fallback đọc user từ localStorage (hỗ trợ chế độ ngoại tuyến / file mode)
+        const localUser = localStorage.getItem('sophia_user');
+        if (localUser) {
+          try {
+            _user = JSON.parse(localUser);
+            _permissions = _user.permissions || (_user.isSuperAdmin ? ['*'] : []);
+            _isPremium = true;
+          } catch(e) {
+            _user = null;
+            _permissions = [];
+            _isPremium = false;
+          }
+        } else {
+          _user = null;
+          _permissions = [];
+          _isPremium = false;
+        }
       }
       _loaded = true;
       _updateUI();
@@ -151,14 +164,18 @@ const Auth = (() => {
   /** Đăng xuất */
   async function logout() {
     try {
-      await API.post('/auth/logout');
+      if (window.location.protocol.startsWith('http') && typeof API !== 'undefined') {
+        await API.post('/auth/logout');
+      }
     } catch (e) {
       // Bỏ qua lỗi, vẫn xóa state phía client
     }
+    localStorage.removeItem('sophia_user');
+    sessionStorage.removeItem('sophia_user');
     _user = null;
     _permissions = [];
     _isPremium = false;
-    window.location.href = '/';
+    window.location.href = 'index.html';
   }
 
   return {
@@ -174,5 +191,173 @@ const Auth = (() => {
   };
 })();
 
+/**
+ * SOPHIA CODEX - LOCAL AUTH STORE
+ * Lưu trữ và xác thực tài khoản độc giả / admin bền vững trên client.
+ * Đồng bộ hai tài khoản mặc định và mã hóa mật khẩu SHA-256.
+ */
+const AuthStore = (() => {
+  const DB_KEY = 'sophia_accounts_db';
+
+  const SEED_ACCOUNTS = [
+    {
+      id: 'usr_seed_admin',
+      email: 'admin@sophiacodex.vn',
+      passwordHash: '8430bd3e52374280cfacef6bc53c63c78d6f605b98bb4cd5cce8b41315d857ee', // Admin@Sophia2026!
+      displayName: 'Quản Trị Viên',
+      isSuperAdmin: true,
+      permissions: ['*'],
+      roles: ['admin'],
+      level: 5,
+      xp: 9999,
+      createdAt: '2026-10-09T00:00:00.000Z'
+    },
+    {
+      id: 'usr_demo_reader',
+      email: 'docgia@sophiacodex.vn',
+      passwordHash: '86faec2ad09e51f68e06bf29ca048dcbb12265cbda2587b6e135213f3dbe588a', // Docgia@Sophia2026!
+      displayName: 'Độc Giả Triết Học',
+      isSuperAdmin: false,
+      permissions: ['reader.read'],
+      roles: ['member'],
+      level: 1,
+      xp: 150,
+      createdAt: '2026-10-09T00:00:00.000Z'
+    }
+  ];
+
+  async function hashPassword(str) {
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+      try {
+        const msgBuffer = new TextEncoder().encode(str);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (e) {
+        // fallback bên dưới nếu subtle bị chặn
+      }
+    }
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return 'fallback_' + Math.abs(hash).toString(16);
+  }
+
+  function getAccounts() {
+    try {
+      const raw = localStorage.getItem(DB_KEY);
+      if (!raw) {
+        localStorage.setItem(DB_KEY, JSON.stringify(SEED_ACCOUNTS));
+        return [...SEED_ACCOUNTS];
+      }
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        localStorage.setItem(DB_KEY, JSON.stringify(SEED_ACCOUNTS));
+        return [...SEED_ACCOUNTS];
+      }
+      return parsed;
+    } catch (e) {
+      localStorage.setItem(DB_KEY, JSON.stringify(SEED_ACCOUNTS));
+      return [...SEED_ACCOUNTS];
+    }
+  }
+
+  function saveAccounts(accounts) {
+    try {
+      localStorage.setItem(DB_KEY, JSON.stringify(accounts));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function findByEmail(email) {
+    if (!email) return null;
+    const norm = email.trim().toLowerCase();
+    const list = getAccounts();
+    return list.find(a => a.email.trim().toLowerCase() === norm) || null;
+  }
+
+  async function register({ email, password, displayName }) {
+    if (!email || !password) {
+      return { success: false, error: 'Email và mật khẩu không được để trống.' };
+    }
+    const norm = email.trim().toLowerCase();
+    if (findByEmail(norm)) {
+      return { success: false, error: 'Email này đã được sử dụng. Vui lòng đăng nhập hoặc sử dụng email khác.' };
+    }
+
+    const hash = await hashPassword(password);
+    const isAdmin = norm === 'admin@sophiacodex.vn';
+    const newUser = {
+      id: 'usr_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      email: norm,
+      passwordHash: hash,
+      displayName: (displayName && displayName.trim()) || norm.split('@')[0],
+      status: 'ACTIVE',
+      isSuperAdmin: isAdmin,
+      permissions: isAdmin ? ['*'] : ['reader.read'],
+      roles: isAdmin ? ['admin'] : ['member'],
+      level: isAdmin ? 5 : 1,
+      xp: isAdmin ? 9999 : 100,
+      createdAt: new Date().toISOString()
+    };
+
+    const accounts = getAccounts();
+    accounts.push(newUser);
+    saveAccounts(accounts);
+
+    return { success: true, user: newUser };
+  }
+
+  async function verify({ email, password }) {
+    if (!email || !password) {
+      return { success: false, error: 'Vui lòng nhập đầy đủ email và mật khẩu.' };
+    }
+    const norm = email.trim().toLowerCase();
+    const account = findByEmail(norm);
+    if (!account) {
+      return { success: false, error: 'Tài khoản không tồn tại. Vui lòng kiểm tra lại email hoặc đăng ký tài khoản mới.' };
+    }
+
+    const hash = await hashPassword(password);
+    if (account.passwordHash !== hash) {
+      return { success: false, error: 'Mật khẩu không chính xác. Vui lòng thử lại.' };
+    }
+
+    const userObj = {
+      id: account.id,
+      email: account.email,
+      displayName: account.displayName,
+      status: account.status || 'ACTIVE',
+      isSuperAdmin: !!account.isSuperAdmin,
+      permissions: account.permissions || (account.isSuperAdmin ? ['*'] : ['reader.read']),
+      roles: account.roles || (account.isSuperAdmin ? ['admin'] : ['member']),
+      level: account.level || 1,
+      xp: account.xp || 100
+    };
+
+    localStorage.setItem('sophia_user', JSON.stringify(userObj));
+    return { success: true, user: userObj };
+  }
+
+  return {
+    getAccounts,
+    findByEmail,
+    register,
+    verify,
+    hashPassword
+  };
+})();
+
+if (typeof window !== 'undefined') {
+  window.Auth = Auth;
+  window.AuthStore = AuthStore;
+}
+
 // Tự động tải khi trang load
 document.addEventListener('DOMContentLoaded', () => Auth.loadMe());
+

@@ -39,5 +39,14 @@ Dự án **Sophia Codex** đã được cấu hình sẵn sàng 100% cho Vercel 
    git push -u origin main
    ```
 2. Truy cập [https://vercel.com](https://vercel.com) -> Đăng nhập.
-3. Bấm **"Add New..."** -> **"Project"** -> Chọn repository `sophia-codex`.
-4. Bấm **"Deploy"**. Vercel sẽ tự động hoàn tất trong 30 giây!
+3. Bấm **"Add New..."** -> **"Project"** -> Chọn repository `sopia-codex`.
+4. **LƯU Ý QUAN TRỌNG:** Tại mục **Root Directory**, bấm **"Edit"** và chọn thư mục `Web  v1`.
+5. (Tùy chọn) Điền các Biến Môi Trường (Environment Variables) nếu muốn dùng PostgreSQL/Supabase hoặc Gemini AI (nếu chưa có, hệ thống tự động chạy chế độ SQLite Standalone với đầy đủ dữ liệu kiệt tác triết học).
+6. Bấm **"Deploy"**. Vercel sẽ tự động hoàn tất trong 30 giây!
+
+---
+
+## 🔑 THÔNG TIN ĐĂNG NHẬP MẶC ĐỊNH
+- **Tài khoản Admin:** `admin@sophiacodex.vn` / Mật khẩu: `Admin@Sophia2026!`
+- **Tài khoản Độc giả:** `docgia@sophiacodex.vn` / Mật khẩu: `Docgia@Sophia2026!`
+- Đường dẫn Admin Studio: `https://<ten-mien-vercel>/admin` hoặc `https://<ten-mien-vercel>/admin.html`

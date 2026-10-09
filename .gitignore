@@ -1,6 +1,13 @@
 # Dependencies
 node_modules/
 
+# Environment
+.env
+.env.*
+
+# Vercel
+.vercel/
+
 # Archives & Temporary files
 *.zip
 *.log

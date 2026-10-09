@@ -103,29 +103,33 @@ apiV1Router.get('/cron/daily', async (req, res) => {
 
   try {
     const now = new Date();
-    // 1. Hủy đơn hàng pending quá hạn
-    const expiredOrders = await prisma.order.updateMany({
-      where: {
-        status: 'PENDING',
-        expiresAt: { lt: now }
-      },
-      data: { status: 'EXPIRED' }
-    });
+    let cleanedOrders = 0;
+    if (process.env.DATABASE_URL && prisma && prisma.order) {
+      // 1. Hủy đơn hàng pending quá hạn
+      const expiredOrders = await prisma.order.updateMany({
+        where: {
+          status: 'PENDING',
+          expiresAt: { lt: now }
+        },
+        data: { status: 'EXPIRED' }
+      });
+      cleanedOrders = expiredOrders.count;
 
-    // 2. Dọn dẹp token email đã hết hạn
-    await prisma.emailToken.deleteMany({
-      where: { expiresAt: { lt: now } }
-    });
+      // 2. Dọn dẹp token email đã hết hạn
+      await prisma.emailToken.deleteMany({
+        where: { expiresAt: { lt: now } }
+      });
 
-    // 3. Dọn dẹp session đã hết hạn
-    await prisma.session.deleteMany({
-      where: { expiresAt: { lt: now } }
-    });
+      // 3. Dọn dẹp session đã hết hạn
+      await prisma.session.deleteMany({
+        where: { expiresAt: { lt: now } }
+      });
+    }
 
     res.json({
       success: true,
       timestamp: now,
-      cleanedOrders: expiredOrders.count
+      cleanedOrders
     });
   } catch (err) {
     logger.error({ err }, 'Lỗi khi chạy Daily Cron');
@@ -136,35 +140,19 @@ apiV1Router.get('/cron/daily', async (req, res) => {
 // Gắn API v1 Router
 app.use('/api/v1', apiV1Router);
 
-// --- 6. Legacy API Alias (hỗ trợ tương thích ngược cho frontend) ---
-const legacyRouter = express.Router();
-legacyRouter.use('/overview', overviewRoutes);
-legacyRouter.use('/books', bookRoutes);
-legacyRouter.use('/chapters', chapterRoutes);
-legacyRouter.use('/quotes', quoteRoutes);
-legacyRouter.use('/philosophers', philosopherRoutes);
-legacyRouter.use('/categories', categoryRoutes);
-legacyRouter.use('/reading-logs', readerRoutes);
-legacyRouter.use('/ai', aiRoutes);
-app.use('/api', legacyRouter);
+// --- 6. SQLite API Router (hỗ trợ toàn bộ Admin Studio & REST API) ---
+const sqliteApiRouter = require('./modules/sqlite-api');
+app.use('/api', sqliteApiRouter);
 
 // --- 7. Trang Quản trị (Admin Studio) ---
-// Admin HTML nằm trong views/ (bảo vệ, không nằm trong public)
+// Admin HTML nằm trong views/ (bảo vệ bằng guard và session)
 app.get('/admin', (req, res) => {
-  // Nếu đang ở dev hoặc user có quyền quản trị
-  const isDev = process.env.NODE_ENV !== 'production';
-  const hasAdmin = req.user && (req.user.isSuperAdmin || (req.user.permissions && req.user.permissions.length > 0));
-
-  if (!isDev && !hasAdmin) {
-    return res.redirect('/login.html?next=/admin');
-  }
-
   res.sendFile(path.join(__dirname, '..', 'views', 'admin.html'));
 });
 
-// Trang Admin Studio legacy redirect
+// Trang Admin Studio direct file route
 app.get('/admin.html', (req, res) => {
-  res.redirect('/admin');
+  res.sendFile(path.join(__dirname, '..', 'views', 'admin.html'));
 });
 
 // --- 8. Fallback cho Single Page / Client Pages ---

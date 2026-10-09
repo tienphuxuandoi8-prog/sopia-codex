@@ -1,0 +1,34 @@
+[
+  {
+    "id": "usr_seed_admin",
+    "email": "admin@sophiacodex.vn",
+    "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$zsrWqLJuAOVO5cZsB+1kjA$wIPa0je87anFnbkvAs+uYxRWaTsU5xtIj0eHT21BC44",
+    "displayName": "Quản Trị Viên",
+    "isSuperAdmin": true,
+    "permissions": [
+      "*"
+    ],
+    "roles": [
+      "admin"
+    ],
+    "level": 5,
+    "xp": 9999,
+    "createdAt": "2026-10-09T00:00:00.000Z"
+  },
+  {
+    "id": "usr_demo_reader",
+    "email": "docgia@sophiacodex.vn",
+    "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$O/A7KKAHZyRVFa1PPJc+dQ$7lDVfyQY1GN/WLFSgb2S2HdlyRLFAQW1Y/0ictC8imQ",
+    "displayName": "Độc Giả Triết Học",
+    "isSuperAdmin": false,
+    "permissions": [
+      "reader.read"
+    ],
+    "roles": [
+      "member"
+    ],
+    "level": 1,
+    "xp": 150,
+    "createdAt": "2026-10-09T00:00:00.000Z"
+  }
+]

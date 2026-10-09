@@ -16,7 +16,7 @@ const API = (() => {
       const res = await fetch(`${BASE}/auth/csrf`, { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
-        _csrfToken = data.token;
+        _csrfToken = data.token || data.csrfToken;
       }
     } catch (e) {
       console.warn('[API] Could not fetch CSRF token:', e.message);
@@ -63,20 +63,20 @@ const API = (() => {
     try {
       const res = await fetch(url, config);
 
-      // 401 Unauthorized → chuyển sang trang đăng nhập
-      if (res.status === 401) {
-        const currentPath = window.location.pathname + window.location.search;
-        if (!currentPath.startsWith('/login')) {
-          window.location.href = `/login.html?next=${encodeURIComponent(currentPath)}`;
-        }
-        throw new ApiError(401, 'UNAUTHORIZED', 'Phiên đăng nhập đã hết hạn');
-      }
-
       // Parse JSON response
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         const error = data.error || {};
+        const isAuthRequest = path.includes('/auth/login') || path.includes('/auth/register');
+        const isLoginPage = window.location.pathname.includes('login');
+
+        // Chỉ chuyển sang trang login nếu 401 xảy ra ở trang khác và không phải request đăng nhập
+        if (res.status === 401 && !isAuthRequest && !isLoginPage) {
+          const currentPath = window.location.pathname + window.location.search;
+          window.location.href = `login.html?next=${encodeURIComponent(currentPath)}`;
+        }
+
         throw new ApiError(
           res.status,
           error.code || 'UNKNOWN',

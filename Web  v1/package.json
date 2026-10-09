@@ -9,13 +9,14 @@
   "scripts": {
     "dev": "concurrently \"node --watch src/server.local.js\" \"npx tailwindcss -i src/styles/tailwind.css -o public/css/app.css --watch\"",
     "start": "node src/server.local.js",
+    "build": "npm run build:css && (npx prisma generate || true)",
     "build:css": "npx tailwindcss -i src/styles/tailwind.css -o public/css/app.css --minify",
     "db:migrate": "npx prisma migrate deploy",
     "db:migrate:dev": "npx prisma migrate dev",
     "db:seed": "node prisma/seed.js",
     "db:studio": "npx prisma studio",
     "db:generate": "npx prisma generate",
-    "postinstall": "npx prisma generate",
+    "postinstall": "npx prisma generate || true",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "echo TODO"

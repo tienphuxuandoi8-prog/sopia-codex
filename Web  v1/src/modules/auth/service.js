@@ -8,9 +8,30 @@ const AppError = require('../../middleware/errorHandler').AppError;
  * Đăng ký tài khoản mới
  */
 const register = async ({ email, password, displayName }) => {
-  const normalizedEmail = email.toLowerCase();
+  const normalizedEmail = email.toLowerCase().trim();
   
-  // Kiểm tra email tồn tại
+  if (!process.env.DATABASE_URL) {
+    const localUserStore = require('../../lib/localUserStore');
+    const existingUser = localUserStore.findByEmail(normalizedEmail);
+    if (existingUser) {
+      throw new AppError(400, 'EMAIL_EXISTS', 'Email này đã được sử dụng. Vui lòng đăng nhập hoặc sử dụng email khác.');
+    }
+    const hashedPassword = await hashPassword(password);
+    const user = localUserStore.createUser({
+      email: normalizedEmail,
+      passwordHash: hashedPassword,
+      displayName: displayName || normalizedEmail.split('@')[0]
+    });
+    return {
+      success: true,
+      message: 'Đăng ký tài khoản thành công! Bạn có thể đăng nhập ngay.',
+      user: {
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName
+      }
+    };
+  }
   const existingUser = await prisma.user.findUnique({
     where: { email: normalizedEmail }
   });
@@ -123,8 +144,22 @@ const resendVerification = async (userId) => {
  * Đăng nhập
  */
 const login = async ({ email, password, ip, userAgent }) => {
-  const normalizedEmail = email.toLowerCase();
+  const normalizedEmail = email.toLowerCase().trim();
   
+  if (!process.env.DATABASE_URL) {
+    const localUserStore = require('../../lib/localUserStore');
+    const user = localUserStore.findByEmail(normalizedEmail);
+    if (!user) {
+      throw new AppError(401, 'INVALID_CREDENTIALS', 'Tài khoản không tồn tại. Vui lòng kiểm tra lại email hoặc đăng ký tài khoản mới.');
+    }
+    const isValid = await verifyPassword(user.passwordHash, password);
+    if (!isValid) {
+      throw new AppError(401, 'INVALID_CREDENTIALS', 'Mật khẩu không chính xác. Vui lòng thử lại.');
+    }
+    const { sessionToken, expiresAt } = localUserStore.createSession(user.id);
+    return { user, sessionToken, expiresAt };
+  }
+
   const user = await prisma.user.findUnique({
     where: { email: normalizedEmail }
   });
@@ -187,6 +222,11 @@ const login = async ({ email, password, ip, userAgent }) => {
  */
 const logout = async (sessionToken) => {
   if (sessionToken) {
+    if (!process.env.DATABASE_URL) {
+      const localUserStore = require('../../lib/localUserStore');
+      localUserStore.deleteSession(sessionToken);
+      return;
+    }
     const tokenHash = cryptoUtils.hashString(sessionToken);
     await prisma.session.updateMany({
       where: { tokenHash, revokedAt: null },
@@ -283,6 +323,28 @@ const resetPassword = async (token, newPassword) => {
 const getMe = async (user) => {
   if (!user) {
     return { user: null, isLoggedIn: false };
+  }
+
+  if (!process.env.DATABASE_URL) {
+    const localUserStore = require('../../lib/localUserStore');
+    const u = localUserStore.findById(user.id) || user;
+    return {
+      isLoggedIn: true,
+      user: {
+        id: u.id,
+        email: u.email,
+        displayName: u.displayName || u.email.split('@')[0],
+        avatarUrl: u.avatarUrl || null,
+        status: u.status || 'ACTIVE',
+        isSuperAdmin: !!u.isSuperAdmin,
+        permissions: u.permissions || (u.isSuperAdmin ? ['*'] : ['reader.read']),
+        roles: u.roles || (u.isSuperAdmin ? ['admin'] : ['member']),
+        subscription: null,
+        dailyAiQuota: u.isSuperAdmin ? 100 : 20,
+        level: u.level || 1,
+        xp: u.xp || 100
+      }
+    };
   }
 
   const userDetails = await prisma.user.findUnique({

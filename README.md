@@ -52,7 +52,18 @@ Dự án ứng dụng web triết học Sophia Codex tích hợp thư viện sá
 
 ## ☁️ Hướng Dẫn Deploy Lên Vercel
 
-Xem chi tiết tại [Web  v1/DEPLOY.md](Web%20%20v1/DEPLOY.md).
+1. Truy cập [https://vercel.com](https://vercel.com) và chọn **"Add New..."** -> **"Project"**.
+2. Chọn repository **`tienphuxuandoi8-prog/sopia-codex`**.
+3. **Quan trọng:** Tại mục **Root Directory**, bấm **Edit** và chọn thư mục `Web  v1`.
+4. Bấm **Deploy**. Vercel sẽ tự động build và xuất bản trang web!
+
+Chi tiết đầy đủ: xem tại [Web  v1/DEPLOY.md](Web%20%20v1/DEPLOY.md).
+
+---
+
+## 🔑 Tài Khoản Mặc Định
+- **Quản Trị Viên (Admin Studio):** `admin@sophiacodex.vn` / `Admin@Sophia2026!`
+- **Độc Giả Mẫu:** `docgia@sophiacodex.vn` / `Docgia@Sophia2026!`
 
 ---
 

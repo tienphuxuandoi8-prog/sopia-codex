@@ -51,7 +51,7 @@
   </script>
 
   <!-- PWA App Manifest & Theme Color -->
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#181E1A">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -106,7 +106,7 @@
         </div>
         <div class="flex items-center gap-1.5 font-medium">
           <i data-lucide="layers" class="w-4 h-4 text-emerald-700"></i>
-          <span id="stat-chapters-count">24 Chương Kinh Điển</span>
+          <span id="stat-chapters-count">124 Chương Kinh Điển</span>
         </div>
       </div>
 
@@ -131,28 +131,28 @@
 
         <!-- Auth Buttons (Logged Out) -->
         <div data-auth="logged-out" class="flex items-center gap-1.5">
-          <a href="/login.html" class="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-950 hover:bg-emerald-900 text-amber-200 border border-amber-600/30 transition-all shadow-sm">
+          <a href="login.html" class="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-950 hover:bg-emerald-900 text-amber-200 border border-amber-600/30 transition-all shadow-sm">
             Đăng Nhập
           </a>
-          <a href="/register.html" class="hidden sm:inline-block px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-stone-950 transition-all shadow-sm">
+          <a href="register.html" class="hidden sm:inline-block px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-stone-950 transition-all shadow-sm">
             Đăng Ký
           </a>
         </div>
 
         <!-- Auth Menu (Logged In) -->
         <div data-auth="logged-in" class="hidden flex items-center gap-1.5">
-          <a href="/library.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-200/80 dark:bg-emerald-900/60 hover:bg-stone-300 dark:hover:bg-emerald-900 text-stone-800 dark:text-stone-200 border border-stone-300/60 dark:border-emerald-800/60 transition-all" title="Tủ Sách & Ghi Chú">
+          <a href="library.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-200/80 dark:bg-emerald-900/60 hover:bg-stone-300 dark:hover:bg-emerald-900 text-stone-800 dark:text-stone-200 border border-stone-300/60 dark:border-emerald-800/60 transition-all" title="Tủ Sách & Ghi Chú">
             <i data-lucide="bookmark" class="w-3.5 h-3.5 text-amber-500"></i>
             <span class="hidden sm:inline">Tủ Sách</span>
           </a>
-          <a href="/account.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-600/30 transition-all" title="Quản Lý Tài Khoản">
+          <a href="account.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-600/30 transition-all" title="Quản Lý Tài Khoản">
             <i data-lucide="user" class="w-3.5 h-3.5 text-amber-500"></i>
             <span data-auth-name class="max-w-[80px] truncate">Tài Khoản</span>
           </a>
         </div>
 
         <!-- Admin Portal Link (Nút Quản Trị) -->
-        <a href="/admin" data-auth="admin" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-600/30 transition-all" title="Trang Quản Trị Hệ Thống">
+        <a href="admin.html" onclick="handleAdminEntry(event)" data-auth="admin" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-600/30 transition-all" title="Trang Quản Trị Hệ Thống">
           <i data-lucide="shield" class="w-3.5 h-3.5 text-amber-500"></i>
           <span>Quản Trị</span>
         </a>
@@ -193,7 +193,7 @@
       
       <div class="space-y-6 px-3">
         <!-- User Profile Widget (Logged In) -->
-        <a href="/account.html" data-auth="logged-in" class="hidden flex items-center gap-3 p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 transition-all">
+        <a href="account.html" data-auth="logged-in" class="hidden flex items-center gap-3 p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 hover:bg-amber-500/20 transition-all">
           <div class="w-10 h-10 rounded-full bg-emerald-950 text-amber-300 flex items-center justify-center font-bold text-sm shadow-sm border border-amber-600/30 overflow-hidden">
             <i data-lucide="user" class="w-5 h-5"></i>
           </div>
@@ -207,58 +207,91 @@
         <div data-auth="logged-out" class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-xs text-center space-y-2">
           <p class="text-stone-700 dark:text-stone-300 font-medium text-[11px]">Đăng nhập để đồng bộ tiến độ & ghi chú</p>
           <div class="flex gap-1.5 justify-center">
-            <a href="/login.html" class="w-full py-1.5 rounded-xl bg-emerald-950 text-amber-300 font-semibold text-[11px] shadow-sm hover:opacity-90">Đăng Nhập</a>
-            <a href="/register.html" class="w-full py-1.5 rounded-xl bg-amber-500 text-stone-950 font-semibold text-[11px] shadow-sm hover:opacity-90">Đăng Ký</a>
+            <a href="login.html" class="w-full py-1.5 rounded-xl bg-emerald-950 text-amber-300 font-semibold text-[11px] shadow-sm hover:opacity-90">Đăng Nhập</a>
+            <a href="register.html" class="w-full py-1.5 rounded-xl bg-amber-500 text-stone-950 font-semibold text-[11px] shadow-sm hover:opacity-90">Đăng Ký</a>
           </div>
         </div>
 
         <!-- Navigation Links -->
-        <nav class="space-y-1.5 text-sm font-medium">
-          <button onclick="if(window.readerEngine) window.readerEngine.closeReader()" 
-                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-emerald-950 text-amber-200 font-semibold shadow-sm border border-amber-600/30">
-            <i data-lucide="compass" class="w-5 h-5 text-amber-400"></i>
+        <nav class="space-y-1.5 text-sm font-medium" id="sidebar-nav">
+          <!-- 1. Khám Phá Sách -->
+          <button id="nav-btn-explore" 
+                  data-nav-id="explore"
+                  onclick="selectSidebarMenu('explore')" 
+                  class="sidebar-nav-btn active w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-emerald-950 text-amber-200 font-semibold shadow-sm border border-amber-600/30 transition-all text-left">
+            <i data-lucide="compass" class="nav-icon w-5 h-5 text-amber-400 shrink-0"></i>
             <span class="md:hidden lg:inline">Khám Phá Sách</span>
           </button>
 
-          <a href="/library.html" data-auth="logged-in" class="hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 transition-colors">
-            <i data-lucide="bookmark" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
+          <!-- 2. Tủ Sách & Trích Dẫn -->
+          <a id="nav-btn-library" 
+             data-nav-id="library"
+             href="library.html" 
+             class="sidebar-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 border border-transparent transition-all text-left" 
+             title="Tủ Sách Cá Nhân & Sổ Tay Ghi Chú">
+            <i data-lucide="bookmark" class="nav-icon w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0"></i>
             <span class="md:hidden lg:inline">Tủ Sách & Trích Dẫn</span>
           </a>
 
-          <a href="/pricing.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-amber-500/10 hover:text-amber-800 dark:hover:text-amber-300 transition-colors">
-            <i data-lucide="crown" class="w-5 h-5 text-amber-500"></i>
+          <!-- 3. Gói Sophia Premium -->
+          <button id="nav-btn-premium" 
+                  data-nav-id="premium"
+                  onclick="openSophiaPremiumModal()" 
+                  class="sidebar-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-amber-500/10 hover:text-amber-800 dark:hover:text-amber-300 border border-transparent transition-all text-left"
+                  title="Đặc Quyền Hội Viên Cao Cấp">
+            <i data-lucide="crown" class="nav-icon w-5 h-5 text-amber-500 shrink-0"></i>
             <span class="md:hidden lg:inline font-semibold">Gói Sophia Premium</span>
-          </a>
+          </button>
 
-          <button onclick="filterBooks('stoicism')" 
-                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 transition-colors">
-            <i data-lucide="shield" class="w-5 h-5 text-amber-700 dark:text-amber-400"></i>
+          <!-- 4. Chủ Nghĩa Khắc Kỷ -->
+          <button id="nav-btn-stoicism" 
+                  data-nav-id="stoicism"
+                  onclick="selectSidebarMenu('stoicism')" 
+                  class="sidebar-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 border border-transparent transition-all text-left"
+                  title="Triết học Khắc Kỷ: Marcus Aurelius, Seneca, Epictetus">
+            <i data-lucide="shield" class="nav-icon w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0"></i>
             <span class="md:hidden lg:inline">Chủ Nghĩa Khắc Kỷ</span>
           </button>
 
-          <button onclick="filterBooks('eastern')" 
-                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 transition-colors">
-            <i data-lucide="sun" class="w-5 h-5 text-emerald-700 dark:text-emerald-400"></i>
+          <!-- 5. Minh Triết Đông Phương -->
+          <button id="nav-btn-eastern" 
+                  data-nav-id="eastern"
+                  onclick="selectSidebarMenu('eastern')" 
+                  class="sidebar-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 border border-transparent transition-all text-left"
+                  title="Đạo Gia & Triết Học Phương Đông: Lão Tử, Trang Tử">
+            <i data-lucide="sun" class="nav-icon w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0"></i>
             <span class="md:hidden lg:inline">Minh Triết Đông Phương</span>
           </button>
 
-          <button onclick="filterBooks('existentialism')" 
-                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 transition-colors">
-            <i data-lucide="flame" class="w-5 h-5 text-rose-700 dark:text-rose-400"></i>
+          <!-- 6. Chủ Nghĩa Hiện Sinh -->
+          <button id="nav-btn-existentialism" 
+                  data-nav-id="existentialism"
+                  onclick="selectSidebarMenu('existentialism')" 
+                  class="sidebar-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 border border-transparent transition-all text-left"
+                  title="Chủ Nghĩa Hiện Sinh: Friedrich Nietzsche, Albert Camus">
+            <i data-lucide="flame" class="nav-icon w-5 h-5 text-rose-700 dark:text-rose-400 shrink-0"></i>
             <span class="md:hidden lg:inline">Chủ Nghĩa Hiện Sinh</span>
           </button>
 
-          <button onclick="window.audioEngine?.togglePlay()" 
-                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 transition-colors">
-            <i data-lucide="headphones" class="w-5 h-5 text-indigo-600 dark:text-indigo-400"></i>
+          <!-- 7. Sách Nói (Audio Studio) -->
+          <button id="nav-btn-audio" 
+                  data-nav-id="audio"
+                  onclick="openAudioStudioModal()" 
+                  class="sidebar-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 border border-transparent transition-all text-left"
+                  title="Phòng Thu Sách Nói & Âm Hưởng Thiền Định">
+            <i data-lucide="headphones" class="nav-icon w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0"></i>
             <span class="md:hidden lg:inline">Sách Nói (Audio Studio)</span>
           </button>
 
-          <a href="/admin" data-auth="admin" 
-             class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-amber-500/15 hover:text-amber-800 dark:hover:text-amber-300 transition-colors">
-            <i data-lucide="shield" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
+          <!-- 8. Xưởng Quản Trị -->
+          <button id="nav-btn-admin" 
+                  data-nav-id="admin"
+                  onclick="handleAdminEntryClick(event)" 
+                  class="sidebar-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-amber-500/15 hover:text-amber-800 dark:hover:text-amber-300 border border-transparent transition-all text-left"
+                  title="Xưởng Quản Trị Hệ Thống (Dành Cho Admin & Trải Nghiệm Demo)">
+            <i data-lucide="shield" class="nav-icon w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0"></i>
             <span class="md:hidden lg:inline font-semibold">Xưởng Quản Trị</span>
-          </a>
+          </button>
         </nav>
       </div>
 
@@ -392,8 +425,37 @@
           </div>
         </div>
 
+        <!-- DYNAMIC SCHOOL SPOTLIGHT BANNER -->
+        <div id="school-spotlight-banner" class="hidden p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-950 via-[#0B1E14] to-[#06110B] text-white border border-amber-500/40 shadow-xl animate-fade-in">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+              <div id="school-banner-icon" class="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300 text-3xl shadow-inner shrink-0">
+                🏛️
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30 font-bold font-display">
+                    Đang Lọc Trường Phái
+                  </span>
+                  <span id="school-banner-tag" class="text-xs text-stone-300 font-mono"></span>
+                </div>
+                <h3 id="school-banner-title" class="font-display font-bold text-xl sm:text-2xl text-amber-200 mt-1">
+                  Chủ Nghĩa Khắc Kỷ
+                </h3>
+                <p id="school-banner-quote" class="text-xs sm:text-sm text-stone-300 italic font-reading mt-1 leading-relaxed">
+                  "Không phải sự vật làm ta phiền lòng, mà chính cách ta nhìn nhận chúng." — Epictetus
+                </p>
+              </div>
+            </div>
+            <button onclick="selectSidebarMenu('explore')" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-amber-300 text-xs font-semibold border border-white/20 whitespace-nowrap transition-all flex items-center gap-1.5 self-end sm:self-center shadow-sm">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span>Xem Tất Cả Sách</span>
+            </button>
+          </div>
+        </div>
+
         <!-- BOOKS GRID -->
-        <div class="space-y-4">
+        <div class="space-y-4" id="books-grid-header">
           <div class="flex items-center justify-between">
             <div>
               <h3 class="font-display font-bold text-base md:text-lg text-stone-900 dark:text-stone-100">
@@ -1184,6 +1246,333 @@
     </div>
   </div>
 
+  <!-- ==================== MODAL 1: SOPHIA AUDIO STUDIO ==================== -->
+  <div id="audio-studio-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6 animate-fade-in">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer" onclick="closeAudioStudioModal()"></div>
+
+    <!-- Studio Window -->
+    <div class="relative z-10 w-full max-w-4xl bg-[#0D1812] text-stone-100 rounded-3xl shadow-2xl border border-amber-600/40 overflow-hidden flex flex-col max-h-[92vh]">
+      
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-emerald-900/80 bg-emerald-950/80 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500/30 to-emerald-900 border border-amber-500/50 flex items-center justify-center text-amber-300 shadow-md">
+            <i data-lucide="headphones" class="w-5 h-5 text-amber-400"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-lg text-amber-200 leading-tight">Sophia Audio Studio</h3>
+            <p class="text-xs text-stone-400">Không gian sách nói toàn văn & âm hưởng chiêm nghiệm thiền định</p>
+          </div>
+        </div>
+        <button onclick="closeAudioStudioModal()" class="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-white/10 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Body (Dual Column: Studio Turntable + Controls & Bookshelf) -->
+      <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
+        
+        <!-- Top Track Hero: Vinyl & Equalizer -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center p-5 rounded-2xl bg-gradient-to-br from-emerald-950/90 to-[#07130D] border border-amber-600/30">
+          <!-- Vinyl Cover -->
+          <div class="md:col-span-4 flex justify-center">
+            <div class="relative w-40 h-40 sm:w-48 sm:h-48 group">
+              <div id="studio-vinyl-disc" class="absolute -right-3 top-0 w-full h-full rounded-full bg-stone-900 border-4 border-amber-600/30 shadow-2xl flex items-center justify-center animate-spin" style="animation-duration: 12s; animation-play-state: paused;">
+                <div class="w-14 h-14 rounded-full bg-amber-500/30 border-2 border-amber-400 flex items-center justify-center">
+                  <i data-lucide="disc" class="w-6 h-6 text-amber-300"></i>
+                </div>
+              </div>
+              <div class="relative z-10 w-full h-full rounded-2xl overflow-hidden shadow-2xl border-2 border-amber-500/60 bg-black">
+                <img id="studio-cover-img" src="assets/covers/suy-tuong.svg" alt="Cover" class="w-full h-full object-cover">
+              </div>
+            </div>
+          </div>
+
+          <!-- Track Info & Primary Controls -->
+          <div class="md:col-span-8 space-y-3.5">
+            <div class="flex items-center justify-between">
+              <span class="inline-block px-2.5 py-0.5 rounded text-[10px] uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold" id="studio-book-school">
+                Chủ nghĩa Khắc Kỷ
+              </span>
+              <div class="flex items-center gap-1.5 text-xs text-amber-400 font-mono" id="studio-equalizer-bars">
+                <span class="equalizer-bar h-4 w-1 bg-amber-400 rounded-full animate-pulse"></span>
+                <span class="equalizer-bar h-6 w-1 bg-amber-400 rounded-full animate-pulse" style="animation-delay: 0.15s"></span>
+                <span class="equalizer-bar h-3 w-1 bg-amber-400 rounded-full animate-pulse" style="animation-delay: 0.3s"></span>
+                <span class="equalizer-bar h-5 w-1 bg-amber-400 rounded-full animate-pulse" style="animation-delay: 0.45s"></span>
+              </div>
+            </div>
+
+            <div>
+              <h4 id="studio-book-title" class="font-display font-bold text-xl sm:text-2xl text-white">Suy Tưởng (Meditations)</h4>
+              <p id="studio-chapter-title" class="text-xs sm:text-sm text-amber-300/90 font-serif italic mt-0.5">Quyển I: Lời Tri Ân Những Người Thầy</p>
+            </div>
+
+            <!-- Progress scrubber -->
+            <div class="space-y-1">
+              <div class="w-full bg-stone-800 rounded-full h-2 cursor-pointer relative overflow-hidden" onclick="handleStudioScrub(event)">
+                <div id="studio-progress-fill" class="bg-gradient-to-r from-amber-500 to-amber-300 h-full rounded-full transition-all" style="width: 25%"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-stone-400 font-mono">
+                <span id="studio-time-current">01:45</span>
+                <span id="studio-time-total">08:20</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap items-center gap-3 pt-1">
+              <button onclick="studioSeek(-15)" title="Lùi 15 giây" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-stone-200 flex items-center justify-center transition-all">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              </button>
+              <button id="studio-main-play-btn" onclick="studioTogglePlay()" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold flex items-center gap-2 shadow-lg hover:shadow-amber-500/30 transition-all text-sm">
+                <i id="studio-main-play-icon" data-lucide="play" class="w-4 h-4 fill-stone-950"></i>
+                <span id="studio-main-play-text">Phát Audio</span>
+              </button>
+              <button onclick="studioSeek(15)" title="Tiến 15 giây" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-stone-200 flex items-center justify-center transition-all">
+                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+              </button>
+
+              <!-- Speed selector -->
+              <button id="studio-speed-btn" onclick="studioCycleSpeed()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-amber-300 text-xs font-mono font-semibold transition-all">
+                1.0x
+              </button>
+
+              <!-- Read along button -->
+              <button onclick="openBookFromStudio()" class="ml-auto px-4 py-2 rounded-xl bg-emerald-900/60 hover:bg-emerald-900 text-amber-200 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>Mở Trình Đọc Sách</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Studio Settings: Voice Mode & Ambient Soundscape -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <!-- Voice Mode Selector -->
+          <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+            <div class="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-wider">
+              <i data-lucide="mic" class="w-4 h-4 text-amber-400"></i> Chế Độ Giọng Đọc
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button id="voice-mode-podcast" onclick="setStudioVoiceMode('studio')" class="p-3 rounded-xl bg-emerald-950 border-2 border-amber-500/60 text-amber-200 font-semibold text-left transition-all">
+                <div class="font-bold">🎙️ Studio Podcast</div>
+                <div class="text-[10px] text-stone-300 mt-1">Giọng thu âm trầm ấm, truyền cảm sâu lắng</div>
+              </button>
+              <button id="voice-mode-tts" onclick="setStudioVoiceMode('tts')" class="p-3 rounded-xl bg-black/30 border border-white/10 text-stone-300 hover:text-white font-medium text-left transition-all">
+                <div class="font-bold">🧠 Giọng AI Hiền Triết</div>
+                <div class="text-[10px] text-stone-400 mt-1">Lọc Equalizer học giả trầm mặc</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Ambient Soundscape Selector -->
+          <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-xs font-bold text-amber-300 uppercase tracking-wider">
+                <i data-lucide="music" class="w-4 h-4 text-amber-400"></i> Âm Hưởng Thiền Định (BGM)
+              </div>
+              <button onclick="toggleStudioBGM()" id="studio-bgm-toggle-btn" class="text-xs text-amber-300 underline font-semibold">
+                Đang Bật
+              </button>
+            </div>
+            <select id="studio-soundscape-select" onchange="changeStudioSoundscape(this.value)" class="w-full bg-emerald-950 border border-amber-600/40 rounded-xl px-3 py-2 text-xs text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="suy-tuong">🎻 Đàn Hạc Thư Phòng & Sa Trường (Marcus Aurelius)</option>
+              <option value="dao-duc-kinh">🔔 Chuông Thiền & Sáo Trúc Ngũ Cung (Lão Tử)</option>
+              <option value="zarathustra">🏔️ Vĩ Cầm Trầm Mặc Đỉnh Núi Tuyết (Nietzsche)</option>
+              <option value="cong-hoa">🏛️ Đàn Lia Hy Lạp Cổ Đại (Plato & Socrates)</option>
+              <option value="ban-ve-tu-do">🎹 Thính Phòng Khai Sáng Oxford (J.S. Mill)</option>
+            </select>
+            <div class="flex items-center gap-3 text-xs text-stone-300">
+              <span>Âm lượng nhạc nền:</span>
+              <input type="range" min="0" max="1" step="0.05" value="0.35" oninput="setStudioBGMVolume(this.value)" class="flex-1 accent-amber-500">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Select Audiobook Track -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h5 class="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="disc" class="w-4 h-4 text-amber-400"></i> Danh Mục Tác Phẩm Có Sẵn Audio Studio
+            </h5>
+            <span class="text-[11px] text-stone-400">5 tác phẩm chọn lọc</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" id="studio-audiobooks-grid">
+            <!-- Book items injected here -->
+          </div>
+        </div>
+
+        <!-- Synchronized Text Preview Card -->
+        <div class="p-4 rounded-2xl bg-black/40 border border-emerald-900/60 space-y-2">
+          <div class="flex items-center justify-between text-[11px] text-stone-400">
+            <span class="flex items-center gap-1.5 text-amber-400 font-semibold">
+              <i data-lucide="align-left" class="w-3.5 h-3.5"></i> Đoạn văn bản đang đọc (Đồng bộ trực tiếp)
+            </span>
+            <span id="studio-para-indicator">Đoạn 1 / 12</span>
+          </div>
+          <p id="studio-synced-text" class="text-xs sm:text-sm text-stone-200 italic font-reading leading-relaxed p-3 rounded-xl bg-white/5 border border-amber-500/20">
+            "Khi bạn thức dậy vào buổi sớm, hãy nghĩ xem đó là một đặc ân quý giá dường nào khi còn được sống, được hít thở, được suy nghĩ và được yêu thương."
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: SOPHIA PREMIUM MEMBERSHIP ==================== -->
+  <div id="premium-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6 animate-fade-in">
+    <div class="absolute inset-0 bg-black/75 backdrop-blur-md cursor-pointer" onclick="closePremiumModal()"></div>
+
+    <div class="relative z-10 w-full max-w-xl bg-white dark:bg-[#0E1A13] text-stone-900 dark:text-stone-100 rounded-3xl shadow-2xl border-2 border-amber-500/50 overflow-hidden flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Header Banner -->
+      <div class="relative bg-gradient-to-br from-emerald-950 via-[#10271C] to-emerald-950 text-white p-6 border-b border-amber-500/30">
+        <button onclick="closePremiumModal()" class="absolute top-4 right-4 p-2 rounded-xl text-stone-300 hover:text-white hover:bg-white/10 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500 text-stone-950 flex items-center justify-center font-bold shadow-lg">
+            <i data-lucide="crown" class="w-5 h-5 fill-stone-950"></i>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase tracking-wider font-bold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded border border-amber-400/30">Đặc Quyền Cao Cấp</span>
+            <h3 class="font-display font-bold text-2xl text-white">Gói Sophia Premium</h3>
+          </div>
+        </div>
+        <p class="text-xs text-stone-300 font-ui leading-relaxed">
+          Khai phóng toàn bộ tinh hoa triết học nhân loại với trọn bộ kiệt tác toàn văn, sách nói Studio & trợ lý đối thoại Socrates AI.
+        </p>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6 overflow-y-auto space-y-5">
+        
+        <!-- Current status alert (if admin or premium) -->
+        <div id="premium-status-badge" class="hidden p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-xs text-amber-900 dark:text-amber-300 flex items-center gap-2.5">
+          <i data-lucide="award" class="w-5 h-5 text-amber-600 shrink-0"></i>
+          <div>
+            <span class="font-bold">Đặc quyền đang kích hoạt:</span>
+            <span id="premium-status-text">Tài khoản Quản Trị Viên sở hữu toàn quyền Premium vĩnh viễn.</span>
+          </div>
+        </div>
+
+        <!-- Plan Pricing Toggle -->
+        <div class="bg-stone-100 dark:bg-emerald-950/60 p-1.5 rounded-2xl flex gap-1">
+          <button id="modal-plan-month-btn" onclick="toggleModalPlan('month')" class="flex-1 py-2 text-xs font-bold rounded-xl bg-emerald-950 text-amber-200 shadow-sm border border-amber-500/30 transition-all">
+            Gói Tháng • 49.000đ
+          </button>
+          <button id="modal-plan-year-btn" onclick="toggleModalPlan('year')" class="flex-1 py-2 text-xs font-medium rounded-xl text-stone-600 dark:text-stone-300 hover:text-stone-900 transition-all">
+            Gói Năm • 399.000đ <span class="text-[10px] text-emerald-600 dark:text-amber-400 font-bold">(Tiết kiệm 32%)</span>
+          </button>
+        </div>
+
+        <!-- Benefit list -->
+        <div class="space-y-2.5 text-xs text-stone-700 dark:text-stone-300">
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+            <span><strong>100% Toàn văn</strong> Suy Tưởng, Đạo Đức Kinh, Zarathustra, Cộng Hòa, Bàn Về Tự Do</span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+            <span><strong>100 lượt vấn đáp/ngày</strong> với Hiền Triết Socrates AI thông minh</span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+            <span><strong>Sophia Audio Studio</strong> podcast thu âm & không gian nhạc thiền định</span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+            <span><strong>Sổ tay trích dẫn cá nhân</strong> & xuất file Markdown không giới hạn</span>
+          </div>
+          <div class="flex items-center gap-2.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+            <span><strong>Đọc thuần khiết</strong> tuyệt đối không quảng cáo</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-2.5 pt-2 border-t border-stone-200 dark:border-emerald-900/60">
+          <!-- 1-Click Instant Sandbox Activation -->
+          <button onclick="activatePremiumFromModal()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all">
+            <i data-lucide="zap" class="w-4 h-4 fill-stone-950"></i>
+            <span>⚡ Kích Hoạt Thử Nghiệm Ngay (Dành Cho Admin & Độc Giả)</span>
+          </button>
+
+          <!-- Link to full pricing page -->
+          <a href="pricing.html" class="w-full py-2.5 px-4 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-emerald-950 dark:hover:bg-emerald-900 text-stone-800 dark:text-stone-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors border border-stone-300 dark:border-emerald-800">
+            <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
+            <span>Xem Trang Thanh Toán Đầy Đủ (VNPay / MoMo)</span>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 3: ADMIN ACCESS GATEWAY ==================== -->
+  <div id="admin-gateway-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6 animate-fade-in">
+    <div class="absolute inset-0 bg-black/75 backdrop-blur-md cursor-pointer" onclick="closeAdminGatewayModal()"></div>
+
+    <div class="relative z-10 w-full max-w-lg bg-[#0F2117] text-stone-100 rounded-3xl shadow-2xl border-2 border-amber-500/50 overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <!-- Header -->
+      <div class="p-6 border-b border-emerald-900 bg-emerald-950 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400">
+            <i data-lucide="shield" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-xl text-amber-300">Cổng Vào Xưởng Quản Trị</h3>
+            <p class="text-xs text-stone-300">Sophia Codex Management Studio</p>
+          </div>
+        </div>
+        <button onclick="closeAdminGatewayModal()" class="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-white/10 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 space-y-4 text-xs sm:text-sm">
+        <p class="text-stone-300 leading-relaxed font-ui">
+          Xưởng Quản Trị là trung tâm điều hành nội dung toàn văn, quản lý triết gia, audio studio và cơ sở dữ liệu SQLite của Sophia Codex.
+        </p>
+
+        <div class="p-3.5 rounded-2xl bg-black/40 border border-amber-500/30 space-y-2">
+          <div class="flex items-center gap-2 font-bold text-amber-300">
+            <i data-lucide="key" class="w-4 h-4"></i> Thông tin tài khoản quản trị mặc định:
+          </div>
+          <div class="text-xs font-mono text-stone-300 pl-6 space-y-0.5">
+            <div>Email: <strong class="text-white">admin@sophiacodex.vn</strong></div>
+            <div>Mật khẩu: <strong class="text-white">Admin@Sophia2026!</strong></div>
+            <div>Quyền hạn: <strong class="text-amber-400">Toàn quyền SuperAdmin (Cấp 5: Hiền Giả)</strong></div>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="space-y-2.5 pt-2">
+          <!-- 1-Click Instant Admin Mode -->
+          <button onclick="enterDemoAdminMode()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg hover:shadow-amber-500/30 transition-all">
+            <i data-lucide="arrow-right-circle" class="w-4 h-4 fill-stone-950"></i>
+            <span>🚀 Trải Nghiệm Ngay Với Quyền Quản Trị Viên (Demo Admin)</span>
+          </button>
+
+          <!-- Official Login -->
+          <a href="login.html?next=admin.html" class="w-full py-2.5 px-4 rounded-xl bg-emerald-950 hover:bg-emerald-900 text-amber-200 border border-amber-500/40 font-semibold text-xs flex items-center justify-center gap-2 transition-all">
+            <i data-lucide="log-in" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Đăng Nhập Tài Khoản Quản Trị Chính Thức</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Application Scripts -->
   <script src="js/core/api.js"></script>
   <script src="js/core/auth.js"></script>
@@ -1200,12 +1589,35 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
+        navigator.serviceWorker.register('sw.js').then(reg => {
           console.log('🏛️ Sophia Codex PWA Service Worker đã sẵn sàng:', reg.scope);
         }).catch(err => {
           console.warn('⚠️ Service Worker không thể đăng ký:', err);
         });
       });
+    }
+
+    // Admin Access Guard Helper
+    function handleAdminEntry(event) {
+      if (event) event.preventDefault();
+      try {
+        const localUserStr = localStorage.getItem('sophia_user');
+        let localUser = null;
+        if (localUserStr) localUser = JSON.parse(localUserStr);
+        const isAdmin = localUser && (
+          localUser.isSuperAdmin === true ||
+          (Array.isArray(localUser.permissions) && (localUser.permissions.includes('*') || localUser.permissions.includes('admin'))) ||
+          localUser.email === 'admin@sophiacodex.vn'
+        );
+        if (isAdmin) {
+          window.location.href = 'admin.html';
+        } else {
+          sessionStorage.setItem('auth_redirect_msg', 'Vui lòng đăng nhập tài khoản Quản trị để truy cập trang này.');
+          window.location.href = 'login.html?next=admin.html';
+        }
+      } catch (e) {
+        window.location.href = 'login.html?next=admin.html';
+      }
     }
   </script>
 </body>

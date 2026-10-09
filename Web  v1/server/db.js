@@ -9,17 +9,34 @@ const fs = require('fs');
 const path = require('path');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
-const DB_PATH = path.join(DATA_DIR, 'sophia.db');
+let DB_PATH = path.join(DATA_DIR, 'sophia.db');
 
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+// Hỗ trợ môi trường Serverless (Vercel / AWS Lambda): sao chép sang /tmp để có quyền đọc-ghi
+if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  const tmpDbPath = path.join('/tmp', 'sophia.db');
+  try {
+    if (!fs.existsSync(tmpDbPath) && fs.existsSync(DB_PATH)) {
+      fs.copyFileSync(DB_PATH, tmpDbPath);
+    }
+    DB_PATH = tmpDbPath;
+  } catch (err) {
+    console.warn('[SQLite] Không thể sao chép DB sang /tmp:', err.message);
+  }
+} else {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
 }
 
 const db = new DatabaseSync(DB_PATH);
 
 // Kích hoạt WAL mode và Foreign Keys để tối ưu hiệu năng
-db.exec('PRAGMA journal_mode = WAL;');
-db.exec('PRAGMA foreign_keys = ON;');
+try {
+  db.exec('PRAGMA journal_mode = WAL;');
+  db.exec('PRAGMA foreign_keys = ON;');
+} catch (e) {
+  // Bỏ qua nếu môi trường chỉ đọc
+}
 
 /**
  * Khởi tạo lược đồ cơ sở dữ liệu quan hệ hoàn chỉnh

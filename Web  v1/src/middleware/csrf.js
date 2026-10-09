@@ -16,7 +16,7 @@ function csrfToken(req, res) {
     path: '/'
   });
 
-  res.json({ csrfToken: token });
+  res.json({ token, csrfToken: token });
 }
 
 /**

@@ -1,20 +1,34 @@
 const { PrismaClient } = require('@prisma/client');
 const { config } = require('../config/env');
 
-let prisma;
+let prismaInstance = null;
 
 /**
- * Lấy instance của Prisma Client. Sử dụng lazy initialization.
- * Singleton pattern để tránh tạo nhiều connections.
+ * Lấy instance của Prisma Client. An toàn khi thiếu DATABASE_URL.
  */
 function getPrismaClient() {
-  if (!prisma) {
-    const logLevels = config.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'];
-    prisma = new PrismaClient({
+  if (prismaInstance) return prismaInstance;
+  if (!process.env.DATABASE_URL) {
+    return null;
+  }
+  const logLevels = config.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'];
+  try {
+    prismaInstance = new PrismaClient({
       log: logLevels,
     });
+  } catch (err) {
+    console.warn('[Prisma] Không thể kết nối cơ sở dữ liệu Postgres:', err.message);
+    prismaInstance = null;
   }
-  return prisma;
+  return prismaInstance;
 }
 
-module.exports = { prisma: getPrismaClient() };
+const prismaProxy = new Proxy({}, {
+  get(target, prop) {
+    const client = getPrismaClient();
+    if (!client) return undefined;
+    return client[prop];
+  }
+});
+
+module.exports = { prisma: prismaProxy, getPrismaClient };

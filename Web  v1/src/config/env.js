@@ -42,11 +42,7 @@ try {
   parsedEnv = envSchema.parse(process.env);
   
   if (!parsedEnv.DATABASE_URL) {
-    if (parsedEnv.NODE_ENV === 'production') {
-      throw new Error('DATABASE_URL is required in production');
-    } else {
-      console.warn('⚠️ WARNING: DATABASE_URL is missing. Database operations will fallback gracefully.');
-    }
+    console.warn('⚠️ WARNING: DATABASE_URL is missing. Sophia Codex will run in SQLite standalone mode.');
   }
 } catch (error) {
   console.error('❌ Lỗi xác thực biến môi trường:');

@@ -250,3 +250,8 @@ body {
   transform: translateY(-8px) rotateY(-5deg) scale(1.02);
   box-shadow: -14px 24px 42px rgba(14, 27, 21, 0.38);
 }
+
+/* Reader View Clearance: Chống thanh Audio Player Dock che khuất nội dung trang sách */
+#view-reader {
+  padding-bottom: 140px;
+}

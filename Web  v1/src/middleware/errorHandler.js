@@ -5,9 +5,16 @@ const { ZodError } = require('zod');
 // Lớp lỗi tùy chỉnh cho ứng dụng
 class AppError extends Error {
   constructor(statusCode, code, message) {
-    super(message);
-    this.statusCode = statusCode;
-    this.code = code;
+    if (typeof statusCode === 'string' && typeof code === 'number') {
+      // Trường hợp đảo tham số: new AppError(message, statusCode)
+      super(statusCode);
+      this.statusCode = code;
+      this.code = 'APP_ERROR';
+    } else {
+      super(message || (typeof code === 'string' ? code : 'Application Error'));
+      this.statusCode = typeof statusCode === 'number' ? statusCode : 500;
+      this.code = typeof code === 'string' ? code : 'APP_ERROR';
+    }
     this.isOperational = true;
     Error.captureStackTrace(this, this.constructor);
   }
@@ -22,7 +29,7 @@ function errorHandler(err, req, res, next) {
     return next(err);
   }
 
-  let statusCode = err.statusCode || 500;
+  let statusCode = typeof err.statusCode === 'number' && !isNaN(err.statusCode) ? err.statusCode : 500;
   let code = err.code || 'INTERNAL_SERVER_ERROR';
   let message = err.message || 'Internal Server Error';
   let details = undefined;

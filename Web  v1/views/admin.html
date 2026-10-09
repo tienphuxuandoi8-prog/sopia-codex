@@ -51,7 +51,7 @@
   </script>
 
   <!-- PWA Manifest & Theme Color -->
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#181E1A">
 
   <!-- Lucide Icons -->
@@ -83,8 +83,33 @@
       min-height: 148px;
     }
   </style>
-</head>
 <body class="min-h-screen bg-[#F8F5EE] text-[#181E1A] font-ui antialiased selection:bg-amber-200 selection:text-emerald-950 flex flex-col">
+
+  <!-- ==================== ADMIN AUTHENTICATION GUARD ==================== -->
+  <script>
+    (function enforceAdminAuth() {
+      try {
+        const localUserStr = localStorage.getItem('sophia_user');
+        let localUser = null;
+        if (localUserStr) {
+          localUser = JSON.parse(localUserStr);
+        }
+
+        const isAdmin = localUser && (
+          localUser.isSuperAdmin === true || 
+          (Array.isArray(localUser.permissions) && (localUser.permissions.includes('*') || localUser.permissions.includes('admin'))) ||
+          localUser.email === 'admin@sophiacodex.vn'
+        );
+
+        if (!isAdmin) {
+          sessionStorage.setItem('auth_redirect_msg', 'Vui lòng đăng nhập tài khoản Quản Trị để truy cập trang này.');
+          window.location.replace('login.html?next=admin.html');
+        }
+      } catch (err) {
+        window.location.replace('login.html?next=admin.html');
+      }
+    })();
+  </script>
 
   <!-- ==================== TOP ANNOUNCEMENT / STATUS BAR ==================== -->
   <div class="bg-[#11261B] text-amber-200 text-xs py-1.5 px-4 border-b border-amber-600/30 flex items-center justify-between gap-4">
@@ -101,7 +126,7 @@
         <span>sophia.db • Đang kết nối</span>
       </span>
       <span>|</span>
-      <a href="/" target="_blank" class="hover:text-amber-200 underline flex items-center gap-1">
+      <a href="index.html" class="hover:text-amber-200 underline flex items-center gap-1">
         <span>Xem Thư Viện Độc Giả</span>
         <i data-lucide="external-link" class="w-3 h-3"></i>
       </a>
@@ -153,7 +178,7 @@
               <i data-lucide="layers" class="w-4 h-4 text-stone-400"></i>
               <span>Chương Mục Toàn Văn</span>
             </div>
-            <span id="sidebar-chapters-count" class="text-[10px] bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800 text-stone-300 font-mono">99</span>
+            <span id="sidebar-chapters-count" class="text-[10px] bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800 text-stone-300 font-mono">112</span>
           </button>
 
           <!-- Item: Âm thanh & BGM -->
@@ -228,20 +253,26 @@
       <div class="p-4 border-t border-emerald-900/60 bg-[#09130E] space-y-3">
         <!-- Editor Badge -->
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center font-bold text-xs">
+          <div id="admin-user-avatar" class="w-9 h-9 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center font-bold text-xs">
             AD
           </div>
-          <div class="min-w-0">
-            <div class="text-xs font-semibold text-stone-200 truncate">Biên Tập Viên Trưởng</div>
-            <div class="text-[10px] text-amber-400 font-mono">Quyền Quản Trị Tối Cao</div>
+          <div class="min-w-0 flex-1">
+            <div id="admin-user-name" class="text-xs font-semibold text-stone-200 truncate">Quản Trị Viên</div>
+            <div id="admin-user-email" class="text-[10px] text-amber-400 font-mono truncate">admin@sophiacodex.vn</div>
           </div>
         </div>
 
         <!-- Jump to Front-End Button -->
-        <a href="/" target="_blank" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300 text-xs font-medium border border-white/10 transition-colors">
+        <a href="index.html" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300 text-xs font-medium border border-white/10 transition-colors">
           <i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-400"></i>
           <span>Mở Thư Viện Độc Giả</span>
         </a>
+
+        <!-- Nút Đăng Xuất Quản Trị (Sidebar) -->
+        <button type="button" onclick="handleAdminLogout()" class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 hover:text-rose-100 text-xs font-semibold border border-rose-500/30 transition-all shadow-sm">
+          <i data-lucide="log-out" class="w-3.5 h-3.5 text-rose-400"></i>
+          <span>Đăng Xuất Quản Trị</span>
+        </button>
       </div>
 
     </aside>
@@ -292,6 +323,12 @@
           <button onclick="openNewBookModal()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 text-xs font-bold shadow-md transition-all">
             <i data-lucide="plus" class="w-4 h-4"></i>
             <span>Thêm Tác Phẩm</span>
+          </button>
+
+          <!-- Nút Đăng Xuất Quản Trị (Top Header) -->
+          <button type="button" onclick="handleAdminLogout()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30 text-xs font-semibold shadow-sm transition-all" title="Đăng xuất khỏi quyền Quản trị">
+            <i data-lucide="log-out" class="w-3.5 h-3.5 text-rose-500"></i>
+            <span class="hidden sm:inline">Đăng Xuất</span>
           </button>
         </div>
 
@@ -373,7 +410,7 @@
               </div>
               <div class="my-auto py-1">
                 <div class="text-3xl font-extrabold tracking-tight text-stone-900 dark:text-stone-100 tabular-nums">
-                  <span id="kpi-chapters-count">99</span>
+                  <span id="kpi-chapters-count">112</span>
                 </div>
               </div>
               <div class="flex items-center gap-1.5 text-[11px] text-stone-600 dark:text-stone-400 font-medium truncate pt-2 border-t border-stone-100 dark:border-emerald-900/40">
@@ -2262,19 +2299,42 @@
   </div>
 
   <!-- Admin Application Logic -->
+  <script src="js/data.js"></script>
   <script src="js/bgm.js"></script>
   <script src="js/admin.js"></script>
 
-  <!-- PWA Service Worker Registration -->
+  <!-- Admin Auth & Logout Logic -->
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(reg => {
-          console.log('🏛️ Sophia Codex Admin PWA Service Worker đã sẵn sàng:', reg.scope);
-        }).catch(err => {
-          console.warn('⚠️ Service Worker không thể đăng ký:', err);
-        });
-      });
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const localUserStr = localStorage.getItem('sophia_user');
+        if (localUserStr) {
+          const user = JSON.parse(localUserStr);
+          const nameEl = document.getElementById('admin-user-name');
+          const emailEl = document.getElementById('admin-user-email');
+          const avatarEl = document.getElementById('admin-user-avatar');
+          if (nameEl && user.displayName) nameEl.textContent = user.displayName;
+          if (emailEl && user.email) emailEl.textContent = user.email;
+          if (avatarEl) {
+            const letter = (user.displayName ? user.displayName.charAt(0) : 'A').toUpperCase();
+            avatarEl.textContent = letter;
+          }
+        }
+      } catch(e) {}
+    });
+
+    async function handleAdminLogout() {
+      if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi quyền Quản Trị?')) {
+        localStorage.removeItem('sophia_user');
+        sessionStorage.removeItem('sophia_user');
+
+        if (window.location.protocol.startsWith('http') && typeof API !== 'undefined') {
+          try { await API.post('/auth/logout'); } catch(e) {}
+        }
+
+        sessionStorage.setItem('auth_redirect_msg', 'Bạn đã đăng xuất thành công khỏi trang Quản trị.');
+        window.location.replace('login.html?next=admin.html');
+      }
     }
   </script>
 </body>

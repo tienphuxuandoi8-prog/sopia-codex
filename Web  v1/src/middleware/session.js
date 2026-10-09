@@ -20,6 +20,21 @@ async function sessionMiddleware(req, res, next) {
     return next();
   }
 
+  if (!config.DATABASE_URL) {
+    const localUserStore = require('../lib/localUserStore');
+    const sessionData = localUserStore.getSession(token);
+    if (sessionData && sessionData.user) {
+      req.session = sessionData.session;
+      const user = sessionData.user;
+      req.user = {
+        ...user,
+        permissions: user.permissions || (user.isSuperAdmin ? ['*'] : ['reader.read']),
+        isSuperAdmin: !!user.isSuperAdmin
+      };
+    }
+    return next();
+  }
+
   try {
     // Hash token để tìm trong database
     const tokenHash = sha256(token);

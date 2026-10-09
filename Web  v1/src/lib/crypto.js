@@ -47,7 +47,9 @@ function timingSafeCompare(a, b) {
 
 module.exports = {
   randomToken,
+  generateToken: randomToken,
   sha256,
+  hashString: sha256,
   hmacSha256,
   timingSafeCompare
 };
