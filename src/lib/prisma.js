@@ -31,4 +31,6 @@ const prismaProxy = new Proxy({}, {
   }
 });
 
-module.exports = { prisma: prismaProxy, getPrismaClient };
+module.exports = prismaProxy;
+module.exports.prisma = prismaProxy;
+module.exports.getPrismaClient = getPrismaClient;

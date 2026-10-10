@@ -56,4 +56,5 @@ try {
   process.exit(1);
 }
 
-module.exports = { config: parsedEnv };
+module.exports = parsedEnv;
+module.exports.config = parsedEnv;
