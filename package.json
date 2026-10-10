@@ -4,7 +4,7 @@
   "description": "Thư Viện Triết Học Toàn Văn & Chiêm Nghiệm Thông Minh",
   "main": "src/server.local.js",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=18.0.0"
   },
   "scripts": {
     "dev": "concurrently \"node --watch src/server.local.js\" \"npx tailwindcss -i src/styles/tailwind.css -o public/css/app.css --watch\"",
