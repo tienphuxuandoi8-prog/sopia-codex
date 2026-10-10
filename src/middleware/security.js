@@ -34,8 +34,10 @@ function securityMiddleware() {
       credentials: true,
     }),
     
-    // Thêm Request ID vào header
+    // Thêm Security headers bổ sung và Request ID vào header
     (req, res, next) => {
+      res.setHeader('X-XSS-Protection', '1; mode=block');
+      res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
       const reqId = req.headers['x-request-id'] || crypto.randomUUID();
       req.id = reqId;
       res.setHeader('X-Request-Id', reqId);

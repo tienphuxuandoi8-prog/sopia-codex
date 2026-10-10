@@ -2,8 +2,6 @@
 chcp 65001 >nul
 title Sophia Codex — Khởi Động Hệ Thống Máy Chủ
 
-cd /d "%~dp0Web  v1"
-
 echo ====================================================================
 echo               🏛️  SOPHIA CODEX - THƯ VIỆN MINH TRIẾT
 echo ====================================================================
@@ -13,6 +11,7 @@ where node >nul 2>nul
 if %errorlevel% neq 0 (
     echo  ❌ Không tìm thấy Node.js trên máy tính!
     echo  👉 Vui lòng cài đặt Node.js từ https://nodejs.org để chạy máy chủ.
+    echo  (Bạn vẫn có thể mở trực tiếp file index.html để xem giao diện)
     pause
     exit /b 1
 )

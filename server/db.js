@@ -30,9 +30,10 @@ if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
 
 const db = new DatabaseSync(DB_PATH);
 
-// Kích hoạt WAL mode và Foreign Keys để tối ưu hiệu năng
+// Kích hoạt WAL mode, busy_timeout và Foreign Keys để tối ưu hiệu năng và an toàn đồng thời
 try {
   db.exec('PRAGMA journal_mode = WAL;');
+  db.exec('PRAGMA busy_timeout = 5000;');
   db.exec('PRAGMA foreign_keys = ON;');
 } catch (e) {
   // Bỏ qua nếu môi trường chỉ đọc
@@ -847,13 +848,24 @@ function getAllAiConversations(bookId = null) {
   `).all();
 }
 
+function sanitizeXss(str) {
+  if (typeof str !== 'string') return str;
+  return str
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/onerror\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+    .replace(/onload\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '');
+}
+
 function createAiConversation(conv) {
+  const sanitizedQuestion = sanitizeXss(conv.question || '');
+  const sanitizedResponse = sanitizeXss(conv.response || '');
   const insert = db.prepare(`
     INSERT INTO ai_conversations (book_id, question, response, created_at)
     VALUES (?, ?, ?, datetime('now'))
   `);
-  const res = insert.run(conv.book_id || null, conv.question, conv.response || '');
-  return { id: res.lastInsertRowid, ...conv };
+  const res = insert.run(conv.book_id || null, sanitizedQuestion, sanitizedResponse);
+  return { id: res.lastInsertRowid, ...conv, question: sanitizedQuestion, response: sanitizedResponse };
 }
 
 function deleteAiConversation(id) {

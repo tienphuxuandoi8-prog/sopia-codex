@@ -275,7 +275,7 @@ router.get('/ai/stats', (req, res) => {
 
 router.get('/ai/conversations', (req, res) => {
   try {
-    const convs = dbService.getAllAiConversations();
+    const convs = dbService.getAllAiConversations(req.query.book_id || null);
     res.json(convs);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -284,8 +284,8 @@ router.get('/ai/conversations', (req, res) => {
 
 router.post('/ai/conversations', (req, res) => {
   try {
-    const id = dbService.createAiConversation(req.body);
-    res.status(201).json({ success: true, id });
+    const created = dbService.createAiConversation(req.body);
+    res.status(201).json({ success: true, ...created });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -302,7 +302,7 @@ router.delete('/ai/conversations/:id', (req, res) => {
 
 router.delete('/ai/conversations', (req, res) => {
   try {
-    const result = dbService.clearAiConversations();
+    const result = dbService.clearAiConversations(req.query.book_id || null);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -313,7 +313,7 @@ router.delete('/ai/conversations', (req, res) => {
 router.post('/reading-logs', (req, res) => {
   try {
     const result = dbService.createReadingLog(req.body);
-    res.json(result);
+    res.status(201).json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

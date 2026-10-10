@@ -2,62 +2,74 @@
 
 > **Thư Viện Triết Học Toàn Văn & Chiêm Nghiệm Thông Minh**
 
-Dự án ứng dụng web triết học Sophia Codex tích hợp thư viện sách kinh điển, chiêm nghiệm Socrates AI, audio narration, hệ thống ghi chú và trang quản trị Admin Studio với cơ sở dữ liệu SQLite.
+Dự án ứng dụng web triết học Sophia Codex tích hợp thư viện sách kinh điển, chiêm nghiệm Socrates AI, audio narration, hệ thống ghi chú và trang quản trị Admin Studio với cơ sở dữ liệu SQLite / PostgreSQL. Toàn bộ dự án đã được tinh gọn và đồng bộ thống nhất tại thư mục gốc.
 
 ---
 
-## 📁 Cấu Trúc Dự Án
+## 📁 Cấu Trúc Dự Án (Hợp Nhất)
 
 ```
-├── Web  v1/                     # Mã nguồn chính của ứng dụng
-│   ├── api/                     # Serverless Function API (Vercel)
-│   ├── assets/                  # Ảnh bìa SVG, assets
-│   ├── css/                     # Stylesheet & Tailwind CSS config
-│   ├── data/                    # SQLite Database (sophia.db)
-│   ├── js/                      # Frontend JavaScript logic
-│   │   └── books-data/          # Dữ liệu nội dung các tác phẩm triết học
-│   ├── scripts/                 # Build & test scripts
-│   ├── server/                  # Backend HTTP & REST API server
-│   ├── admin.html               # Giao diện Quản Trị Admin Studio
-│   ├── DEPLOY.md                # Hướng dẫn deploy lên Vercel
-│   ├── index.html               # Giao diện Độc Giả chính
-│   ├── manifest.json            # PWA manifest
-│   ├── package.json             # Cấu hình dự án & dependencies
-│   ├── sw.js                    # Service Worker
-│   └── vercel.json              # Cấu hình Vercel deployment
-├── tham khảo/                   # Hình ảnh thiết kế & tài liệu tham khảo
-└── README.md                    # Tài liệu hướng dẫn dự án
+├── api/                     # Serverless Function API (Vercel)
+├── assets/                  # Ảnh bìa SVG & tài nguyên đồ họa
+├── css/                     # Stylesheet & Tailwind CSS
+├── data/                    # SQLite Database (sophia.db) & seeds
+├── docs/                    # Tài liệu kiến trúc và hướng dẫn vận hành
+├── js/                      # Frontend JavaScript logic (Admin, AI, Audio, Reader)
+├── prisma/                  # Prisma ORM Schema & seed scripts
+├── public/                  # Static assets & giao diện phát hành
+├── scripts/                 # Test suites (E2E, Admin, Production) & build scripts
+├── server/                  # SQLite database engine & REST API handlers
+├── src/                     # Core backend Express server & middleware
+├── tests/                   # Unit & Integration test suites (Vitest)
+├── admin.html               # Giao diện Quản Trị Admin Studio
+├── index.html               # Giao diện Độc Giả chính
+├── Chay_Website.bat         # Script 1-click khởi chạy máy chủ trên Windows
+├── DEPLOY.md                # Hướng dẫn chi tiết triển khai lên Vercel
+├── package.json             # Cấu hình dự án & scripts kiểm thử
+├── sw.js                    # Service Worker (PWA Offline)
+├── manifest.json            # Web App Manifest
+├── vercel.json              # Cấu hình xuất bản Vercel
+├── tham khảo/               # Tư liệu tham khảo
+└── README.md                # Tài liệu dự án
 ```
 
 ---
 
 ## 🚀 Hướng Dẫn Chạy Cục Bộ (Local)
 
-1. **Di chuyển vào thư mục ứng dụng:**
-   ```bash
-   cd "Web  v1"
-   ```
+1. **Cách 1: Khởi chạy 1-Click (Windows):**
+   Nhấp đúp chuột vào file `Chay_Website.bat`. Trình duyệt sẽ tự động mở trang web và khởi chạy server local.
 
-2. **Khởi động server:**
+2. **Cách 2: Khởi chạy qua dòng lệnh:**
    ```bash
    npm start
-   # hoặc: node server/index.js
+   # hoặc: node src/server.local.js
    ```
 
 3. **Mở trình duyệt:**
-   - Độc giả: [http://localhost:3000](http://localhost:3000)
-   - Admin Studio: [http://localhost:3000/admin.html](http://localhost:3000/admin.html)
+   - Cổng Độc giả: [http://localhost:3000](http://localhost:3000)
+   - Cổng Quản trị Admin: [http://localhost:3000/admin.html](http://localhost:3000/admin.html)
 
 ---
 
-## ☁️ Hướng Dẫn Deploy Lên Vercel
+## 🧪 Kiểm Thử Hệ Thống (Automated Test Suites)
 
-1. Truy cập [https://vercel.com](https://vercel.com) và chọn **"Add New..."** -> **"Project"**.
-2. Chọn repository **`tienphuxuandoi8-prog/sopia-codex`**.
-3. **Quan trọng:** Tại mục **Root Directory**, bấm **Edit** và chọn thư mục `Web  v1`.
-4. Bấm **Deploy**. Vercel sẽ tự động build và xuất bản trang web!
+Toàn bộ hệ thống được bảo đảm chất lượng với các bộ test tự động:
+```bash
+npm test                             # Unit & Integration tests (Vitest)
+node scripts/test-e2e.js             # Kiểm thử End-to-End API & Độc Giả (33/33 PASS)
+node scripts/test-admin-e2e.js       # Kiểm thử Quản Trị Admin Studio (62/62 PASS)
+node scripts/test-production-ready.js # Kiểm thử bảo mật & chuẩn Production (29/29 PASS)
+```
 
-Chi tiết đầy đủ: xem tại [Web  v1/DEPLOY.md](Web%20%20v1/DEPLOY.md).
+---
+
+## ☁️ Triển Khai Lên Vercel
+
+Dự án đã được cấu hình tối ưu ở thư mục gốc:
+1. Đẩy mã nguồn lên GitHub repository.
+2. Trên Vercel Dashboard, import repository **`tienphuxuandoi8-prog/sopia-codex`**.
+3. Vercel tự động nhận diện `vercel.json` và build toàn bộ ứng dụng từ thư mục gốc.
 
 ---
 

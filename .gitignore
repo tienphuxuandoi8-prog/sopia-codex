@@ -3,6 +3,8 @@ node_modules/
 
 # Environment
 .env
+.env.local
+.env.production
 .env.*
 
 # Vercel
@@ -15,7 +17,17 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# SQLite temp / WAL files
+# SQLite WAL & temporary files
 *.db-shm
 *.db-wal
 data/backups/
+
+# Prisma
+prisma/*.db
+
+# Build output
+public/css/app.css
+
+# IDE
+.vscode/
+.idea/
