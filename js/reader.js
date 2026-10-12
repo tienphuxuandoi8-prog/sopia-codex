@@ -5,6 +5,7 @@
  * - Đo lường tiến độ cuộn trang & ước tính thời gian đọc còn lại
  * - Chuyển đổi font chữ chuẩn: Merriweather, Lora, Be Vietnam Pro
  * - Tương tác bôi đen hỏi Hiền Triết AI hoặc nghe đọc riêng
+ * - Highlight lưu trữ, progress sync, reading session log
  */
 
 class ReaderEngine {
@@ -14,14 +15,24 @@ class ReaderEngine {
     this.fontSize = 19; // px chuẩn sách đọc
     this.fontFamily = 'Merriweather';
     this.selectedText = "";
+    this.currentSelectionRange = null;
+    this.selectedParagraphIndex = 0;
+    this.selectedStartOffset = 0;
+    this.selectedEndOffset = 0;
 
     this.readerView = document.getElementById('view-reader');
     this.catalogView = document.getElementById('view-catalog');
     this.readerBody = document.getElementById('reader-body');
     this.tocContainer = document.getElementById('reader-toc-list');
+    
+    // Popup container (sẽ được lazy-init hoặc gắn event sau)
     this.popup = document.getElementById('text-selection-popup');
+    
     this.readingProgressEl = document.getElementById('reader-reading-progress');
     this.timeLeftEl = document.getElementById('reader-time-left');
+
+    this.progressTimeout = null;
+    this.currentProgressPct = 0;
 
     this.initEvents();
   }
@@ -62,55 +73,39 @@ class ReaderEngine {
     // Window scroll progress bar & remaining time calculation
     window.addEventListener('scroll', () => {
       const progressBar = document.getElementById('reading-scroll-progress');
-      if (!progressBar) return;
       if (this.readerView && !this.readerView.classList.contains('hidden')) {
-        progressBar.classList.remove('hidden');
+        if (progressBar) progressBar.classList.remove('hidden');
         const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
         const progress = scrollTotal > 0 ? (window.scrollY / scrollTotal) * 100 : 0;
-        progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+        if (progressBar) progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
         
         if (this.readingProgressEl) {
           this.readingProgressEl.textContent = `${Math.round(progress)}% đã đọc`;
         }
+
+        this.scheduleProgressSave(progress);
       } else {
-        progressBar.classList.add('hidden');
+        if (progressBar) progressBar.classList.add('hidden');
       }
     });
+
+    // Save progress immediately if page is hidden
+    window.addEventListener('visibilitychange', () => {
+      if (document.hidden && this.currentBook) {
+        this.saveProgressBeacon();
+      }
+    });
+
+    // Periodic reading session log (every 30s)
+    setInterval(() => {
+        if (this.currentBook && !document.hidden && this.readerView && !this.readerView.classList.contains('hidden')) {
+            this.logReadingSessionAPI();
+        }
+    }, 30000);
 
     // Selection popup events
     document.addEventListener('selectionchange', () => this.handleSelection());
     
-    document.getElementById('popup-ask-ai')?.addEventListener('click', () => {
-      if (this.selectedText && window.aiChat) {
-        window.aiChat.askWithSelection(this.selectedText);
-        this.hideSelectionPopup();
-      }
-    });
-
-    document.getElementById('popup-listen')?.addEventListener('click', () => {
-      if (this.selectedText && window.audioEngine) {
-        window.audioEngine.readSpecificText(this.selectedText);
-        this.hideSelectionPopup();
-      }
-    });
-
-    document.getElementById('popup-copy')?.addEventListener('click', () => {
-      if (this.selectedText) {
-        navigator.clipboard.writeText(this.selectedText);
-        this.showToast("Đã sao chép trích đoạn!");
-        this.hideSelectionPopup();
-      }
-    });
-
-    document.getElementById('popup-quote-card')?.addEventListener('click', () => {
-      if (this.selectedText && window.quoteGenerator) {
-        const bookTitle = this.currentBook ? this.currentBook.title : "Kinh Điển Triết Học";
-        const author = this.currentBook ? this.currentBook.author : "Hiền Triết";
-        window.quoteGenerator.open(this.selectedText, author, bookTitle);
-        this.hideSelectionPopup();
-      }
-    });
-
     // Reader BGM Toggle & Volume
     document.getElementById('reader-bgm-toggle')?.addEventListener('click', () => {
       if (window.bgmEngine) {
@@ -125,9 +120,11 @@ class ReaderEngine {
     });
 
     // Ngăn chặn sự kiện mousedown trên popup làm mất vùng chọn văn bản
-    this.popup?.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-    });
+    if (this.popup) {
+        this.popup.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+        });
+    }
 
     // Hide popup when clicking outside
     document.addEventListener('mousedown', (e) => {
@@ -170,19 +167,36 @@ class ReaderEngine {
   async openBook(bookId, chapterIndex = 0) {
     let book = null;
     try {
-      const res = await fetch(`/api/books/${bookId}`);
+      const res = await fetch(`/api/v1/books/${bookId}`);
       if (res.ok) {
         book = await res.json();
-        if (book) {
-          book.school = book.school || 'Kinh Điển Triết Học';
-          book.bgmTheme = book.bgm_theme || book.bgmTheme || "Nhạc nền thiền định";
-          book.readTime = book.read_time || book.readTime || "15 phút đọc";
-        }
       }
     } catch (e) {}
 
-    if (!book) {
-      book = PHILOSOPHY_DATA.books.find(b => b.id === bookId);
+    const localBook = (typeof PHILOSOPHY_DATA !== 'undefined' && PHILOSOPHY_DATA.books) 
+      ? PHILOSOPHY_DATA.books.find(b => b.id === bookId || b.slug === bookId) 
+      : null;
+
+    if (book) {
+      book = {
+        ...localBook,
+        ...book,
+        title: book.title || localBook?.title,
+        author: book.author || localBook?.author,
+        school: book.school || localBook?.school || 'Kinh Điển Triết Học',
+        bgmTheme: book.bgm_theme || book.bgmTheme || localBook?.bgmTheme || "Giai điệu thiền định thư phòng",
+        readTime: book.read_time || book.readTime || localBook?.readTime || "180 phút",
+        audioDuration: book.audio_duration || book.audioDuration || localBook?.audioDuration || "4 giờ",
+        summary: book.summary || localBook?.summary || '',
+        tagline: book.tagline || localBook?.tagline || '',
+        annotation: book.annotation || localBook?.annotation || book.summary || localBook?.summary || '',
+        historicalContext: book.historicalContext || book.historical_context || localBook?.historicalContext || '',
+        coreThesis: book.coreThesis || book.core_thesis || localBook?.coreThesis || '',
+        modernRelevance: book.modernRelevance || book.modern_relevance || localBook?.modernRelevance || '',
+        chapters: (book.chapters && book.chapters.length > 0) ? book.chapters : (localBook?.chapters || [])
+      };
+    } else {
+      book = localBook;
     }
     if (!book) return;
 
@@ -213,7 +227,7 @@ class ReaderEngine {
     }
 
     this.renderTOC();
-    this.renderChapter(chapterIndex);
+    await this.renderChapter(chapterIndex);
 
     // Bật Reader View và ẩn Catalog
     this.catalogView?.classList.add('hidden');
@@ -243,6 +257,13 @@ class ReaderEngine {
     this.currentBook.chapters.forEach((chap, idx) => {
       chap.number = chap.number || chap.chapter_number || `Chương ${idx + 1}`;
       const active = idx === this.currentChapterIndex;
+      
+      let lockBadge = '';
+      const hasPremium = window.Auth && typeof window.Auth.hasPremium === 'function' ? window.Auth.hasPremium() : false;
+      if (chap.accessLevel === 'PREMIUM' && !hasPremium) {
+        lockBadge = ' <span title="Premium">🔒</span>';
+      }
+
       const item = document.createElement('button');
       item.className = `w-full text-left p-3.5 rounded-xl transition-all flex items-start gap-3 text-sm ${
         active 
@@ -255,7 +276,7 @@ class ReaderEngine {
         }">${idx + 1}</span>
         <div class="min-w-0 flex-1">
           <div class="text-[11px] uppercase tracking-wider font-display ${active ? 'text-amber-300' : 'text-stone-500'}">${chap.number}</div>
-          <div class="line-clamp-2 text-xs leading-snug mt-0.5">${chap.title}</div>
+          <div class="line-clamp-2 text-xs leading-snug mt-0.5">${chap.title}${lockBadge}</div>
         </div>
       `;
       item.addEventListener('click', () => {
@@ -265,7 +286,7 @@ class ReaderEngine {
     });
   }
 
-  renderChapter(index) {
+  async renderChapter(index) {
     if (!this.currentBook || !this.currentBook.chapters || this.currentBook.chapters.length === 0) return;
     index = Math.max(0, Math.min(this.currentBook.chapters.length - 1, index));
     this.currentChapterIndex = index;
@@ -289,69 +310,143 @@ class ReaderEngine {
     let totalWords = 0;
     if (this.readerBody) {
       this.readerBody.innerHTML = '';
+
+      // Render Chú Thích Tác Phẩm & Bối Cảnh Lịch Sử (Collapsible Annotation)
+      if (this.currentBook && (this.currentBook.annotation || this.currentBook.summary || this.currentBook.historicalContext)) {
+        const annotationBox = document.createElement('div');
+        annotationBox.className = 'mb-10 p-5 md:p-6 rounded-2xl bg-amber-500/10 dark:bg-emerald-950/40 border border-amber-600/30 text-stone-800 dark:text-stone-200 text-xs md:text-sm leading-relaxed';
+        
+        const safeSummary = this.currentBook.summary || this.currentBook.annotation || 'Kiệt tác triết học kinh điển.';
+        const safeHistory = this.currentBook.historicalContext || 'Tác phẩm được đúc kết từ bối cảnh văn hóa - triết học sâu sắc của nhân loại.';
+        const safeThesis = this.currentBook.coreThesis || this.currentBook.tagline || 'Khảo sát bản chất của con người và vũ trụ.';
+        const safeRelevance = this.currentBook.modernRelevance || 'Ứng dụng vào tâm lý học, sự điềm tĩnh và quản trị cuộc sống.';
+
+        annotationBox.innerHTML = `
+          <div class="flex items-center justify-between cursor-pointer select-none" onclick="const b = document.getElementById('reader-book-annotation-content'); const icon = document.getElementById('annotation-chevron'); if (b) { b.classList.toggle('hidden'); } if (icon) { icon.classList.toggle('rotate-180'); }">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-amber-500/25 text-amber-700 dark:text-amber-300 flex items-center justify-center font-bold text-sm">📜</span>
+              <div>
+                <h4 class="font-display font-bold text-sm text-stone-900 dark:text-stone-100">
+                  Chú Thích & Bối Cảnh Tác Phẩm: ${this.currentBook.title}
+                </h4>
+                <p class="text-[11px] text-stone-500 dark:text-stone-400">Hoàn cảnh lịch sử, cốt lõi tư tưởng & giá trị chiêm nghiệm</p>
+              </div>
+            </div>
+            <button class="text-xs text-amber-700 dark:text-amber-400 font-semibold flex items-center gap-1 hover:underline">
+              <span>Chi tiết</span>
+              <span id="annotation-chevron" class="inline-block transition-transform duration-200">▼</span>
+            </button>
+          </div>
+
+          <div id="reader-book-annotation-content" class="hidden mt-4 pt-3.5 border-t border-amber-600/20 space-y-3.5 animate-fade-in text-xs leading-relaxed">
+            <div>
+              <span class="font-bold text-amber-800 dark:text-amber-300">📖 Giới thiệu tác phẩm:</span>
+              <p class="mt-0.5 text-stone-700 dark:text-stone-300">${safeSummary}</p>
+            </div>
+            <div>
+              <span class="font-bold text-amber-800 dark:text-amber-300">🏛️ Bối cảnh lịch sử ra đời:</span>
+              <p class="mt-0.5 text-stone-700 dark:text-stone-300">${safeHistory}</p>
+            </div>
+            <div>
+              <span class="font-bold text-amber-800 dark:text-amber-300">💡 Luận điểm triết học cốt lõi:</span>
+              <p class="mt-0.5 text-stone-700 dark:text-stone-300">${safeThesis}</p>
+            </div>
+            <div>
+              <span class="font-bold text-amber-800 dark:text-amber-300">🎯 Giá trị thực tiễn đương đại:</span>
+              <p class="mt-0.5 text-stone-700 dark:text-stone-300">${safeRelevance}</p>
+            </div>
+          </div>
+        `;
+        this.readerBody.appendChild(annotationBox);
+      }
+
       chapter.paragraphs.forEach((pText, pIdx) => {
         totalWords += pText.split(/\s+/).length;
         const p = document.createElement('p');
         p.id = `para-${pIdx}`;
-        p.className = 'leading-relaxed mb-6 cursor-text transition-colors duration-200';
+        p.className = 'reader-para leading-relaxed mb-6 cursor-text transition-colors duration-200';
         p.textContent = pText;
         this.readerBody.appendChild(p);
       });
 
-      // Render Hộp Chiêm Nghiệm Thực Tiễn Cuối Chương
-      const takeaways = chapter.takeaways || [
-        {
-          title: "Làm Chủ Tâm Trí Trước Biến Cố",
-          desc: "Bạn không thể kiểm soát nghịch cảnh bên ngoài, nhưng hoàn toàn có thể kiểm soát thái độ và phản ứng của bản thân."
-        },
-        {
-          title: "Hành Động Vì Lương Tri",
-          desc: "Làm điều tốt vì đó là bổn phận của một con người chính trực, không phải vì mong cầu người khác khen ngợi hay đền đáp."
-        }
-      ];
-
-      const takeawayBox = document.createElement('div');
-      takeawayBox.className = 'mt-12 p-6 md:p-8 rounded-3xl bg-gradient-to-br from-amber-500/10 via-emerald-950/5 to-amber-500/15 border border-amber-600/30 shadow-sm space-y-4';
-      
-      const safeBookTitle = (this.currentBook.title || '').replace(/'/g, "\\'");
-      const safeAuthor = (this.currentBook.author || '').replace(/'/g, "\\'");
-      const firstQuote = (chapter.paragraphs[0] || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-
-      takeawayBox.innerHTML = `
-        <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-amber-600/20">
-          <div class="flex items-center gap-2.5">
-            <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-base">💡</span>
-            <div>
-              <h4 class="font-bold text-stone-900 dark:text-stone-100 text-sm md:text-base">Chiêm Nghiệm Thực Tiễn & Ứng Dụng Đời Sống</h4>
-              <p class="text-[11px] text-stone-500 dark:text-stone-400">Ứng dụng tư tưởng ${this.currentBook.title} vào công việc & tâm lý hiện đại</p>
-            </div>
-          </div>
-          <button onclick="window.quoteGenerator?.open('${firstQuote}', '${safeAuthor}', '${safeBookTitle} - ${chapter.number}')" 
-                  class="px-3.5 py-1.5 rounded-full bg-emerald-950 text-amber-200 text-xs font-semibold hover:bg-emerald-900 border border-amber-500/40 flex items-center gap-1.5 shadow-sm transition-all hover:scale-105">
-            <span>📸 Tạo ảnh Facebook chương này</span>
+      if (chapter.locked === true) {
+        const lockCard = document.createElement('div');
+        lockCard.innerHTML = `
+      <div class="my-10 p-8 rounded-3xl bg-gradient-to-br from-stone-900 via-emerald-950 to-stone-900 border border-amber-500/40 text-center shadow-2xl space-y-4">
+        <div class="w-14 h-14 mx-auto rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center border border-amber-500/40">
+          <i data-lucide="lock" class="w-7 h-7"></i>
+        </div>
+        <h3 class="text-xl font-display font-bold text-amber-200">Kiệt Tác Này Thuộc Đặc Quyền Sophia Premium</h3>
+        <p class="text-sm text-stone-300 max-w-lg mx-auto leading-relaxed">
+          Bạn vừa đọc xong phần trích đoạn mở đầu. Để chiêm nghiệm trọn vẹn toàn bộ văn bản gốc cùng các chú giải triết học sâu sắc và đàm đạo không giới hạn với Socrates AI, hãy nâng cấp tài khoản của bạn.
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <a href="/pricing.html" class="px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-sm shadow-md transition-all">
+            ✨ Mở Khóa Toàn Bộ Chỉ Từ 49.000đ
+          </a>
+          <button onclick="if(window.Auth && !window.Auth.isLoggedIn()) window.location.href='/login.html?next='+encodeURIComponent(window.location.pathname+window.location.search);" class="px-5 py-2.5 rounded-full bg-stone-800/80 hover:bg-stone-700 text-stone-200 text-sm border border-stone-700 transition-all">
+            Đã có gói? Đăng nhập
           </button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
-          ${takeaways.map((item, tIdx) => {
-            const safeItemDesc = (item.desc || item.description || '').replace(/'/g, "\\'");
-            const safeItemTitle = (item.title || '').replace(/'/g, "\\'");
-            return `
-            <div class="p-4 rounded-2xl bg-white/85 dark:bg-[#111E17] border border-stone-200/80 dark:border-emerald-900/60 shadow-xs flex items-start gap-3">
-              <span class="w-6 h-6 rounded-lg bg-emerald-950 text-amber-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">${tIdx + 1}</span>
-              <div class="min-w-0 flex-1">
-                <h5 class="text-xs font-bold text-stone-900 dark:text-stone-100 leading-snug">${item.title}</h5>
-                <p class="text-[12px] text-stone-600 dark:text-stone-300 mt-1.5 leading-relaxed">${item.desc || item.description || ''}</p>
-                <button onclick="window.quoteGenerator?.open('${safeItemTitle}: ${safeItemDesc}', '${safeAuthor}', '${safeBookTitle}')" 
-                        class="mt-2.5 text-[11px] text-amber-700 dark:text-amber-400 font-semibold hover:underline flex items-center gap-1">
-                  <span>Tạo ảnh trích dẫn này →</span>
-                </button>
+      </div>`;
+        this.readerBody.appendChild(lockCard);
+        if (window.lucide) window.lucide.createIcons();
+      } else {
+        // Render Hộp Chiêm Nghiệm Thực Tiễn Cuối Chương
+        const takeaways = chapter.takeaways || [
+          {
+            title: "Làm Chủ Tâm Trí Trước Biến Cố",
+            desc: "Bạn không thể kiểm soát nghịch cảnh bên ngoài, nhưng hoàn toàn có thể kiểm soát thái độ và phản ứng của bản thân."
+          },
+          {
+            title: "Hành Động Vì Lương Tri",
+            desc: "Làm điều tốt vì đó là bổn phận của một con người chính trực, không phải vì mong cầu người khác khen ngợi hay đền đáp."
+          }
+        ];
+
+        const takeawayBox = document.createElement('div');
+        takeawayBox.className = 'mt-12 p-6 md:p-8 rounded-3xl bg-gradient-to-br from-amber-500/10 via-emerald-950/5 to-amber-500/15 border border-amber-600/30 shadow-sm space-y-4';
+        
+        const safeBookTitle = (this.currentBook.title || '').replace(/'/g, "\\'");
+        const safeAuthor = (this.currentBook.author || '').replace(/'/g, "\\'");
+        const firstQuote = (chapter.paragraphs[0] || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+        takeawayBox.innerHTML = `
+          <div class="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-amber-600/20">
+            <div class="flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-base">💡</span>
+              <div>
+                <h4 class="font-bold text-stone-900 dark:text-stone-100 text-sm md:text-base">Chiêm Nghiệm Thực Tiễn & Ứng Dụng Đời Sống</h4>
+                <p class="text-[11px] text-stone-500 dark:text-stone-400">Ứng dụng tư tưởng ${this.currentBook.title} vào công việc & tâm lý hiện đại</p>
               </div>
             </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-      this.readerBody.appendChild(takeawayBox);
+            <button onclick="window.quoteGenerator?.open('${firstQuote}', '${safeAuthor}', '${safeBookTitle} - ${chapter.number}')" 
+                    class="px-3.5 py-1.5 rounded-full bg-emerald-950 text-amber-200 text-xs font-semibold hover:bg-emerald-900 border border-amber-500/40 flex items-center gap-1.5 shadow-sm transition-all hover:scale-105">
+              <span>📸 Tạo ảnh Facebook chương này</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
+            ${takeaways.map((item, tIdx) => {
+              const safeItemDesc = (item.desc || item.description || '').replace(/'/g, "\\'");
+              const safeItemTitle = (item.title || '').replace(/'/g, "\\'");
+              return `
+              <div class="p-4 rounded-2xl bg-white/85 dark:bg-[#111E17] border border-stone-200/80 dark:border-emerald-900/60 shadow-xs flex items-start gap-3">
+                <span class="w-6 h-6 rounded-lg bg-emerald-950 text-amber-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">${tIdx + 1}</span>
+                <div class="min-w-0 flex-1">
+                  <h5 class="text-xs font-bold text-stone-900 dark:text-stone-100 leading-snug">${item.title}</h5>
+                  <p class="text-[12px] text-stone-600 dark:text-stone-300 mt-1.5 leading-relaxed">${item.desc || item.description || ''}</p>
+                  <button onclick="window.quoteGenerator?.open('${safeItemTitle}: ${safeItemDesc}', '${safeAuthor}', '${safeBookTitle}')" 
+                          class="mt-2.5 text-[11px] text-amber-700 dark:text-amber-400 font-semibold hover:underline flex items-center gap-1">
+                    <span>Tạo ảnh trích dẫn này →</span>
+                  </button>
+                </div>
+              </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+        this.readerBody.appendChild(takeawayBox);
+      }
 
       this.updateTypography();
     }
@@ -370,7 +465,10 @@ class ReaderEngine {
     // Cuộn trang mượt mà lên đầu chương mới
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Ghi nhận nhật ký đọc sâu vào cơ sở dữ liệu SQLite
+    // Restore Highlights
+    await this.restoreHighlights(chapter.id || chapter.chapterId || chapter.chapter_number || index.toString());
+
+    // Ghi nhận nhật ký đọc sâu vào cơ sở dữ liệu
     this.logReadingSession(this.currentBook.id, chapter.id || `${this.currentBook.id}-c${index + 1}`);
   }
 
@@ -392,7 +490,10 @@ class ReaderEngine {
     this.renderChapter(this.currentChapterIndex + 1);
   }
 
+  // --- LOGGING VÀ PROGRESS SYNC ---
+
   logReadingSession(bookId, chapterId) {
+    // Old legacy API method
     try {
       fetch('/api/reading-logs', {
         method: 'POST',
@@ -408,6 +509,98 @@ class ReaderEngine {
     } catch (e) {}
   }
 
+  async logReadingSessionAPI() {
+    const token = localStorage.getItem('token');
+    if (!token || !this.currentBook) return;
+    try {
+      await fetch('/api/v1/reader/sessions', {
+         method: 'POST',
+         headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          bookId: this.currentBook.id,
+          chapterId: this.currentBook.chapters[this.currentChapterIndex]?.id || this.currentChapterIndex.toString(),
+          durationSeconds: 30
+        })
+      });
+    } catch(e) {}
+  }
+
+  scheduleProgressSave(progressPct) {
+    if (this.progressTimeout) clearTimeout(this.progressTimeout);
+    this.currentProgressPct = progressPct;
+    this.progressTimeout = setTimeout(() => {
+      this.saveProgressAPI();
+    }, 5000);
+  }
+
+  getVisibleParagraphIndex() {
+    let paragraphIndex = 0;
+    if (this.readerBody) {
+      const paragraphs = this.readerBody.querySelectorAll('.reader-para');
+      for(let i=0; i<paragraphs.length; i++) {
+        const rect = paragraphs[i].getBoundingClientRect();
+        if (rect.top >= 0 && rect.top <= window.innerHeight/2) {
+           paragraphIndex = parseInt(paragraphs[i].id.split('-')[1] || "0");
+           break;
+        }
+      }
+    }
+    return paragraphIndex;
+  }
+
+  async saveProgressAPI() {
+    const token = localStorage.getItem('token');
+    if (!token || !this.currentBook) return;
+    try {
+      const paragraphIndex = this.getVisibleParagraphIndex();
+      const chapterId = this.currentBook.chapters[this.currentChapterIndex]?.id || this.currentChapterIndex.toString();
+      
+      await fetch(`/api/v1/reader/progress/${this.currentBook.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          chapterId: chapterId,
+          paragraphIndex: paragraphIndex,
+          progressPct: Math.round(this.currentProgressPct || 0)
+        })
+      });
+    } catch(e) {}
+  }
+
+  saveProgressBeacon() {
+    const token = localStorage.getItem('token');
+    if (!token || !this.currentBook) return;
+    const paragraphIndex = this.getVisibleParagraphIndex();
+    const chapterId = this.currentBook.chapters[this.currentChapterIndex]?.id || this.currentChapterIndex.toString();
+
+    const payload = JSON.stringify({
+      chapterId: chapterId,
+      paragraphIndex: paragraphIndex,
+      progressPct: Math.round(this.currentProgressPct || 0)
+    });
+
+    try {
+      // Dùng fetch với keepalive thay cho sendBeacon để có thể gửi header Authorization
+      fetch(`/api/v1/reader/progress/${this.currentBook.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: payload,
+        keepalive: true
+      });
+    } catch(e) {}
+  }
+
+  // --- HIGHLIGHT & TEXT SELECTION POPUP ---
+
   handleSelection() {
     const selection = window.getSelection();
     const text = selection?.toString().trim();
@@ -418,26 +611,208 @@ class ReaderEngine {
     }
 
     this.selectedText = text;
+    if (selection.rangeCount > 0) {
+      this.currentSelectionRange = selection.getRangeAt(0).cloneRange();
+    }
+    
+    // Tìm paragraph index & offset
+    let node = selection.anchorNode;
+    let pNode = node.nodeType === 3 ? node.parentNode.closest('p') : node.closest('p');
+    if (pNode && pNode.id && pNode.id.startsWith('para-')) {
+        this.selectedParagraphIndex = parseInt(pNode.id.split('-')[1]);
+        const pText = pNode.textContent;
+        this.selectedStartOffset = pText.indexOf(text);
+        if (this.selectedStartOffset === -1) this.selectedStartOffset = 0;
+        this.selectedEndOffset = this.selectedStartOffset + text.length;
+    }
+
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
 
-    if (this.popup) {
-      this.popup.style.top = `${rect.top + window.scrollY - 10}px`;
-      this.popup.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
-      this.popup.classList.remove('hidden');
+    if (!this.popup) {
+      this.popup = document.createElement('div');
+      this.popup.id = 'text-selection-popup';
+      document.body.appendChild(this.popup);
     }
+    
+    this.popup.className = 'absolute z-50 bg-white dark:bg-stone-800 shadow-xl rounded-lg border border-gray-200 dark:border-stone-700 flex flex-col overflow-hidden text-stone-800 transition-opacity';
+    
+    this.popup.innerHTML = `
+      <div class="flex items-center px-3 py-2 border-b border-gray-100 dark:border-stone-700">
+         <button class="w-6 h-6 rounded-full bg-amber-400 mr-2 highlight-color-btn transform hover:scale-110 transition-transform shadow-sm" data-color="gold" title="Vàng"></button>
+         <button class="w-6 h-6 rounded-full bg-emerald-400 mr-2 highlight-color-btn transform hover:scale-110 transition-transform shadow-sm" data-color="emerald" title="Lục"></button>
+         <button class="w-6 h-6 rounded-full bg-rose-400 mr-2 highlight-color-btn transform hover:scale-110 transition-transform shadow-sm" data-color="rose" title="Hồng"></button>
+         <div class="h-5 w-px bg-gray-300 dark:bg-stone-600 mx-2"></div>
+         <button class="px-2 py-1 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-stone-700 rounded flex items-center" id="popup-note-btn"><i class="fas fa-pen-nib mr-1.5 text-gray-500"></i> Ghi chú</button>
+      </div>
+      <div class="flex items-center px-2 py-1 bg-gray-50 dark:bg-stone-800/50">
+         <button class="px-2 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-stone-700 rounded mr-1 flex items-center" id="popup-ask-ai-btn"><i class="fas fa-robot mr-1.5 text-blue-500"></i> Hỏi Socrates</button>
+         <button class="px-2 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-stone-700 rounded mr-1 flex items-center" id="popup-quote-card-btn"><i class="fas fa-image mr-1.5 text-purple-500"></i> Tạo thiệp</button>
+      </div>
+      <div id="popup-note-container" class="hidden px-3 py-3 border-t border-gray-100 dark:border-stone-700 bg-white dark:bg-stone-800">
+         <input type="text" id="popup-note-input" placeholder="Nhập ghi chú của bạn..." class="w-full text-sm px-3 py-2 border border-gray-300 dark:border-stone-600 rounded outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-stone-900 dark:text-stone-100 transition-all">
+         <button id="popup-note-save-btn" class="mt-2 w-full bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-sm py-1.5 rounded transition-colors shadow-sm">Lưu Trích Dẫn & Ghi Chú</button>
+      </div>
+    `;
+
+    // Gắn sự kiện cho popup
+    this.popup.addEventListener('mousedown', (e) => e.preventDefault());
+
+    this.popup.querySelectorAll('.highlight-color-btn').forEach(btn => {
+       btn.addEventListener('click', (e) => {
+           e.stopPropagation();
+           this.saveHighlight(btn.dataset.color, '');
+       });
+    });
+
+    this.popup.querySelector('#popup-note-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const container = this.popup.querySelector('#popup-note-container');
+        container.classList.remove('hidden');
+        this.popup.querySelector('#popup-note-input').focus();
+    });
+
+    this.popup.querySelector('#popup-note-save-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const note = this.popup.querySelector('#popup-note-input').value;
+        this.saveHighlight('gold', note); // Default color for note
+    });
+
+    this.popup.querySelector('#popup-ask-ai-btn').addEventListener('click', (e) => {
+       e.stopPropagation();
+       if (window.aiChat) window.aiChat.askWithSelection(this.selectedText);
+       this.hideSelectionPopup();
+    });
+
+    this.popup.querySelector('#popup-quote-card-btn').addEventListener('click', (e) => {
+       e.stopPropagation();
+       if (window.quoteGenerator) {
+          const bookTitle = this.currentBook ? this.currentBook.title : "Kinh Điển Triết Học";
+          const author = this.currentBook ? this.currentBook.author : "Hiền Triết";
+          window.quoteGenerator.open(this.selectedText, author, bookTitle);
+       }
+       this.hideSelectionPopup();
+    });
+
+    // Định vị popup
+    this.popup.style.top = `${rect.top + window.scrollY - this.popup.offsetHeight - 15}px`;
+    this.popup.style.left = `${rect.left + window.scrollX + rect.width / 2 - this.popup.offsetWidth / 2}px`;
+    
+    if (rect.top - this.popup.offsetHeight - 15 < 0) {
+        this.popup.style.top = `${rect.bottom + window.scrollY + 10}px`;
+    }
+
+    this.popup.classList.remove('hidden');
   }
 
   hideSelectionPopup() {
     this.popup?.classList.add('hidden');
   }
 
+  async saveHighlight(color, note) {
+      if (!this.selectedText || !this.currentBook) return;
+      const chapterId = this.currentBook.chapters[this.currentChapterIndex]?.id || this.currentChapterIndex.toString();
+      
+      const payload = {
+          bookId: this.currentBook.id,
+          chapterId: chapterId,
+          paragraphIndex: this.selectedParagraphIndex,
+          startOffset: this.selectedStartOffset,
+          endOffset: this.selectedEndOffset,
+          quoteText: this.selectedText,
+          color: color,
+          note: note
+      };
+
+      // Áp dụng bôi đen ngay lập tức để phản hồi nhanh UI
+      if (this.currentSelectionRange) {
+        this.applyInlineHighlight(this.currentSelectionRange, color);
+      }
+
+      this.hideSelectionPopup();
+      window.getSelection().removeAllRanges();
+
+      const token = localStorage.getItem('token');
+      if (token) {
+         try {
+             const res = await fetch('/api/v1/reader/highlights', {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                 body: JSON.stringify(payload)
+             });
+             if (res.ok) {
+                 this.showToast('Đã lưu trích dẫn vào sổ tay!');
+             }
+         } catch(e) {
+             console.error('Lỗi khi lưu highlight', e);
+         }
+      } else {
+         this.showToast('Đã lưu trích dẫn cục bộ (hãy đăng nhập để đồng bộ)');
+      }
+  }
+
+  applyInlineHighlight(range, color) {
+      const colorMap = {
+          'gold': 'bg-amber-400/30 text-amber-900 border-b-2 border-amber-400 font-medium rounded-sm',
+          'emerald': 'bg-emerald-400/30 text-emerald-900 border-b-2 border-emerald-400 font-medium rounded-sm',
+          'rose': 'bg-rose-400/30 text-rose-900 border-b-2 border-rose-400 font-medium rounded-sm'
+      };
+      const mark = document.createElement('mark');
+      mark.className = colorMap[color] || colorMap['gold'];
+      try {
+          mark.textContent = range.toString();
+          range.deleteContents();
+          range.insertNode(mark);
+      } catch(e) {
+          console.warn('Không thể bọc highlight trực tiếp bằng Range, fallback:', e);
+      }
+  }
+
+  async restoreHighlights(chapterId) {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+          const res = await fetch(`/api/v1/reader/highlights?chapterId=${chapterId}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+              const data = await res.json();
+              const highlights = data.highlights || [];
+              const colorMap = {
+                    'gold': 'bg-amber-400/30 text-amber-900 border-b-2 border-amber-400 font-medium rounded-sm cursor-pointer',
+                    'emerald': 'bg-emerald-400/30 text-emerald-900 border-b-2 border-emerald-400 font-medium rounded-sm cursor-pointer',
+                    'rose': 'bg-rose-400/30 text-rose-900 border-b-2 border-rose-400 font-medium rounded-sm cursor-pointer'
+              };
+              
+              highlights.forEach(h => {
+                  const pNode = document.getElementById(`para-${h.paragraphIndex}`);
+                  if (pNode) {
+                      const textToHighlight = h.quoteText;
+                      if (pNode.innerHTML.includes(textToHighlight)) {
+                           const cls = colorMap[h.color] || colorMap['gold'];
+                           // Thực hiện replace nội dung HTML đơn giản (nếu chưa có thẻ HTML lồng nhau trong đoạn)
+                           pNode.innerHTML = pNode.innerHTML.replace(
+                               textToHighlight, 
+                               `<mark class="${cls}" title="${h.note || ''}">${textToHighlight}</mark>`
+                           );
+                      }
+                  }
+              });
+          }
+      } catch (e) {
+          console.error('Lỗi khi khôi phục highlight:', e);
+      }
+  }
+
+  // --- UTILS ---
+
   showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-stone-900 text-amber-200 text-xs px-4 py-2 rounded-full shadow-lg z-50 animate-bounce';
     toast.textContent = message;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2200);
+    setTimeout(() => toast.remove(), 2500);
   }
 }
 

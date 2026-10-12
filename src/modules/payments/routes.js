@@ -1,5 +1,4 @@
 const express = require('express');
-const { requireAuth } = require('../../middleware/requireAuth');
 const service = require('./service');
 
 const router = express.Router();
@@ -10,21 +9,49 @@ const router = express.Router();
 router.get('/plans', async (req, res, next) => {
   try {
     const plans = await service.getPlans();
-    res.json(plans);
+    res.json({ success: true, data: plans });
   } catch (err) {
     next(err);
   }
 });
 
 /**
- * Tạo đơn thanh toán
+ * Tạo đơn thanh toán (Hỗ trợ cả người dùng đã đăng nhập hoặc khách mua)
  */
-router.post('/checkout', requireAuth, async (req, res, next) => {
+router.post('/checkout', async (req, res, next) => {
   try {
-    const { planCode, provider } = req.body;
+    const { planCode, provider, customerEmail, customerName, customerPhone } = req.body;
+    const userId = req.user ? req.user.id : null;
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    const result = await service.createCheckout(req.user.id, { planCode, provider, ip });
-    res.json(result);
+
+    const result = await service.createCheckout(userId, {
+      planCode,
+      provider,
+      ip,
+      customerEmail: customerEmail || (req.user ? req.user.email : ''),
+      customerName: customerName || (req.user ? req.user.displayName : ''),
+      customerPhone: customerPhone || ''
+    });
+
+    res.json({ success: true, data: result });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * Xác thực giao dịch chuyển khoản từ khách hàng
+ */
+router.post('/orders/:code/verify', async (req, res, next) => {
+  try {
+    const { transactionRef, customerPhone, senderNote } = req.body;
+    const result = await service.verifyTransfer({
+      orderCode: req.params.code,
+      transactionRef,
+      customerPhone,
+      senderNote
+    });
+    res.json({ success: true, data: result });
   } catch (err) {
     next(err);
   }
@@ -33,10 +60,10 @@ router.post('/checkout', requireAuth, async (req, res, next) => {
 /**
  * Trạng thái đơn hàng
  */
-router.get('/orders/:code/status', requireAuth, async (req, res, next) => {
+router.get('/orders/:code/status', async (req, res, next) => {
   try {
     const status = await service.getOrderStatus(req.params.code);
-    res.json(status);
+    res.json({ success: true, data: status });
   } catch (err) {
     next(err);
   }

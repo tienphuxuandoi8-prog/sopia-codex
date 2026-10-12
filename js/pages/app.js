@@ -110,28 +110,45 @@ let cachedBooks = null;
 
 async function getBooksList() {
   if (cachedBooks) return cachedBooks;
+  const masterBooks = (typeof PHILOSOPHY_DATA !== 'undefined' && PHILOSOPHY_DATA.books) ? PHILOSOPHY_DATA.books : [];
   try {
     const res = await fetch('/api/v1/books');
     if (res.ok) {
       const json = await res.json();
       const data = Array.isArray(json) ? json : (json.data || []);
       if (Array.isArray(data) && data.length > 0) {
-        cachedBooks = data.map(b => ({
-          ...b,
-          category: b.category_id || b.categoryId || (b.category ? b.category.slug : null) || b.category || 'all',
-          readTime: b.read_time || b.readTime || '15 phút đọc',
-          coverImage: b.cover_image || b.coverImage || `assets/covers/${b.slug || b.id || 'suy-tuong'}.svg`,
-          fallbackCover: b.fallback_cover || b.fallbackCover || `assets/covers/${b.slug || b.id || 'suy-tuong'}.svg`,
-          bgmTheme: b.bgm_theme || b.bgmTheme || 'Nhạc Thiền Tĩnh Lặng',
-          rating: b.rating || 4.9,
-          chaptersCount: b.chapters_count !== undefined ? b.chapters_count : (b.chapters ? b.chapters.length : 12),
-          chapters: b.chapters || []
-        }));
+        cachedBooks = data.map(b => {
+          const localBook = masterBooks.find(x => x.id === (b.id || b.slug) || (b.slug && x.id === b.slug.toLowerCase()));
+          return {
+            ...localBook,
+            ...b,
+            id: b.id || b.slug || localBook?.id,
+            title: b.title || localBook?.title,
+            originalTitle: b.originalTitle || b.original_title || localBook?.originalTitle || '',
+            author: b.author || localBook?.author,
+            school: b.school || localBook?.school || 'Triết Học Cổ Điển',
+            category: b.category_id || b.categoryId || (b.category ? b.category.slug : null) || b.category || localBook?.category || 'all',
+            readTime: b.read_time || b.readTime || localBook?.readTime || '180 phút',
+            audioDuration: b.audio_duration || b.audioDuration || localBook?.audioDuration || '4 giờ',
+            coverImage: b.cover_image || b.coverImage || localBook?.coverImage || `assets/covers/${b.slug || b.id || 'suy-tuong'}.svg`,
+            fallbackCover: b.fallback_cover || b.fallbackCover || localBook?.fallbackCover || `assets/covers/${b.slug || b.id || 'suy-tuong'}.svg`,
+            bgmTheme: b.bgm_theme || b.bgmTheme || localBook?.bgmTheme || 'Giai điệu thiền tịnh thư phòng',
+            rating: b.rating || localBook?.rating || 5.0,
+            chaptersCount: b.chapters_count !== undefined ? b.chapters_count : (b.chapters ? b.chapters.length : (localBook?.chapters ? localBook.chapters.length : 12)),
+            summary: b.summary || localBook?.summary || b.tagline || localBook?.tagline || 'Kiệt tác triết học kinh điển toàn văn.',
+            tagline: b.tagline || localBook?.tagline || '',
+            annotation: b.annotation || localBook?.annotation || b.summary || localBook?.summary || '',
+            historicalContext: b.historical_context || b.historicalContext || localBook?.historicalContext || '',
+            coreThesis: b.core_thesis || b.coreThesis || localBook?.coreThesis || '',
+            modernRelevance: b.modern_relevance || b.modernRelevance || localBook?.modernRelevance || '',
+            chapters: (b.chapters && b.chapters.length > 0) ? b.chapters : (localBook?.chapters || [])
+          };
+        });
         return cachedBooks;
       }
     }
   } catch (e) {}
-  cachedBooks = PHILOSOPHY_DATA.books.map(b => ({
+  cachedBooks = masterBooks.map(b => ({
     ...b,
     chaptersCount: b.chapters ? b.chapters.length : 12
   }));
@@ -179,6 +196,9 @@ async function renderBooksGrid(category = 'all', searchQuery = '') {
     const card = document.createElement('div');
     card.className = 'group bg-white dark:bg-[#111E17] rounded-3xl p-5 border border-stone-200/90 dark:border-emerald-900/60 shadow-sm hover:shadow-2xl transition-all duration-400 flex flex-col justify-between';
 
+    const safeSummary = book.summary || book.tagline || 'Kiệt tác triết học kinh điển toàn văn.';
+    const safeSchool = (book.school || 'Triết Học Cổ Điển').split('(')[0];
+
     card.innerHTML = `
       <div>
         <!-- Real Authentic Book Cover 3D Mockup -->
@@ -196,7 +216,7 @@ async function renderBooksGrid(category = 'all', searchQuery = '') {
           <!-- Gold Plaque Typography -->
           <div class="book-title-plaque">
             <span class="inline-block px-2.5 py-0.5 rounded text-[9px] uppercase tracking-wider bg-amber-500/30 text-amber-200 border border-amber-400/40 mb-1.5 font-display">
-              ${book.school.split('(')[0]}
+              ${safeSchool}
             </span>
             <h3 class="font-display font-bold text-base md:text-lg text-white leading-tight drop-shadow-md group-hover:text-amber-300 transition-colors">
               ${book.title}
@@ -233,8 +253,17 @@ async function renderBooksGrid(category = 'all', searchQuery = '') {
           </h4>
 
           <p class="text-xs text-stone-600 dark:text-stone-400 line-clamp-3 leading-relaxed font-ui">
-            ${book.summary}
+            ${safeSummary}
           </p>
+
+          <!-- Nút xem Chú Thích Tác Phẩm & Bối Cảnh Lịch Sử -->
+          <div class="pt-1">
+            <button onclick="event.stopPropagation(); openBookAnnotationModal('${book.id}')" 
+                    class="text-[11px] font-semibold text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 flex items-center gap-1 transition-colors">
+              <i data-lucide="file-text" class="w-3 h-3 text-amber-600"></i>
+              <span>Xem chú thích & bối cảnh tác phẩm →</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -947,6 +976,120 @@ window.handleAdminEntryClick = function(event) {
     } else {
       alert('Khu vực này chỉ dành riêng cho Quản trị viên (Admin). Tài khoản Độc giả không có quyền truy cập.');
     }
+  }
+};
+
+/* ==========================================================================
+   12. BOOK ANNOTATION & HISTORICAL CONTEXT MODAL
+   Chú Thích Tác Phẩm & Bối Cảnh Lịch Sử Chi Tiết
+   ========================================================================== */
+
+window.openBookAnnotationModal = async function(bookId) {
+  const books = await getBooksList();
+  const book = books.find(b => b.id === bookId || b.slug === bookId) || 
+               (typeof PHILOSOPHY_DATA !== 'undefined' ? PHILOSOPHY_DATA.books.find(b => b.id === bookId) : null);
+  if (!book) return;
+
+  let modal = document.getElementById('book-annotation-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'book-annotation-modal';
+    modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in';
+    document.body.appendChild(modal);
+  }
+
+  const safeTitle = book.title || 'Tác Phẩm Triết Học';
+  const safeAuthor = book.author || 'Hiền Triết';
+  const safeSchool = (book.school || 'Triết Học Cổ Điển').split('(')[0];
+  const safeYear = book.year || '';
+  const safeSummary = book.summary || book.tagline || 'Kiệt tác triết học kinh điển toàn văn.';
+  const safeHistory = book.historicalContext || 'Tác phẩm được đúc kết từ bối cảnh văn hóa và triết học sâu sắc của nhân loại.';
+  const safeThesis = book.coreThesis || book.tagline || 'Khảo sát bản chất của con người và vũ trụ.';
+  const safeRelevance = book.modernRelevance || 'Cung cấp bài học thực tiễn giúp cân bằng tâm trí và phát triển bản thân.';
+
+  modal.innerHTML = `
+    <div class="bg-[#FAF7F2] dark:bg-[#111E17] border border-amber-600/40 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 md:p-8 space-y-6 relative text-stone-800 dark:text-stone-100 font-sans">
+      <!-- Close button -->
+      <button onclick="closeBookAnnotationModal()" 
+              class="absolute top-5 right-5 w-8 h-8 rounded-full bg-stone-200/80 dark:bg-emerald-950 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-stone-300 transition-colors">
+        ✕
+      </button>
+
+      <!-- Header with Cover thumbnail -->
+      <div class="flex items-start gap-4 pr-8">
+        <img src="${book.coverImage || 'assets/covers/suy-tuong.svg'}" 
+             alt="${safeTitle}" 
+             class="w-16 h-24 object-cover rounded-xl shadow-md border border-amber-500/30 shrink-0">
+        <div>
+          <span class="inline-block px-2.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30 mb-1">
+            ${safeSchool}
+          </span>
+          <h3 class="font-display font-bold text-xl md:text-2xl text-stone-900 dark:text-amber-100 leading-tight">
+            ${safeTitle}
+          </h3>
+          <p class="text-xs text-amber-700 dark:text-amber-300 font-serif italic mt-0.5">${safeAuthor} ${safeYear ? `(${safeYear})` : ''}</p>
+        </div>
+      </div>
+
+      <!-- Content sections -->
+      <div class="space-y-4 text-xs md:text-sm leading-relaxed">
+        <!-- 1. Tóm Lược & Chú Thích Tổng Quan -->
+        <div class="p-4 rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-600/30 space-y-1.5">
+          <h4 class="font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5 text-xs uppercase tracking-wide">
+            <span class="text-base">📜</span> Lời Giới Thiệu & Chú Thích Tác Phẩm
+          </h4>
+          <p class="text-stone-700 dark:text-stone-300 leading-relaxed">${safeSummary}</p>
+        </div>
+
+        <!-- 2. Hoàn Cảnh Lịch Sử & Bối Cảnh Ra Đời -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-[#0A160F] border border-stone-200 dark:border-emerald-900/60 space-y-1.5 shadow-sm">
+          <h4 class="font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5 text-xs uppercase tracking-wide">
+            <span class="text-base">🏛️</span> Bối Cảnh Lịch Sử & Hoàn Cảnh Ra Đời
+          </h4>
+          <p class="text-stone-600 dark:text-stone-300 leading-relaxed">${safeHistory}</p>
+        </div>
+
+        <!-- 3. Luận Điểm Triết Học Cốt Lõi -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-[#0A160F] border border-stone-200 dark:border-emerald-900/60 space-y-1.5 shadow-sm">
+          <h4 class="font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5 text-xs uppercase tracking-wide">
+            <span class="text-base">💡</span> Luận Điểm Triết Học Cốt Lõi
+          </h4>
+          <p class="text-stone-600 dark:text-stone-300 leading-relaxed">${safeThesis}</p>
+        </div>
+
+        <!-- 4. Ứng Dụng Thực Tiễn -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-[#0A160F] border border-stone-200 dark:border-emerald-900/60 space-y-1.5 shadow-sm">
+          <h4 class="font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5 text-xs uppercase tracking-wide">
+            <span class="text-base">🎯</span> Giá Trị & Ứng Dụng Thực Tiễn Hiện Đại
+          </h4>
+          <p class="text-stone-600 dark:text-stone-300 leading-relaxed">${safeRelevance}</p>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="pt-2 flex items-center justify-end gap-3 border-t border-stone-200 dark:border-emerald-900/60">
+        <button onclick="closeBookAnnotationModal()" 
+                class="px-5 py-2.5 rounded-xl border border-stone-300 dark:border-emerald-800 text-xs font-semibold text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-emerald-900 transition-colors">
+          Đóng
+        </button>
+        <button onclick="closeBookAnnotationModal(); openBookReader('${book.id}')" 
+                class="px-6 py-2.5 rounded-xl bg-emerald-950 hover:bg-emerald-900 text-amber-200 font-semibold text-xs border border-amber-600/30 flex items-center gap-2 shadow-md transition-all">
+          <span>Đọc Toàn Văn Ngay</span> →
+        </button>
+      </div>
+    </div>
+  `;
+
+  modal.classList.remove('hidden');
+  modal.onclick = (e) => {
+    if (e.target === modal) closeBookAnnotationModal();
+  };
+};
+
+window.closeBookAnnotationModal = function() {
+  const modal = document.getElementById('book-annotation-modal');
+  if (modal) {
+    modal.classList.add('hidden');
   }
 };
 

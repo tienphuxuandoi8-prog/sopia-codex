@@ -27,23 +27,32 @@ const Auth = (() => {
         _isPremium = data.isPremium || false;
         _premiumUntil = data.premiumUntil || null;
         _aiQuota = data.aiQuota || null;
-      } catch (err) {
         // Fallback đọc user từ localStorage (hỗ trợ chế độ ngoại tuyến / file mode)
         const localUser = localStorage.getItem('sophia_user');
         if (localUser) {
           try {
             _user = JSON.parse(localUser);
             _permissions = _user.permissions || (_user.isSuperAdmin ? ['*'] : []);
-            _isPremium = true;
+            const hasValidPremium = Boolean(
+              _user.isSuperAdmin ||
+              (_user.isPremium && (!_user.premiumUntil || new Date(_user.premiumUntil).getTime() > Date.now()))
+            );
+            _isPremium = hasValidPremium;
+            _premiumUntil = _user.premiumUntil || null;
+            _aiQuota = _user.isSuperAdmin ? 100 : (hasValidPremium ? 100 : 20);
           } catch(e) {
             _user = null;
             _permissions = [];
             _isPremium = false;
+            _premiumUntil = null;
+            _aiQuota = 20;
           }
         } else {
           _user = null;
           _permissions = [];
           _isPremium = false;
+          _premiumUntil = null;
+          _aiQuota = 20;
         }
       }
       _loaded = true;

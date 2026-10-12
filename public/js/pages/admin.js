@@ -1722,35 +1722,44 @@ function renderAdminQuoteCanvas() {
   let bgColor = "#0E1B15";
   let bgGradientEnd = "#070E0B";
   let goldColor = "#D4AF37";
+  let goldAccent = "#F3E5AB";
   let textColor = "#FBF7EE";
   let subTextColor = "#D8C7A5";
   let watermarkColor = "#8C7345";
+  let textShadowColor = "rgba(0, 0, 0, 0.75)";
+  let shadowBlur = 6;
 
   if (adminCardTheme === 'parchment') {
     bgColor = "#F8F4EB";
-    bgGradientEnd = "#EFE8D8";
-    goldColor = "#B8860B";
-    textColor = "#1F2622";
+    bgGradientEnd = "#E8DFCA";
+    goldColor = "#9E782F";
+    goldAccent = "#7A5A1E";
+    textColor = "#1C2420";
     subTextColor = "#5C5242";
-    watermarkColor = "#8A7960";
+    watermarkColor = "#827258";
+    textShadowColor = "rgba(180, 160, 130, 0.25)";
+    shadowBlur = 3;
   } else if (adminCardTheme === 'jade') {
     bgColor = "#0D261B";
-    bgGradientEnd = "#06130D";
+    bgGradientEnd = "#05160E";
     goldColor = "#48CAE4";
+    goldAccent = "#90E0EF";
     textColor = "#F0FDF4";
     subTextColor = "#BBEFDF";
     watermarkColor = "#39806A";
+    textShadowColor = "rgba(0, 0, 0, 0.75)";
+    shadowBlur = 6;
   }
 
   // 1. Radial background gradient
-  const grad = ctx.createRadialGradient(width / 2, height / 2, width * 0.1, width / 2, height / 2, width * 0.8);
+  const grad = ctx.createRadialGradient(width / 2, height / 2, width * 0.1, width / 2, height / 2, width * 0.85);
   grad.addColorStop(0, bgColor);
   grad.addColorStop(1, bgGradientEnd);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height);
 
   // 2. Ornate Double Gold Border
-  const margin = adminCardFormat === 'story' ? 80 : 60;
+  const margin = adminCardFormat === 'story' ? 80 : 64;
   ctx.strokeStyle = goldColor;
   ctx.lineWidth = 3;
   ctx.strokeRect(margin, margin, width - margin * 2, height - margin * 2);
@@ -1761,7 +1770,7 @@ function renderAdminQuoteCanvas() {
   ctx.setLineDash([]);
 
   // Corner flourishes
-  const cornerSize = 40;
+  const cornerSize = 42;
   drawCanvasCorner(ctx, margin, margin, cornerSize, goldColor, 0);
   drawCanvasCorner(ctx, width - margin, margin, cornerSize, goldColor, Math.PI / 2);
   drawCanvasCorner(ctx, width - margin, height - margin, cornerSize, goldColor, Math.PI);
@@ -1769,76 +1778,139 @@ function renderAdminQuoteCanvas() {
 
   // 3. Header Logo & Title
   ctx.textAlign = "center";
-  ctx.font = "bold 20px 'Cinzel', serif";
+  ctx.textBaseline = "alphabetic";
+
+  ctx.font = "bold 20px 'Cinzel', 'Times New Roman', serif";
   ctx.fillStyle = goldColor;
-  ctx.letterSpacing = "6px";
+  if ('letterSpacing' in ctx) ctx.letterSpacing = "6px";
   const headerY = adminCardFormat === 'story' ? 220 : 150;
   ctx.fillText("S O P H I A   C O D E X", width / 2, headerY);
 
-  ctx.font = "italic 16px 'Lora', serif";
+  if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
+  ctx.font = "italic 16px 'Lora', 'Merriweather', 'Times New Roman', serif";
   ctx.fillStyle = subTextColor;
-  ctx.letterSpacing = "2px";
   ctx.fillText("Thư Viện Triết Học & Chiêm Nghiệm Toàn Cầu", width / 2, headerY + 36);
 
+  // Chuẩn hóa văn bản Unicode NFC
+  const cleanQuote = (adminCardQuoteText || "").normalize('NFC').trim();
+  const cleanAuthor = (adminCardAuthor || 'KHUYẾT DANH').normalize('NFC').trim();
+  const cleanBook = (adminCardBook || 'Sophia Codex').normalize('NFC').trim();
+
+  // Dynamic smart sizing
+  const textLen = cleanQuote.length;
+  let quoteSize = 38;
+  let lineHeight = 62;
+  if (textLen < 60) {
+    quoteSize = adminCardFormat === 'story' ? 44 : 42;
+    lineHeight = adminCardFormat === 'story' ? 72 : 68;
+  } else if (textLen > 180) {
+    quoteSize = adminCardFormat === 'story' ? 32 : 30;
+    lineHeight = adminCardFormat === 'story' ? 52 : 50;
+  } else if (textLen > 120) {
+    quoteSize = adminCardFormat === 'story' ? 35 : 33;
+    lineHeight = adminCardFormat === 'story' ? 56 : 54;
+  } else {
+    quoteSize = adminCardFormat === 'story' ? 40 : 37;
+    lineHeight = adminCardFormat === 'story' ? 66 : 60;
+  }
+
+  // 4. Quote Body
+  ctx.font = `500 ${quoteSize}px 'Lora', 'Merriweather', 'Times New Roman', serif`;
+  ctx.fillStyle = textColor;
+  if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
+
+  const maxLineWidth = width - margin * 3.6;
+  const lines = wrapCanvasText(ctx, cleanQuote, maxLineWidth);
+  const totalTextHeight = lines.length * lineHeight;
+  let startY = (height / 2) - (totalTextHeight / 2) + (adminCardFormat === 'story' ? -60 : -10);
+
   // Decorative Quote Mark
-  ctx.font = "italic 110px 'Playfair Display', Georgia, serif";
+  ctx.font = "italic 76px 'Playfair Display', 'Times New Roman', serif";
   ctx.fillStyle = goldColor;
-  ctx.globalAlpha = 0.45;
-  const quoteMarkY = adminCardFormat === 'story' ? 440 : 280;
+  ctx.globalAlpha = 0.35;
+  const quoteMarkY = Math.max(headerY + 75, startY - 45);
   ctx.fillText("“", width / 2, quoteMarkY);
   ctx.globalAlpha = 1.0;
 
-  // 4. Quote Body
-  ctx.font = "500 38px 'Lora', Georgia, serif";
-  ctx.fillStyle = textColor;
-  ctx.letterSpacing = "0px";
+  // Text Shadow vi tế
+  ctx.shadowColor = textShadowColor;
+  ctx.shadowBlur = shadowBlur;
+  ctx.shadowOffsetY = 2;
 
-  const maxLineWidth = width - margin * 4;
-  const lines = wrapCanvasText(ctx, adminCardQuoteText, maxLineWidth);
-  const lineHeight = 64;
-  const totalTextHeight = lines.length * lineHeight;
-  let startY = (height / 2) - (totalTextHeight / 2) + (adminCardFormat === 'story' ? -60 : -10);
+  ctx.font = `500 ${quoteSize}px 'Lora', 'Merriweather', 'Times New Roman', serif`;
+  ctx.fillStyle = textColor;
+  if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
 
   lines.forEach((line, idx) => {
     ctx.fillText(line, width / 2, startY + (idx * lineHeight));
   });
 
-  // Gold Divider Line
-  const divY = startY + totalTextHeight + 40;
-  ctx.strokeStyle = goldColor;
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(width / 2 - 120, divY);
-  ctx.lineTo(width / 2 + 120, divY);
-  ctx.stroke();
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
 
+  // 5. Gold Divider Line with Diamond Motif
+  const divY = startY + totalTextHeight + 42;
+  drawCanvasDivider(ctx, width / 2, divY, 260, goldColor);
+
+  // 6. Author & Book / Context
+  ctx.font = "bold 25px 'Playfair Display', 'Merriweather', 'Times New Roman', serif";
   ctx.fillStyle = goldColor;
-  ctx.beginPath();
-  ctx.arc(width / 2, divY, 4, 0, Math.PI * 2);
-  ctx.fill();
+  if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
+  ctx.fillText(cleanAuthor.toUpperCase(), width / 2, divY + 54);
 
-  // 5. Author & Book / Context
-  ctx.font = "bold 26px 'Playfair Display', Georgia, serif";
-  ctx.fillStyle = goldColor;
-  ctx.letterSpacing = "1.5px";
-  ctx.fillText((adminCardAuthor || 'KHUYẾT DANH').toUpperCase(), width / 2, divY + 54);
-
-  ctx.font = "italic 22px 'Lora', Georgia, serif";
+  ctx.font = "italic 20px 'Lora', 'Merriweather', 'Times New Roman', serif";
   ctx.fillStyle = subTextColor;
-  ctx.fillText(adminCardBook || 'Sophia Codex', width / 2, divY + 92);
+  ctx.fillText(cleanBook, width / 2, divY + 88);
 
-  // 6. Watermark Footer
-  ctx.font = "14px 'Inter', sans-serif";
+  // 7. Watermark Footer
+  ctx.font = "14px 'Be Vietnam Pro', 'Inter', -apple-system, sans-serif";
   ctx.fillStyle = watermarkColor;
-  ctx.letterSpacing = "1px";
-  const footerY = height - margin - 35;
-  ctx.fillText("📖 Đọc trọn vẹn tại: sophiacodex.vn • 100% Miễn phí & Toàn văn", width / 2, footerY);
+  if ('letterSpacing' in ctx) ctx.letterSpacing = "0px";
+  const footerY = height - margin - 32;
+  ctx.fillText("📖 Sophia Codex • Triết Học Toàn Văn & Chiêm Nghiệm Sống • sophiacodex.vn", width / 2, footerY);
 
   // Render to preview image
   const previewImg = document.getElementById('admin-quote-preview-image');
   if (previewImg) {
     previewImg.src = canvas.toDataURL('image/png');
   }
+}
+
+function drawCanvasDivider(ctx, centerX, y, length, color) {
+  const halfLen = length / 2;
+  const gradLeft = ctx.createLinearGradient(centerX - halfLen, y, centerX - 25, y);
+  gradLeft.addColorStop(0, 'rgba(212, 175, 55, 0)');
+  gradLeft.addColorStop(1, color);
+  ctx.strokeStyle = gradLeft;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(centerX - halfLen, y);
+  ctx.lineTo(centerX - 25, y);
+  ctx.stroke();
+
+  const gradRight = ctx.createLinearGradient(centerX + 25, y, centerX + halfLen, y);
+  gradRight.addColorStop(0, color);
+  gradRight.addColorStop(1, 'rgba(212, 175, 55, 0)');
+  ctx.strokeStyle = gradRight;
+  ctx.beginPath();
+  ctx.moveTo(centerX + 25, y);
+  ctx.lineTo(centerX + halfLen, y);
+  ctx.stroke();
+
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(centerX, y - 6);
+  ctx.lineTo(centerX + 6, y);
+  ctx.lineTo(centerX, y + 6);
+  ctx.lineTo(centerX - 6, y);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(centerX - 14, y, 2, 0, Math.PI * 2);
+  ctx.arc(centerX + 14, y, 2, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 function drawCanvasCorner(ctx, x, y, size, color, angle) {

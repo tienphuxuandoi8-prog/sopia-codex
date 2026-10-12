@@ -170,18 +170,33 @@ class ReaderEngine {
       const res = await fetch(`/api/v1/books/${bookId}`);
       if (res.ok) {
         book = await res.json();
-        if (book) {
-          book.school = book.school || 'Kinh Điển Triết Học';
-          book.bgmTheme = book.bgm_theme || book.bgmTheme || "Nhạc nền thiền định";
-          book.readTime = book.read_time || book.readTime || "15 phút đọc";
-        }
       }
     } catch (e) {}
 
-    if (!book) {
-      if (typeof PHILOSOPHY_DATA !== 'undefined' && PHILOSOPHY_DATA.books) {
-        book = PHILOSOPHY_DATA.books.find(b => b.id === bookId);
-      }
+    const localBook = (typeof PHILOSOPHY_DATA !== 'undefined' && PHILOSOPHY_DATA.books) 
+      ? PHILOSOPHY_DATA.books.find(b => b.id === bookId || b.slug === bookId) 
+      : null;
+
+    if (book) {
+      book = {
+        ...localBook,
+        ...book,
+        title: book.title || localBook?.title,
+        author: book.author || localBook?.author,
+        school: book.school || localBook?.school || 'Kinh Điển Triết Học',
+        bgmTheme: book.bgm_theme || book.bgmTheme || localBook?.bgmTheme || "Giai điệu thiền định thư phòng",
+        readTime: book.read_time || book.readTime || localBook?.readTime || "180 phút",
+        audioDuration: book.audio_duration || book.audioDuration || localBook?.audioDuration || "4 giờ",
+        summary: book.summary || localBook?.summary || '',
+        tagline: book.tagline || localBook?.tagline || '',
+        annotation: book.annotation || localBook?.annotation || book.summary || localBook?.summary || '',
+        historicalContext: book.historicalContext || book.historical_context || localBook?.historicalContext || '',
+        coreThesis: book.coreThesis || book.core_thesis || localBook?.coreThesis || '',
+        modernRelevance: book.modernRelevance || book.modern_relevance || localBook?.modernRelevance || '',
+        chapters: (book.chapters && book.chapters.length > 0) ? book.chapters : (localBook?.chapters || [])
+      };
+    } else {
+      book = localBook;
     }
     if (!book) return;
 
@@ -295,6 +310,56 @@ class ReaderEngine {
     let totalWords = 0;
     if (this.readerBody) {
       this.readerBody.innerHTML = '';
+
+      // Render Chú Thích Tác Phẩm & Bối Cảnh Lịch Sử (Collapsible Annotation)
+      if (this.currentBook && (this.currentBook.annotation || this.currentBook.summary || this.currentBook.historicalContext)) {
+        const annotationBox = document.createElement('div');
+        annotationBox.className = 'mb-10 p-5 md:p-6 rounded-2xl bg-amber-500/10 dark:bg-emerald-950/40 border border-amber-600/30 text-stone-800 dark:text-stone-200 text-xs md:text-sm leading-relaxed';
+        
+        const safeSummary = this.currentBook.summary || this.currentBook.annotation || 'Kiệt tác triết học kinh điển.';
+        const safeHistory = this.currentBook.historicalContext || 'Tác phẩm được đúc kết từ bối cảnh văn hóa - triết học sâu sắc của nhân loại.';
+        const safeThesis = this.currentBook.coreThesis || this.currentBook.tagline || 'Khảo sát bản chất của con người và vũ trụ.';
+        const safeRelevance = this.currentBook.modernRelevance || 'Ứng dụng vào tâm lý học, sự điềm tĩnh và quản trị cuộc sống.';
+
+        annotationBox.innerHTML = `
+          <div class="flex items-center justify-between cursor-pointer select-none" onclick="const b = document.getElementById('reader-book-annotation-content'); const icon = document.getElementById('annotation-chevron'); if (b) { b.classList.toggle('hidden'); } if (icon) { icon.classList.toggle('rotate-180'); }">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-amber-500/25 text-amber-700 dark:text-amber-300 flex items-center justify-center font-bold text-sm">📜</span>
+              <div>
+                <h4 class="font-display font-bold text-sm text-stone-900 dark:text-stone-100">
+                  Chú Thích & Bối Cảnh Tác Phẩm: ${this.currentBook.title}
+                </h4>
+                <p class="text-[11px] text-stone-500 dark:text-stone-400">Hoàn cảnh lịch sử, cốt lõi tư tưởng & giá trị chiêm nghiệm</p>
+              </div>
+            </div>
+            <button class="text-xs text-amber-700 dark:text-amber-400 font-semibold flex items-center gap-1 hover:underline">
+              <span>Chi tiết</span>
+              <span id="annotation-chevron" class="inline-block transition-transform duration-200">▼</span>
+            </button>
+          </div>
+
+          <div id="reader-book-annotation-content" class="hidden mt-4 pt-3.5 border-t border-amber-600/20 space-y-3.5 animate-fade-in text-xs leading-relaxed">
+            <div>
+              <span class="font-bold text-amber-800 dark:text-amber-300">📖 Giới thiệu tác phẩm:</span>
+              <p class="mt-0.5 text-stone-700 dark:text-stone-300">${safeSummary}</p>
+            </div>
+            <div>
+              <span class="font-bold text-amber-800 dark:text-amber-300">🏛️ Bối cảnh lịch sử ra đời:</span>
+              <p class="mt-0.5 text-stone-700 dark:text-stone-300">${safeHistory}</p>
+            </div>
+            <div>
+              <span class="font-bold text-amber-800 dark:text-amber-300">💡 Luận điểm triết học cốt lõi:</span>
+              <p class="mt-0.5 text-stone-700 dark:text-stone-300">${safeThesis}</p>
+            </div>
+            <div>
+              <span class="font-bold text-amber-800 dark:text-amber-300">🎯 Giá trị thực tiễn đương đại:</span>
+              <p class="mt-0.5 text-stone-700 dark:text-stone-300">${safeRelevance}</p>
+            </div>
+          </div>
+        `;
+        this.readerBody.appendChild(annotationBox);
+      }
+
       chapter.paragraphs.forEach((pText, pIdx) => {
         totalWords += pText.split(/\s+/).length;
         const p = document.createElement('p');

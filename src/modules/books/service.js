@@ -41,12 +41,27 @@ const getAllBooks = async ({ categoryId, search, status, accessLevel, page = 1, 
       })
     ]);
 
-    // Định dạng lại kết quả trả về
-    const formattedBooks = books.map(book => ({
-      ...book,
-      chaptersCount: book._count.chapters,
-      _count: undefined
-    }));
+    // Định dạng lại kết quả trả về và bổ sung chú thích đầy đủ
+    let masterBooks = [];
+    try {
+      const pData = require('../../../js/data.js');
+      masterBooks = pData?.books || [];
+    } catch (e) {}
+
+    const formattedBooks = books.map(book => {
+      const mb = masterBooks.find(b => b.id === book.id || b.id === book.slug);
+      return {
+        ...book,
+        summary: book.summary || mb?.summary || 'Kiệt tác triết học kinh điển toàn văn.',
+        tagline: book.tagline || mb?.tagline || '',
+        annotation: book.annotation || mb?.annotation || book.summary || mb?.summary || '',
+        historicalContext: book.historicalContext || mb?.historicalContext || '',
+        coreThesis: book.coreThesis || mb?.coreThesis || '',
+        modernRelevance: book.modernRelevance || mb?.modernRelevance || '',
+        chaptersCount: book._count ? book._count.chapters : (mb?.chapters ? mb.chapters.length : 12),
+        _count: undefined
+      };
+    });
 
     return {
       data: formattedBooks,
@@ -88,9 +103,21 @@ const getBookBySlug = async (slug) => {
       throw new AppError('Không tìm thấy tác phẩm', 404);
     }
 
+    let mb = null;
+    try {
+      const pData = require('../../../js/data.js');
+      mb = pData?.books?.find(b => b.id === book.id || b.id === book.slug);
+    } catch (e) {}
+
     return {
       ...book,
-      chaptersCount: book._count.chapters,
+      summary: book.summary || mb?.summary || 'Kiệt tác triết học kinh điển toàn văn.',
+      tagline: book.tagline || mb?.tagline || '',
+      annotation: book.annotation || mb?.annotation || book.summary || mb?.summary || '',
+      historicalContext: book.historicalContext || mb?.historicalContext || '',
+      coreThesis: book.coreThesis || mb?.coreThesis || '',
+      modernRelevance: book.modernRelevance || mb?.modernRelevance || '',
+      chaptersCount: book._count ? book._count.chapters : (mb?.chapters ? mb.chapters.length : 12),
       _count: undefined
     };
   } catch (error) {

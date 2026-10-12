@@ -169,6 +169,10 @@ const PHILOSOPHY_DATA = {
         badge: "Kinh Điển Đông Phương • Đủ 81 Chương"
       },
       summary: "Với trọn bộ 81 chương chia làm Thượng Kinh (Đạo Kinh) và Hạ Kinh (Đức Kinh), Đạo Đức Kinh của Lão Tử cô đọng những quy luật vận hành kỳ diệu của vũ trụ và đời người. Triết lý 'Vô vi' (thuận theo tự nhiên, không cưỡng ép tư lợi) và hình tượng 'Nước' mang lại cho con người đương đại liều thuốc an định giữa cuộc sống xô bồ, đua chen danh lợi.",
+      annotation: "Kiệt tác triết học cổ đại phương Đông đúc kết bản thể luận về Đạo và thực hành Đức vô vi, dĩ nhu thắng cương, thuận theo quy luật vận hành vĩnh hằng của trời đất.",
+      historicalContext: "Tác phẩm xuất hiện vào thời Xuân Thu - Chiến Quốc (thế kỷ 6 TCN) tại Trung Hoa cổ đại khi các chư hầu tương tàn, nhân tâm tha hóa. Khi Lão Tử từ quan cưỡi trâu qua ải Hàm Cốc, quan lệnh Doãn Hỷ khẩn thiết xin ông để lại sách chỉ dẫn cho đời, từ đó 81 thiên Đạo Đức Kinh được ghi lại cho muôn đời sau.",
+      coreThesis: "Vô vi nhi vô bất vi (Không làm điều gượng gạo vụ lợi thì việc gì cũng thành tựu trọn vẹn). Thượng thiện nhược thủy: Đỉnh cao của đạo đức và trí tuệ ví như nước, luôn khiêm nhường ở chỗ thấp, nuôi dưỡng vạn vật mà không tranh giành.",
+      modernRelevance: "Giúp con người hiện đại giải tỏa áp lực cạnh tranh độc hại và kiệt sức (burnout), học nghệ thuật lãnh đạo thuận tự nhiên, giữ tâm an tĩnh trước mọi đảo điên danh lợi.",
       chapters: DAO_DUC_KINH_CHAPTERS
     },
     {
@@ -197,6 +201,10 @@ const PHILOSOPHY_DATA = {
         badge: "Tuyệt Tác Khắc Kỷ • Đủ 12 Quyển"
       },
       summary: "Cuốn sách không được viết ra để xuất bản hay giảng dạy cho người khác, mà là những ghi chép chân thực nhất của Marcus Aurelius gửi gắm cho chính bản thân mình giữa sa trường Carnuntum và dịch bệnh Antonine hiểm nghèo. Tác phẩm dạy ta nghệ thuật làm chủ tâm trí, phân biệt những gì thuộc về quyền kiểm soát của ta và những gì nằm ngoài, từ đó đạt được sự an tĩnh nội tại tối thượng trước mọi giông bão cuộc đời.",
+      annotation: "Nhật ký tu dưỡng tâm trí và bản lĩnh của vị Hoàng đế Khắc Kỷ vĩ đại nhất La Mã, chỉ dẫn cách xây dựng pháo đài nội tâm bất khả xâm phạm trước mọi nghịch cảnh.",
+      historicalContext: "Được ghi chép trong khoảng 170 – 180 SCN khi Marcus Aurelius chỉ huy quân đội La Mã tại biên cương sông Danube (Carnuntum), giữa chiến tranh Marcomanni khốc liệt, sự phản bội của tướng lĩnh và đại dịch Antonine cướp đi sinh mạng hàng triệu người dân.",
+      coreThesis: "Dichotomy of Control (Phân đôi quyền kiểm soát): Phân biệt rạch ròi giữa điều ta kiểm soát được (tư duy, đạo đức, phản ứng) và điều ta không kiểm soát được (ngoại cảnh, tiếng tăm, cái chết). Tinh thần Amor Fati (Yêu lấy số phận) và Memento Mori (Nhớ rằng ta sẽ chết).",
+      modernRelevance: "Phương pháp trị liệu tâm lý kinh điển chống lo âu, kiểm soát cảm xúc, giúp nhà lãnh đạo và người trẻ giữ vững sự điềm tĩnh và chính trực tuyệt đối.",
       chapters: SUY_TUONG_CHAPTERS
     },
     {
@@ -225,6 +233,10 @@ const PHILOSOPHY_DATA = {
         badge: "Nền Tảng Văn Minh • Đủ 10 Quyển"
       },
       summary: "Tác phẩm đối thoại kinh điển của Plato dưới lời dẫn của Socrates. Cuốn sách khảo sát bản chất sâu xa của Công lý trong linh hồn con người và trong cấu trúc của một quốc gia lý tưởng. Đỉnh cao của tác phẩm là Dụ ngôn Hang Động — ẩn dụ bất hủ về hành trình giải phóng con người khỏi xiềng xích của định kiến và ảo ảnh để bước ra ánh sáng chân lý, cùng học thuyết Vua Triết gia (Philosopher King).",
+      annotation: "Kiệt tác nền tảng của triết học phương Tây khảo sát bản chất của Công lý, mô hình nhà nước lý tưởng và sự giải phóng linh hồn con người qua Dụ ngôn Hang Động.",
+      historicalContext: "Hoàn thành khoảng năm 375 TCN tại Athens sau bi kịch nền dân chủ thành bang kết án tử hình oan sai người thầy Socrates. Plato lập nên Viện Hàn lâm Athens và viết tác phẩm để tìm kiếm nền tảng đạo đức và công lý vĩnh cửu cho xã hội.",
+      coreThesis: "Công lý là sự hài hòa giữa 3 phần linh hồn (Lý trí - Dũng khí - Dục vọng) và 3 giai tầng xã hội. Dụ ngôn Hang Động minh chứng con người bị giam trong bóng tối của định kiến giác quan và sứ mệnh giải phóng tư duy để vươn tới Ánh sáng Thiện.",
+      modernRelevance: "Cung cấp năng lực tư duy phản biện sắc bén, nhận diện sự thao túng của truyền thông và thuật mị dân số đông, xây dựng đạo đức lãnh đạo có trách nhiệm.",
       chapters: CONG_HOA_CHAPTERS
     },
     {
@@ -253,6 +265,10 @@ const PHILOSOPHY_DATA = {
         badge: "Khai Phóng Hiện Sinh • 16 Bài Giảng"
       },
       summary: "Cuốn sách chấn động nhất của Friedrich Nietzsche theo chân nhà tiên tri Zarathustra từ đỉnh núi tuyết trở về với nhân gian sau mười năm ẩn dật. Tác phẩm thúc giục mỗi cá nhân vượt thoát khỏi thói mòn bầy đàn, dũng cảm đối diện với hư vô và tự tôi luyện chính mình thành hình mẫu Con Người Siêu Việt (Übermensch) với ngọn lửa Ý chí Quyền lực và tinh thần Amor Fati.",
+      annotation: "Thi ca triết học hiện sinh kinh điển thúc giục con người đập tan tâm lý bầy đàn, vượt qua sự hư vô để tự kiến tạo giá trị sống và trở thành Con Người Siêu Việt.",
+      historicalContext: "Sáng tác từ năm 1883 đến 1885 tại Thụy Sĩ và bờ biển Địa Trung Hải, giữa thời kỳ Nietzsche chịu đựng nỗi cô đơn tột cùng và những cơn đau đầu hành hạ nhưng trí lực và ngọn lửa sáng tạo bùng cháy rực rỡ nhất.",
+      coreThesis: "Hình tượng Siêu Nhân (Übermensch) tự mình vượt lên giới hạn bản thân (Self-overcoming); Ý chí Quyền lực (Will to Power) như sức mạnh hoàn thiện chính mình; và Sự trở lại vĩnh cửu (Eternal Recurrence) như tiêu chuẩn tối hậu cho một cuộc đời đáng sống.",
+      modernRelevance: "Đánh thức nội lực tiềm tàng, khuyến khích sự độc lập can trường, giúp độc giả vượt qua khủng hoảng hiện sinh và biến nghịch cảnh thành bệ phóng vươn lên tầm vóc cao hơn.",
       chapters: ZARATHUSTRA_CHAPTERS
     },
     {
@@ -281,6 +297,10 @@ const PHILOSOPHY_DATA = {
         badge: "Khai Minh Nhân Loại • Đủ 5 Chương"
       },
       summary: "Tác phẩm đặt ra nguyên lý tối thượng về quyền tự do cá nhân: Xã hội chỉ có quyền can thiệp vào tự do của một người nhằm mục đích duy nhất là tự vệ, ngăn chặn điều gây hại cho người khác (The Harm Principle). Tự do tư tưởng, tự do thảo luận và tranh biện là điều kiện tiên quyết cho sự tiến bộ và phẩm giá của nền văn minh nhân loại, cảnh giác trước Sự Độc tài của Số đông.",
+      annotation: "Tuyên ngôn triết học chính trị bất hủ bảo vệ tự do ngôn luận, quyền tự quyết của cá nhân và cảnh báo về mối hiểm họa từ sự độc tài của số đông.",
+      historicalContext: "Xuất bản năm 1859 tại nước Anh thời Victoria, cùng viết với người bạn đời Harriet Taylor Mill. Tác phẩm cảnh báo rằng khi xã hội dân chủ phát triển, áp lực định kiến bầy đàn của dư luận có thể trở thành thứ quyền lực bóp nghẹt tính sáng tạo của cá nhân.",
+      coreThesis: "Nguyên lý Gây hại (Harm Principle): Xã hội chỉ được phép can thiệp vào tự do của một cá nhân nhằm mục đích duy nhất là ngăn ngừa hành vi gây hại cho người khác. Tự do tư tưởng và tranh luận mở là điều kiện sống còn để chân lý luôn sống động và phát triển.",
+      modernRelevance: "Tấm khiên bảo vệ quyền tự do biểu đạt và sự đa dạng ý kiến trong thời đại mạng xã hội phân cực và văn hóa triệt hạ (cancel culture), thúc đẩy tinh thần khoan dung và tôn trọng cá nhân.",
       chapters: BAN_VE_TU_DO_CHAPTERS
     }
   ],
@@ -345,6 +365,11 @@ const dbPath = path.join(__dirname, '..', 'data', 'sophia.db');
 if (fs.existsSync(dbPath)) {
   console.log('⚡ Đang đồng bộ cơ sở dữ liệu SQLite sophia.db...');
   const db = new DatabaseSync(dbPath);
+  try { db.exec('ALTER TABLE books ADD COLUMN annotation TEXT;'); } catch(e) {}
+  try { db.exec('ALTER TABLE books ADD COLUMN historical_context TEXT;'); } catch(e) {}
+  try { db.exec('ALTER TABLE books ADD COLUMN core_thesis TEXT;'); } catch(e) {}
+  try { db.exec('ALTER TABLE books ADD COLUMN modern_relevance TEXT;'); } catch(e) {}
+
   db.exec('PRAGMA foreign_keys = OFF;');
   db.exec('DELETE FROM chapters;');
   db.exec('DELETE FROM books;');
@@ -354,8 +379,9 @@ if (fs.existsSync(dbPath)) {
     INSERT OR REPLACE INTO books (
       id, title, original_title, author, author_role, school, category_id,
       read_time, audio_duration, year, rating, readers_count, featured, tagline,
-      cover_image, fallback_cover, bgm_theme, studio_audio_url, cover_theme_json, summary, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')
+      cover_image, fallback_cover, bgm_theme, studio_audio_url, cover_theme_json,
+      summary, annotation, historical_context, core_thesis, modern_relevance, status
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')
   `);
 
   const insertChapter = db.prepare(`
@@ -385,7 +411,11 @@ if (fs.existsSync(dbPath)) {
       b.bgmTheme || '',
       b.studioAudioUrl || '',
       JSON.stringify(b.coverTheme || {}),
-      b.summary || ''
+      b.summary || '',
+      b.annotation || b.summary || '',
+      b.historicalContext || '',
+      b.coreThesis || '',
+      b.modernRelevance || ''
     );
 
     b.chapters.forEach((c, idx) => {
@@ -412,8 +442,10 @@ if (fs.existsSync(publicDir)) {
   const pubJsPages = path.join(publicDir, 'js', 'pages');
   const pubJs = path.join(publicDir, 'js');
   const pubBooksData = path.join(publicDir, 'js', 'books-data');
+  const pubCore = path.join(publicDir, 'js', 'core');
   if (!fs.existsSync(pubJsPages)) fs.mkdirSync(pubJsPages, { recursive: true });
   if (!fs.existsSync(pubBooksData)) fs.mkdirSync(pubBooksData, { recursive: true });
+  if (!fs.existsSync(pubCore)) fs.mkdirSync(pubCore, { recursive: true });
   
   fs.writeFileSync(path.join(pubJsPages, 'data.js'), masterContentJs, 'utf8');
   fs.writeFileSync(path.join(pubJs, 'data.js'), masterContentJs, 'utf8');
@@ -422,13 +454,37 @@ if (fs.existsSync(publicDir)) {
     fs.copyFileSync(path.join(booksDataDir, f), path.join(pubBooksData, f));
   });
 
-  const pubIndexHtml = path.join(publicDir, 'index.html');
-  if (fs.existsSync(pubIndexHtml)) {
-    let pubHtml = fs.readFileSync(pubIndexHtml, 'utf8');
-    pubHtml = pubHtml.replace(/<span id="stat-chapters-count">\d+ Chương Kinh Điển<\/span>/, `<span id="stat-chapters-count">${totalChapters} Chương Kinh Điển</span>`);
-    fs.writeFileSync(pubIndexHtml, pubHtml, 'utf8');
+  // Đồng bộ app.js và reader.js từ js/pages sang public và js/
+  const jsPagesDir = path.join(__dirname, '..', 'js', 'pages');
+  const rootJsDir = path.join(__dirname, '..', 'js');
+  ['app.js', 'reader.js'].forEach(f => {
+    const srcF = path.join(jsPagesDir, f);
+    if (fs.existsSync(srcF)) {
+      fs.copyFileSync(srcF, path.join(pubJsPages, f));
+      fs.copyFileSync(srcF, path.join(pubJs, f));
+      fs.copyFileSync(srcF, path.join(rootJsDir, f));
+    }
+  });
+
+  // Đồng bộ core scripts
+  const rootCoreDir = path.join(__dirname, '..', 'js', 'core');
+  if (fs.existsSync(rootCoreDir)) {
+    fs.readdirSync(rootCoreDir).forEach(f => {
+      fs.copyFileSync(path.join(rootCoreDir, f), path.join(pubCore, f));
+    });
   }
-  console.log(`  ✓ Đã đồng bộ sang thư mục public/ thành công!`);
+
+  // Đồng bộ index.html
+  const rootIndexHtml = path.join(__dirname, '..', 'index.html');
+  const pubIndexHtml = path.join(publicDir, 'index.html');
+  if (fs.existsSync(rootIndexHtml)) {
+    let rootHtml = fs.readFileSync(rootIndexHtml, 'utf8');
+    rootHtml = rootHtml.replace(/<span id="stat-chapters-count">\d+ Chương Kinh Điển<\/span>/, `<span id="stat-chapters-count">${totalChapters} Chương Kinh Điển</span>`);
+    fs.writeFileSync(rootIndexHtml, rootHtml, 'utf8');
+    fs.writeFileSync(pubIndexHtml, rootHtml, 'utf8');
+  }
+
+  console.log(`  ✓ Đã đồng bộ toàn bộ file HTML, JS sang thư mục public/ thành công!`);
 }
 
 console.log('🎉 TOÀN BỘ DỮ LIỆU ĐÃ ĐƯỢC CẬP NHẬT HOÀN HẢO 100%!');

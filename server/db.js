@@ -87,6 +87,10 @@ function initSchema() {
       studio_audio_url TEXT,
       cover_theme_json TEXT,
       summary TEXT,
+      annotation TEXT,
+      historical_context TEXT,
+      core_thesis TEXT,
+      modern_relevance TEXT,
       status TEXT DEFAULT 'published',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -145,6 +149,11 @@ function initSchema() {
       value TEXT
     );
   `);
+
+  try { db.exec('ALTER TABLE books ADD COLUMN annotation TEXT;'); } catch(e) {}
+  try { db.exec('ALTER TABLE books ADD COLUMN historical_context TEXT;'); } catch(e) {}
+  try { db.exec('ALTER TABLE books ADD COLUMN core_thesis TEXT;'); } catch(e) {}
+  try { db.exec('ALTER TABLE books ADD COLUMN modern_relevance TEXT;'); } catch(e) {}
 }
 
 /**
@@ -229,8 +238,9 @@ function seedInitialDataIfEmpty(force = false) {
     INSERT OR REPLACE INTO books (
       id, title, original_title, author, author_role, school, category_id,
       read_time, audio_duration, year, rating, readers_count, featured, tagline,
-      cover_image, fallback_cover, bgm_theme, studio_audio_url, cover_theme_json, summary, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')
+      cover_image, fallback_cover, bgm_theme, studio_audio_url, cover_theme_json,
+      summary, annotation, historical_context, core_thesis, modern_relevance, status
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published')
   `);
 
   const insertChapter = db.prepare(`
@@ -260,7 +270,11 @@ function seedInitialDataIfEmpty(force = false) {
       b.bgmTheme || '',
       b.studioAudioUrl || '',
       JSON.stringify(b.coverTheme || {}),
-      b.summary || ''
+      b.summary || '',
+      b.annotation || b.summary || '',
+      b.historicalContext || '',
+      b.coreThesis || '',
+      b.modernRelevance || ''
     );
 
     // Xác định nguồn chapters: ưu tiên full chapters nạp từ file chuyên biệt
@@ -428,8 +442,8 @@ function getOverviewStats() {
 function formatBookRow(book) {
   if (!book) return null;
   book.category = book.category_id || book.category || 'stoicism';
-  book.readTime = book.read_time || book.readTime || '60 phút';
-  book.audioDuration = book.audio_duration || book.audioDuration || '2 giờ';
+  book.readTime = book.read_time || book.readTime || '180 phút';
+  book.audioDuration = book.audio_duration || book.audioDuration || '4 giờ';
   book.originalTitle = book.original_title || book.originalTitle || '';
   book.authorRole = book.author_role || book.authorRole || '';
   book.readersCount = book.readers_count || book.readersCount || '0';
@@ -437,6 +451,28 @@ function formatBookRow(book) {
   book.fallbackCover = book.fallback_cover || book.fallbackCover || '';
   book.bgmTheme = book.bgm_theme || book.bgmTheme || '';
   book.studioAudioUrl = book.studio_audio_url || book.studioAudioUrl || '';
+
+  try {
+    const pData = require('../js/data.js');
+    const masterBook = pData?.books?.find(b => b.id === book.id || b.id === book.slug);
+    if (masterBook) {
+      if (!book.summary) book.summary = masterBook.summary;
+      if (!book.tagline) book.tagline = masterBook.tagline;
+      book.annotation = book.annotation || masterBook.annotation || masterBook.summary;
+      book.historicalContext = book.historical_context || book.historicalContext || masterBook.historicalContext || '';
+      book.coreThesis = book.core_thesis || book.coreThesis || masterBook.coreThesis || '';
+      book.modernRelevance = book.modern_relevance || book.modernRelevance || masterBook.modernRelevance || '';
+      if (!book.readTime || book.readTime === '60 phút') book.readTime = masterBook.readTime;
+      if (!book.audioDuration || book.audioDuration === '2 giờ') book.audioDuration = masterBook.audioDuration;
+      if (!book.bgmTheme) book.bgmTheme = masterBook.bgmTheme;
+      if (!book.title && masterBook.title) book.title = masterBook.title;
+      if (!book.author && masterBook.author) book.author = masterBook.author;
+      if (!book.school && masterBook.school) book.school = masterBook.school;
+    }
+  } catch(e) {}
+
+  book.summary = book.summary || book.tagline || 'Kiệt tác triết học kinh điển toàn văn.';
+  book.annotation = book.annotation || book.summary;
   return book;
 }
 

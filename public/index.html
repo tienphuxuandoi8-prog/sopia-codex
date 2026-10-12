@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sophia Codex — Thư Viện Triết Học Toàn Cầu</title>
   
-  <!-- Google Fonts: Be Vietnam Pro + Cinzel + Inter + Lora + Merriweather + Playfair Display -->
+  <!-- Google Fonts: 6 Bộ Font Học Viện & Triết Học Toàn Cầu (Đầy đủ biến thể tiếng Việt) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -19,10 +19,10 @@
         extend: {
           fontFamily: {
             ui: ['"Be Vietnam Pro"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-            reading: ['Lora', 'Georgia', 'serif'],
-            display: ['"Playfair Display"', 'Georgia', 'serif'],
-            heading: ['"Playfair Display"', 'Georgia', 'serif'],
-            serif: ['Lora', 'Georgia', 'serif']
+            reading: ['Lora', 'Merriweather', 'Times New Roman', 'serif'],
+            display: ['"Playfair Display"', 'Merriweather', 'Times New Roman', 'serif'],
+            heading: ['"Playfair Display"', 'Merriweather', 'Times New Roman', 'serif'],
+            serif: ['Lora', 'Merriweather', 'Times New Roman', 'serif']
           },
           colors: {
             scholar: {
@@ -1221,10 +1221,26 @@
             </div>
           </div>
 
+          <!-- Typography Style Selector -->
+          <div>
+            <label class="font-bold text-stone-700 dark:text-stone-300 block mb-1.5 uppercase tracking-wider text-[10px]">Phong Cách Font Triết Học:</label>
+            <div class="grid grid-cols-3 gap-1.5 bg-stone-200/70 dark:bg-emerald-950 p-1 rounded-2xl border border-stone-300/60 dark:border-emerald-800">
+              <button class="quote-font-btn py-1.5 px-2 rounded-xl text-[11px] font-semibold transition-all flex items-center justify-center gap-1 bg-amber-500 text-stone-950 font-bold" data-font="classical">
+                <span>🏛️ Kinh Viện</span>
+              </button>
+              <button class="quote-font-btn py-1.5 px-2 rounded-xl text-[11px] font-semibold transition-all flex items-center justify-center gap-1 text-stone-600 dark:text-stone-300 hover:bg-white/10" data-font="monumental">
+                <span>📜 Văn Khảo</span>
+              </button>
+              <button class="quote-font-btn py-1.5 px-2 rounded-xl text-[11px] font-semibold transition-all flex items-center justify-center gap-1 text-stone-600 dark:text-stone-300 hover:bg-white/10" data-font="zen">
+                <span>🌿 Tối Giản</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Edit Quote Text -->
           <div>
             <label class="font-bold text-stone-700 dark:text-stone-300 block mb-1 uppercase tracking-wider text-[10px]">Nội Dung Trích Dẫn:</label>
-            <textarea id="quote-input-text" rows="4" class="w-full p-3 rounded-2xl bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-inner font-serif italic"></textarea>
+            <textarea id="quote-input-text" rows="4" spellcheck="false" class="w-full p-3 rounded-2xl bg-white dark:bg-emerald-950 border border-stone-200 dark:border-emerald-800 text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-amber-500/50 shadow-inner font-reading"></textarea>
             <div id="quote-input-author" class="text-[11px] text-stone-500 dark:text-stone-400 mt-1 italic font-medium"></div>
           </div>
 
@@ -1245,6 +1261,20 @@
       </div>
 
     </div>
+  </div>
+
+  <!-- Hidden Font Preloader for 100% Crisp Canvas & Web Rendering -->
+  <div class="fixed -left-[9999px] -top-[9999px] opacity-0 pointer-events-none select-none" aria-hidden="true">
+    <span style="font-family: 'Lora'; font-weight: 500;">Sophia Codex Thư Viện Triết Học Sống</span>
+    <span style="font-family: 'Lora'; font-weight: 600;">Sophia Codex Thư Viện Triết Học Sống</span>
+    <span style="font-family: 'Lora'; font-style: italic; font-weight: 400;">Sophia Codex Thư Viện Triết Học Sống</span>
+    <span style="font-family: 'Merriweather'; font-weight: 400;">Sophia Codex Thư Viện Triết Học Sống</span>
+    <span style="font-family: 'Merriweather'; font-weight: 700;">Sophia Codex Thư Viện Triết Học Sống</span>
+    <span style="font-family: 'Playfair Display'; font-weight: 600;">Sophia Codex Thư Viện Triết Học Sống</span>
+    <span style="font-family: 'Playfair Display'; font-weight: 700;">Sophia Codex Thư Viện Triết Học Sống</span>
+    <span style="font-family: 'Playfair Display'; font-style: italic; font-weight: 400;">“Sophia Codex”</span>
+    <span style="font-family: 'Cinzel'; font-weight: 700;">SOPHIA CODEX</span>
+    <span style="font-family: 'Be Vietnam Pro'; font-weight: 500;">Sophia Codex Thư Viện Triết Học Sống</span>
   </div>
 
   <!-- ==================== MODAL 1: SOPHIA AUDIO STUDIO ==================== -->
