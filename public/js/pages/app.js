@@ -919,41 +919,8 @@ window.activatePremiumFromModal = function() {
 
 /* ==========================================================================
    11. ADMIN GATEWAY CONTROLLER (CỔNG XƯỞNG QUẢN TRỊ)
-   Dành cho Quản Trị Viên & Hỗ trợ trải nghiệm Demo Quản trị
+   Dành riêng cho Quản Trị Viên (SuperAdmin)
    ========================================================================== */
-
-window.openAdminGatewayModal = function() {
-  const modal = document.getElementById('admin-gateway-modal');
-  if (modal) {
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    if (window.lucide) window.lucide.createIcons();
-  }
-};
-
-window.closeAdminGatewayModal = function() {
-  const modal = document.getElementById('admin-gateway-modal');
-  if (modal) {
-    modal.classList.remove('flex');
-    modal.classList.add('hidden');
-  }
-};
-
-window.enterDemoAdminMode = function() {
-  const adminUser = {
-    id: 'usr_admin',
-    email: 'admin@sophiacodex.vn',
-    displayName: 'Quản Trị Viên',
-    status: 'ACTIVE',
-    level: 5,
-    xp: 2500,
-    isSuperAdmin: true,
-    permissions: ['*']
-  };
-  localStorage.setItem('sophia_user', JSON.stringify(adminUser));
-  localStorage.setItem('token', 'admin_demo_token_' + Date.now());
-  window.location.href = 'admin.html';
-};
 
 window.handleAdminEntryClick = function(event) {
   if (event) event.preventDefault();
@@ -971,8 +938,15 @@ window.handleAdminEntryClick = function(event) {
 
   if (isAdmin) {
     window.location.href = 'admin.html';
+  } else if (!user) {
+    sessionStorage.setItem('auth_redirect_msg', 'Vui lòng đăng nhập tài khoản Quản trị để tiếp tục.');
+    window.location.href = 'login.html?next=admin.html';
   } else {
-    openAdminGatewayModal();
+    if (typeof Toast !== 'undefined') {
+      Toast.error('Khu vực này chỉ dành riêng cho Quản trị viên (Admin). Tài khoản Độc giả không có quyền truy cập.');
+    } else {
+      alert('Khu vực này chỉ dành riêng cho Quản trị viên (Admin). Tài khoản Độc giả không có quyền truy cập.');
+    }
   }
 };
 

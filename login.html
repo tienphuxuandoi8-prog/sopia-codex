@@ -59,31 +59,7 @@
             <span id="authNoticeText" class="font-medium">Vui lòng đăng nhập để tiếp tục.</span>
         </div>
 
-        <!-- Quick Credentials Hint -->
-        <div class="mb-5 p-3 rounded-xl bg-stone-100/90 border border-stone-200 text-xs font-sans text-stone-700 space-y-2">
-            <div class="flex items-start gap-2">
-                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-700 shrink-0 mt-0.5"></i>
-                <div class="flex-1">
-                    <span class="font-semibold text-emerald-950">👑 Tài khoản Quản Trị (Admin):</span><br>
-                    <span>Email: <code class="font-mono text-emerald-900 font-bold select-all">admin@sophiacodex.vn</code></span><br>
-                    <span>Mật khẩu: <code class="font-mono text-emerald-900 font-bold select-all">Admin@Sophia2026!</code></span>
-                    <button type="button" onclick="fillAdminCredentials()" class="mt-1 block px-2.5 py-1 rounded bg-amber-500 text-stone-950 font-semibold text-[11px] hover:bg-amber-600 transition-colors shadow-sm">
-                        ⚡ Điền tài khoản Quản trị
-                    </button>
-                </div>
-            </div>
-            <div class="pt-2 border-t border-stone-200 flex items-start gap-2">
-                <i data-lucide="book-open" class="w-4 h-4 text-emerald-700 shrink-0 mt-0.5"></i>
-                <div class="flex-1">
-                    <span class="font-semibold text-emerald-950">📖 Tài khoản Độc Giả Mẫu (Reader):</span><br>
-                    <span>Email: <code class="font-mono text-emerald-900 font-bold select-all">docgia@sophiacodex.vn</code></span><br>
-                    <span>Mật khẩu: <code class="font-mono text-emerald-900 font-bold select-all">Docgia@Sophia2026!</code></span>
-                    <button type="button" onclick="fillReaderCredentials()" class="mt-1 block px-2.5 py-1 rounded bg-stone-200 text-stone-900 font-semibold text-[11px] hover:bg-stone-300 transition-colors shadow-sm">
-                        ⚡ Điền tài khoản Độc giả
-                    </button>
-                </div>
-            </div>
-        </div>
+
 
         <form id="loginForm" class="space-y-4">
             <div>
@@ -136,16 +112,6 @@
     <script src="js/core/dom.js"></script>
     <script>
         lucide.createIcons();
-
-        function fillAdminCredentials() {
-            document.getElementById('email').value = 'admin@sophiacodex.vn';
-            document.getElementById('password').value = 'Admin@Sophia2026!';
-        }
-
-        function fillReaderCredentials() {
-            document.getElementById('email').value = 'docgia@sophiacodex.vn';
-            document.getElementById('password').value = 'Docgia@Sophia2026!';
-        }
 
         // Check notices & existing auth
         document.addEventListener('DOMContentLoaded', async () => {

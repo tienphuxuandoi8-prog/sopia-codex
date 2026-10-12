@@ -37,7 +37,7 @@ Dự án **Sophia Codex** đã được tối ưu hóa toàn diện để xuất
 
 ---
 
-## 🔑 THÔNG TIN ĐĂNG NHẬP MẶC ĐỊNH
-- **Tài khoản Admin:** `admin@sophiacodex.vn` / Mật khẩu: `Admin@Sophia2026!`
-- **Tài khoản Độc giả:** `docgia@sophiacodex.vn` / Mật khẩu: `Docgia@Sophia2026!`
-- Đường dẫn Admin Studio: `https://<ten-mien-vercel>/admin.html`
+## 🔑 QUẢN TRỊ VIÊN & ĐỘC GIẢ
+- **Tài khoản Admin:** `admin@sophiacodex.vn` (Mật khẩu bí mật do Quản trị viên nắm giữ)
+- **Độc giả:** Người dùng đăng ký tài khoản độc lập tại `/register.html`
+- Đường dẫn Admin Studio: `https://<ten-mien-vercel>/admin.html` (Chỉ tài khoản Quản trị mới được phép truy cập)

@@ -73,9 +73,9 @@ Dự án đã được cấu hình tối ưu ở thư mục gốc:
 
 ---
 
-## 🔑 Tài Khoản Mặc Định
-- **Quản Trị Viên (Admin Studio):** `admin@sophiacodex.vn` / `Admin@Sophia2026!`
-- **Độc Giả Mẫu:** `docgia@sophiacodex.vn` / `Docgia@Sophia2026!`
+## 🔑 Phân Quyền & Tài Khoản
+- **Quản Trị Viên (Admin Studio):** Dành riêng cho Quản trị viên quản lý nội dung và cơ sở dữ liệu.
+- **Độc Giả:** Đăng ký tài khoản độc lập qua giao diện `register.html`.
 
 ---
 

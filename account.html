@@ -151,18 +151,18 @@
                         <form id="passwordForm" class="space-y-4 mb-10">
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 font-sans mb-1">Mật khẩu hiện tại</label>
-                                <input type="password" required class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm">
+                                <input type="password" id="currentPassword" required class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 font-sans mb-1">Mật khẩu mới</label>
-                                <input type="password" required class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm">
+                                <input type="password" id="newPassword" required class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm" placeholder="Tối thiểu 6 ký tự">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 font-sans mb-1">Xác nhận mật khẩu mới</label>
-                                <input type="password" required class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm">
+                                <input type="password" id="confirmPassword" required class="block w-full px-3 py-2 border border-parchment-300 rounded-lg focus:ring-emerald-900 focus:border-emerald-900 font-sans sm:text-sm">
                             </div>
                             <div class="pt-2">
-                                <button type="submit" class="inline-flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-emerald-900 hover:bg-emerald-950 font-sans transition-colors">
+                                <button type="submit" id="btnChangePassword" class="inline-flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-emerald-900 hover:bg-emerald-950 font-sans transition-colors">
                                     Cập nhật mật khẩu
                                 </button>
                             </div>
@@ -311,6 +311,57 @@
                     user.bio = newBio;
                     localStorage.setItem('sophia_user', JSON.stringify(user));
                     alert('✅ Đã lưu cập nhật hồ sơ cá nhân thành công!');
+                });
+
+                // Password form save
+                document.getElementById('passwordForm')?.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const curPwd = document.getElementById('currentPassword').value;
+                    const newPwd = document.getElementById('newPassword').value;
+                    const confPwd = document.getElementById('confirmPassword').value;
+
+                    if (newPwd !== confPwd) {
+                        alert('❌ Mật khẩu xác nhận không khớp!');
+                        return;
+                    }
+                    if (newPwd.length < 6) {
+                        alert('❌ Mật khẩu mới phải có ít nhất 6 ký tự!');
+                        return;
+                    }
+
+                    try {
+                        let ok = false;
+                        if (window.location.protocol.startsWith('http') && typeof API !== 'undefined') {
+                            try {
+                                await API.post('/account/change-password', { currentPassword: curPwd, newPassword: newPwd });
+                                ok = true;
+                            } catch (apiErr) {
+                                if (apiErr.status === 400 || (apiErr.message && !apiErr.message.includes('NETWORK_ERROR') && !apiErr.message.includes('Không thể kết nối'))) {
+                                    throw apiErr;
+                                }
+                            }
+                        }
+                        if (!ok && typeof AuthStore !== 'undefined') {
+                            const res = await AuthStore.changePassword({ 
+                                email: user.email, 
+                                currentPassword: curPwd, 
+                                newPassword: newPwd 
+                            });
+                            if (!res.success) {
+                                throw new Error(res.error);
+                            }
+                            ok = true;
+                        }
+
+                        if (ok) {
+                            alert('✅ Đổi mật khẩu thành công! Mật khẩu mới của bạn đã được cập nhật an toàn.');
+                            document.getElementById('currentPassword').value = '';
+                            document.getElementById('newPassword').value = '';
+                            document.getElementById('confirmPassword').value = '';
+                        }
+                    } catch (err) {
+                        alert('❌ ' + (err.message || 'Không thể đổi mật khẩu. Vui lòng kiểm tra lại mật khẩu hiện tại.'));
+                    }
                 });
 
             } catch (err) {

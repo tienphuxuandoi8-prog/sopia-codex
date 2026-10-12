@@ -70,8 +70,11 @@ const Auth = (() => {
   /** Có bất kỳ quyền quản trị nào? */
   function hasAnyAdminPermission() {
     if (!_user) return false;
-    if (_permissions.includes('*')) return true;
-    return _permissions.length > 0;
+    if (_user.isSuperAdmin === true) return true;
+    if (_user.email === 'admin@sophiacodex.vn') return true;
+    if (Array.isArray(_permissions) && (_permissions.includes('*') || _permissions.includes('admin') || _permissions.some(p => typeof p === 'string' && p.startsWith('admin.')))) return true;
+    if (Array.isArray(_user.roles) && _user.roles.includes('admin')) return true;
+    return false;
   }
 
   /** Là hội viên Premium? */
@@ -104,6 +107,12 @@ const Auth = (() => {
       el.classList.toggle('hidden', !_isPremium);
     });
 
+    // Ẩn/hiện link admin: CHỈ HIỂN THỊ KHI ĐÃ ĐĂNG NHẬP VÀ LÀ QUẢN TRỊ VIÊN THỰC THỤ
+    const isUserAdmin = hasAnyAdminPermission();
+    document.querySelectorAll('[data-auth="admin"]').forEach(el => {
+      el.classList.toggle('hidden', !isUserAdmin);
+    });
+
     // Hiển thị tên + avatar nếu đã đăng nhập
     if (_user) {
       document.querySelectorAll('[data-auth-name]').forEach(el => {
@@ -123,11 +132,6 @@ const Auth = (() => {
       });
       document.querySelectorAll('[data-auth-xp]').forEach(el => {
         el.textContent = `${_user.xp} XP`;
-      });
-
-      // Ẩn/hiện link admin
-      document.querySelectorAll('[data-auth="admin"]').forEach(el => {
-        el.classList.toggle('hidden', !hasAnyAdminPermission());
       });
 
       // Banner xác thực email
@@ -344,11 +348,37 @@ const AuthStore = (() => {
     return { success: true, user: userObj };
   }
 
+  async function changePassword({ email, currentPassword, newPassword }) {
+    if (!email || !currentPassword || !newPassword) {
+      return { success: false, error: 'Vui lòng điền đầy đủ mật khẩu hiện tại và mật khẩu mới.' };
+    }
+    const norm = email.trim().toLowerCase();
+    const account = findByEmail(norm);
+    if (!account) {
+      return { success: false, error: 'Tài khoản không tồn tại.' };
+    }
+    const curHash = await hashPassword(currentPassword);
+    if (account.passwordHash !== curHash) {
+      return { success: false, error: 'Mật khẩu hiện tại không chính xác.' };
+    }
+    if (newPassword.length < 6) {
+      return { success: false, error: 'Mật khẩu mới phải có ít nhất 6 ký tự.' };
+    }
+    const newHash = await hashPassword(newPassword);
+    account.passwordHash = newHash;
+    const accounts = getAccounts();
+    const idx = accounts.findIndex(a => a.email.trim().toLowerCase() === norm);
+    if (idx !== -1) accounts[idx] = account;
+    saveAccounts(accounts);
+    return { success: true, message: 'Đổi mật khẩu thành công!' };
+  }
+
   return {
     getAccounts,
     findByEmail,
     register,
     verify,
+    changePassword,
     hashPassword
   };
 })();
