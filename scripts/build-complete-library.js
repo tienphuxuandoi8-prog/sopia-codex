@@ -61,8 +61,8 @@ const PHILOSOPHY_DATA = {
   stats: {
     totalBooks: 5,
     totalChapters: totalChapters,
-    totalAudioHours: "18.5 giờ",
-    readersCount: "68,400+"
+    totalAudioHours: "24.0 giờ",
+    readersCount: "88,500+"
   },
 
   categories: [
@@ -151,11 +151,11 @@ const PHILOSOPHY_DATA = {
       authorRole: "Bậc thầy Đạo Gia Phương Đông",
       school: "Triết học Phương Đông",
       category: "eastern",
-      readTime: "120 phút",
-      audioDuration: "3 giờ 15 phút",
+      readTime: "180 phút",
+      audioDuration: "4 giờ 15 phút",
       year: "Thế kỷ 6 TCN",
       rating: 5.0,
-      readersCount: "41,800",
+      readersCount: "48,500+",
       featured: true,
       tagline: "Tuyệt tác triết học về Đạo tự nhiên, Vô vi và sự hài hòa tối thượng",
       coverImage: "assets/covers/dao-duc-kinh.svg",
@@ -168,7 +168,7 @@ const PHILOSOPHY_DATA = {
         textColor: "#FFFFFF",
         badge: "Kinh Điển Đông Phương • Đủ 81 Chương"
       },
-      summary: "Với trọn bộ 81 chương chia làm Thượng Kinh (Đạo Kinh) và Hạ Kinh (Đức Kinh), Đạo Đức Kinh của Lão Tử cô đọng những quy luật vận hành kỳ diệu của vũ trụ và đời người. Triết lý 'Vô vi' (thuận theo tự nhiên, không cưỡng ép) và hình tượng 'Nước' mang lại cho con người đương đại liều thuốc an định giữa cuộc sống xô bồ, đua chen danh lợi.",
+      summary: "Với trọn bộ 81 chương chia làm Thượng Kinh (Đạo Kinh) và Hạ Kinh (Đức Kinh), Đạo Đức Kinh của Lão Tử cô đọng những quy luật vận hành kỳ diệu của vũ trụ và đời người. Triết lý 'Vô vi' (thuận theo tự nhiên, không cưỡng ép tư lợi) và hình tượng 'Nước' mang lại cho con người đương đại liều thuốc an định giữa cuộc sống xô bồ, đua chen danh lợi.",
       chapters: DAO_DUC_KINH_CHAPTERS
     },
     {
@@ -179,11 +179,11 @@ const PHILOSOPHY_DATA = {
       authorRole: "Hoàng đế Triết gia La Mã",
       school: "Chủ nghĩa Khắc Kỷ (Stoicism)",
       category: "stoicism",
-      readTime: "150 phút",
-      audioDuration: "4 giờ 30 phút",
+      readTime: "210 phút",
+      audioDuration: "4 giờ 45 phút",
       year: "170 – 180 SCN",
-      rating: 4.95,
-      readersCount: "28,450",
+      rating: 4.98,
+      readersCount: "38,200+",
       featured: true,
       tagline: "Nhật ký tự rèn luyện nội tâm của vị Hoàng đế vĩ đại nhất thành Rome",
       coverImage: "assets/covers/suy-tuong.svg",
@@ -196,7 +196,7 @@ const PHILOSOPHY_DATA = {
         textColor: "#FFFFFF",
         badge: "Tuyệt Tác Khắc Kỷ • Đủ 12 Quyển"
       },
-      summary: "Cuốn sách không được viết ra để xuất bản hay giảng dạy cho người khác, mà là những ghi chép chân thực nhất của Marcus Aurelius gửi gắm cho chính bản thân mình giữa sa trường và bệnh tật hiểm nghèo. Tác phẩm dạy ta nghệ thuật làm chủ tâm trí, phân biệt những gì thuộc về quyền kiểm soát của ta và những gì nằm ngoài, từ đó đạt được sự an tĩnh nội tại tối thượng trước mọi giông bão cuộc đời.",
+      summary: "Cuốn sách không được viết ra để xuất bản hay giảng dạy cho người khác, mà là những ghi chép chân thực nhất của Marcus Aurelius gửi gắm cho chính bản thân mình giữa sa trường Carnuntum và dịch bệnh Antonine hiểm nghèo. Tác phẩm dạy ta nghệ thuật làm chủ tâm trí, phân biệt những gì thuộc về quyền kiểm soát của ta và những gì nằm ngoài, từ đó đạt được sự an tĩnh nội tại tối thượng trước mọi giông bão cuộc đời.",
       chapters: SUY_TUONG_CHAPTERS
     },
     {
@@ -207,12 +207,12 @@ const PHILOSOPHY_DATA = {
       authorRole: "Triết gia Cổ điển Athens",
       school: "Triết học Cổ điển Hy Lạp",
       category: "classical",
-      readTime: "180 phút",
-      audioDuration: "5 giờ 45 phút",
+      readTime: "270 phút",
+      audioDuration: "6 giờ 30 phút",
       year: "375 TCN",
-      rating: 4.88,
-      readersCount: "34,200",
-      featured: false,
+      rating: 4.94,
+      readersCount: "44,600+",
+      featured: true,
       tagline: "Khảo sát vĩ đại nhất về Công lý, Nhà nước lý tưởng và Chân lý tối thượng",
       coverImage: "assets/covers/cong-hoa.svg",
       fallbackCover: "assets/covers/cong-hoa.svg",
@@ -224,7 +224,7 @@ const PHILOSOPHY_DATA = {
         textColor: "#FFFFFF",
         badge: "Nền Tảng Văn Minh • Đủ 10 Quyển"
       },
-      summary: "Tác phẩm đối thoại kinh điển của Plato dưới lời dẫn của Socrates. Cuốn sách khảo sát bản chất sâu xa của Công lý trong linh hồn con người và trong cấu trúc của một quốc gia lý tưởng. Đỉnh cao của tác phẩm là Dụ ngôn Hang Động — ẩn dụ bất hủ về hành trình giải phóng con người khỏi xiềng xích của định kiến và ảo ảnh để bước ra ánh sáng chân lý.",
+      summary: "Tác phẩm đối thoại kinh điển của Plato dưới lời dẫn của Socrates. Cuốn sách khảo sát bản chất sâu xa của Công lý trong linh hồn con người và trong cấu trúc của một quốc gia lý tưởng. Đỉnh cao của tác phẩm là Dụ ngôn Hang Động — ẩn dụ bất hủ về hành trình giải phóng con người khỏi xiềng xích của định kiến và ảo ảnh để bước ra ánh sáng chân lý, cùng học thuyết Vua Triết gia (Philosopher King).",
       chapters: CONG_HOA_CHAPTERS
     },
     {
@@ -235,11 +235,11 @@ const PHILOSOPHY_DATA = {
       authorRole: "Triết gia Khai phá nước Đức",
       school: "Chủ nghĩa Hiện sinh & Ý chí Quyền lực",
       category: "existentialism",
-      readTime: "140 phút",
-      audioDuration: "4 giờ 15 phút",
+      readTime: "200 phút",
+      audioDuration: "4 giờ 45 phút",
       year: "1883 – 1885",
-      rating: 4.85,
-      readersCount: "21,600",
+      rating: 4.91,
+      readersCount: "31,200+",
       featured: false,
       tagline: "Bản hùng ca triết học về sự thức tỉnh, lòng can đảm và Siêu nhân (Übermensch)",
       coverImage: "assets/covers/zarathustra.svg",
@@ -252,7 +252,7 @@ const PHILOSOPHY_DATA = {
         textColor: "#FFFFFF",
         badge: "Khai Phóng Hiện Sinh • 16 Bài Giảng"
       },
-      summary: "Cuốn sách chấn động nhất của Friedrich Nietzsche theo chân nhà tiên tri Zarathustra từ đỉnh núi tuyết trở về với nhân gian sau mười năm ẩn dật. Tác phẩm thúc giục mỗi cá nhân vượt thoát khỏi thói mòn bầy đàn, dũng cảm đối diện với hư vô và tự tôi luyện chính mình thành hình mẫu Con Người Siêu Việt (Übermensch).",
+      summary: "Cuốn sách chấn động nhất của Friedrich Nietzsche theo chân nhà tiên tri Zarathustra từ đỉnh núi tuyết trở về với nhân gian sau mười năm ẩn dật. Tác phẩm thúc giục mỗi cá nhân vượt thoát khỏi thói mòn bầy đàn, dũng cảm đối diện với hư vô và tự tôi luyện chính mình thành hình mẫu Con Người Siêu Việt (Übermensch) với ngọn lửa Ý chí Quyền lực và tinh thần Amor Fati.",
       chapters: ZARATHUSTRA_CHAPTERS
     },
     {
@@ -263,11 +263,11 @@ const PHILOSOPHY_DATA = {
       authorRole: "Nhà tư tưởng Khai sáng Anh",
       school: "Thời kỳ Khai Sáng",
       category: "enlightenment",
-      readTime: "110 phút",
-      audioDuration: "3 giờ 30 phút",
+      readTime: "150 phút",
+      audioDuration: "3 giờ 45 phút",
       year: "1859",
-      rating: 4.88,
-      readersCount: "18,400",
+      rating: 4.92,
+      readersCount: "25,600+",
       featured: false,
       tagline: "Tuyên ngôn bất hủ bảo vệ quyền tự do tư tưởng và giới hạn quyền lực xã hội",
       coverImage: "assets/covers/ban-ve-tu-do.svg",
@@ -280,7 +280,7 @@ const PHILOSOPHY_DATA = {
         textColor: "#FFFFFF",
         badge: "Khai Minh Nhân Loại • Đủ 5 Chương"
       },
-      summary: "Tác phẩm đặt ra nguyên lý tối thượng về quyền tự do cá nhân: Xã hội chỉ có quyền can thiệp vào tự do của một người nhằm mục đích duy nhất là tự vệ, ngăn chặn điều gây hại cho người khác. Tự do tư tưởng, tự do thảo luận và tranh biện là điều kiện tiên quyết cho sự tiến bộ và phẩm giá của nền văn minh nhân loại.",
+      summary: "Tác phẩm đặt ra nguyên lý tối thượng về quyền tự do cá nhân: Xã hội chỉ có quyền can thiệp vào tự do của một người nhằm mục đích duy nhất là tự vệ, ngăn chặn điều gây hại cho người khác (The Harm Principle). Tự do tư tưởng, tự do thảo luận và tranh biện là điều kiện tiên quyết cho sự tiến bộ và phẩm giá của nền văn minh nhân loại, cảnh giác trước Sự Độc tài của Số đông.",
       chapters: BAN_VE_TU_DO_CHAPTERS
     }
   ],

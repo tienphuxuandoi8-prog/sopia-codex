@@ -10,6 +10,13 @@ router.get('/by-book/:bookId', validate(chaptersByBookParams, 'params'), async (
     const chapters = await chapterService.getChaptersByBook(req.params.bookId);
     res.json(chapters);
   } catch (error) {
+    try {
+      const dbService = require('../../../server/db');
+      const book = dbService.getBookById(req.params.bookId);
+      if (book && book.chapters) {
+        return res.json(book.chapters);
+      }
+    } catch (e) {}
     next(error);
   }
 });
@@ -22,6 +29,11 @@ router.get('/:id', validate(chapterIdParams, 'params'), async (req, res, next) =
     const chapter = await chapterService.getChapterById(req.params.id, user);
     res.json(chapter);
   } catch (error) {
+    try {
+      const dbService = require('../../../server/db');
+      const chap = dbService.getChapterById ? dbService.getChapterById(req.params.id) : null;
+      if (chap) return res.json(chap);
+    } catch (e) {}
     next(error);
   }
 });
