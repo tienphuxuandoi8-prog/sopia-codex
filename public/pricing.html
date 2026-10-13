@@ -149,12 +149,6 @@
             <i data-lucide="crown" class="w-4 h-4 text-amber-400"></i>
             <span>Nâng Cấp Gói Tháng</span>
           </button>
-          
-          <!-- Sandbox 1-Click Activation For Readers & Admin -->
-          <button onclick="quickSandboxActivate()" class="w-full py-2.5 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-900 border border-amber-500/40 font-semibold transition-all text-xs flex items-center justify-center gap-1.5">
-            <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-600"></i>
-            <span>⚡ Kích Hoạt Thử Nghiệm Ngay (Dành Cho Admin & Độc Giả)</span>
-          </button>
         </div>
       </div>
 
@@ -170,83 +164,203 @@
         </div>
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
           <h4 class="font-bold text-gray-900 mb-1.5 text-sm md:text-base">Tôi có thể thanh toán bằng những hình thức nào?</h4>
-          <p class="text-xs md:text-sm text-gray-600 leading-relaxed">Chúng tôi hỗ trợ thanh toán qua VNPay (Thẻ ATM, Visa/Mastercard, VietQR) và Ví MoMo (quét mã cực kỳ tiện lợi), cũng như chế độ kích hoạt thử nghiệm cho nhà phát triển và ban quản trị.</p>
+          <p class="text-xs md:text-sm text-gray-600 leading-relaxed">Chúng tôi hỗ trợ chuyển khoản ngân hàng qua VietQR 24/7 (MB Bank, Vietcombank, Techcombank...), quét mã siêu nhanh và ví điện tử MoMo chính thức.</p>
         </div>
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-          <h4 class="font-bold text-gray-900 mb-1.5 text-sm md:text-base">Tài khoản Quản Trị Viên (Admin) có cần mua gói không?</h4>
-          <p class="text-xs md:text-sm text-gray-600 leading-relaxed">Tài khoản Quản Trị Viên (Admin) được cấp quyền vĩnh viễn toàn quyền truy cập không giới hạn vào mọi tính năng Premium và phân hệ Quản trị.</p>
+          <h4 class="font-bold text-gray-900 mb-1.5 text-sm md:text-base">Chính sách bảo vệ người mua và tránh mất tiền oan như thế nào?</h4>
+          <p class="text-xs md:text-sm text-gray-600 leading-relaxed">Mọi đơn hàng đều được gắn mã định danh duy nhất và liên kết với tài khoản đã đăng nhập. Chúng tôi cam kết đối soát kích hoạt trong 5-10 phút và hoàn tiền 100% nếu có bất kỳ sự cố kỹ thuật nào.</p>
         </div>
       </div>
     </div>
   </main>
 
   <!-- Checkout Modal -->
-  <div id="checkoutModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform scale-95 transition-transform duration-300 relative overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="p-6 border-b border-gray-100">
+  <div id="checkoutModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full transform scale-95 transition-transform duration-300 relative overflow-hidden flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="p-6 bg-gradient-to-br from-scholar-900 to-scholar-800 text-white relative">
         <div class="flex justify-between items-center">
-          <h3 class="text-xl font-display font-bold text-scholar-900">Chọn Phương Thức Thanh Toán</h3>
-          <button onclick="closeCheckout()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-amber-400 text-scholar-900 flex items-center justify-center font-bold">
+              <i data-lucide="crown" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-amber-300 tracking-wider">Đặc Quyền Cao Cấp</span>
+              <h3 class="text-lg font-display font-bold text-white leading-tight" id="modalPlanName">Sophia Premium - Gói Tháng</h3>
+            </div>
+          </div>
+          <button onclick="closeCheckout()" class="text-stone-300 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/10">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
-        <p class="text-sm text-gray-500 mt-1" id="modalPlanName">Sophia Premium - Gói Tháng</p>
       </div>
 
+      <!-- Modal Body -->
       <div class="p-6 overflow-y-auto space-y-4">
-        <div class="bg-scholar-50 p-4 rounded-xl border border-scholar-100 flex justify-between items-center">
-          <span class="text-gray-600 text-sm">Số tiền thanh toán:</span>
-          <span class="text-2xl font-bold text-scholar-900" id="modalPlanPrice">49.000đ</span>
+        
+        <!-- STEP A: AUTH REQUIRED (Hiển thị khi khách chưa đăng nhập) -->
+        <div id="checkoutAuthRequired" class="hidden text-center py-4 space-y-4">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center border border-amber-200">
+            <i data-lucide="shield-alert" class="w-7 h-7"></i>
+          </div>
+          <div class="space-y-1.5">
+            <h4 class="font-display font-bold text-lg text-gray-900">Yêu Cầu Đăng Ký Tài Khoản</h4>
+            <p class="text-xs text-gray-600 leading-relaxed max-w-sm mx-auto">
+              Để bảo vệ quyền lợi hội viên và đảm bảo quyền truy cập vĩnh viễn không bị mất khi chuyển thiết bị, Quý khách cần có tài khoản trước khi mua gói Premium.
+            </p>
+          </div>
+
+          <div class="space-y-2 pt-2">
+            <a href="register.html?next=pricing.html" class="w-full py-3 px-4 rounded-xl bg-scholar-900 hover:bg-scholar-800 text-amber-200 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-colors">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>Đăng Ký Tài Khoản Mới (Miễn Phí)</span>
+            </a>
+            <a href="login.html?next=pricing.html" class="w-full py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors">
+              <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+              <span>Đã Có Tài Khoản? Đăng Nhập Ngay</span>
+            </a>
+          </div>
         </div>
 
-        <div class="space-y-3">
-          <label class="block text-sm font-semibold text-gray-700">Cổng thanh toán:</label>
-          
-          <!-- VNPay Option -->
-          <label class="flex items-center p-3.5 border-2 rounded-xl cursor-pointer hover:border-scholar-900 transition-all border-scholar-900 bg-scholar-50/50">
-            <input type="radio" name="provider" value="VNPAY" class="text-scholar-900 focus:ring-scholar-900" checked>
-            <div class="ml-3 flex items-center justify-between w-full">
-              <span class="font-medium text-gray-900 text-sm">Cổng VNPay (VietQR / ATM / Visa)</span>
-              <span class="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold">Phổ biến</span>
+        <!-- STEP B: CHECKOUT & VIETQR (Hiển thị khi đã đăng nhập) -->
+        <div id="checkoutContent" class="space-y-4">
+          <!-- Price & Account Summary -->
+          <div class="bg-scholar-50 p-3.5 rounded-2xl border border-scholar-100 flex justify-between items-center text-xs">
+            <div>
+              <span class="text-gray-500 block">Tài khoản nhận quyền lợi:</span>
+              <span class="font-bold text-gray-900 font-mono" id="checkoutUserEmail">...</span>
             </div>
-          </label>
-
-          <!-- MoMo Option -->
-          <label class="flex items-center p-3.5 border-2 rounded-xl cursor-pointer hover:border-scholar-900 transition-all border-gray-200">
-            <input type="radio" name="provider" value="MOMO" class="text-scholar-900 focus:ring-scholar-900">
-            <div class="ml-3 flex items-center justify-between w-full">
-              <span class="font-medium text-gray-900 text-sm">Ví MoMo (Quét QR tiện lợi)</span>
-              <span class="text-[10px] bg-pink-100 text-pink-700 px-2 py-0.5 rounded font-bold">Nhanh</span>
+            <div class="text-right">
+              <span class="text-gray-500 block">Số tiền thanh toán:</span>
+              <span class="text-xl font-bold text-scholar-900 font-mono" id="modalPlanPrice">49.000đ</span>
             </div>
-          </label>
+          </div>
 
-          <!-- Sandbox Direct Option -->
-          <label class="flex items-center p-3.5 border-2 rounded-xl cursor-pointer hover:border-amber-500 transition-all border-amber-300 bg-amber-50/50">
-            <input type="radio" name="provider" value="SANDBOX" class="text-amber-600 focus:ring-amber-500">
-            <div class="ml-3 flex items-center justify-between w-full">
-              <div>
-                <span class="font-bold text-amber-900 text-sm">Kích Hoạt Thử Nghiệm Tức Thì</span>
-                <p class="text-[11px] text-amber-700">Dành cho Admin & kiểm thử không cần quẹt thẻ thật</p>
+          <!-- Order Code Badge -->
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs">
+            <span class="text-amber-800 font-medium">Mã đơn hàng:</span>
+            <div class="flex items-center gap-1.5">
+              <span class="font-mono font-bold text-amber-900 text-sm" id="checkoutOrderCode">...</span>
+              <button type="button" onclick="copyCheckoutField('orderCode')" class="px-2 py-0.5 rounded text-[11px] bg-amber-200 text-amber-900 hover:bg-amber-300 font-semibold">
+                Sao chép
+              </button>
+            </div>
+          </div>
+
+          <!-- VietQR Section -->
+          <div class="text-center p-3 rounded-2xl bg-gray-50 border border-gray-200">
+            <div class="inline-block p-2 bg-white rounded-xl shadow-sm border border-gray-200 mb-1.5">
+              <img id="checkoutVietQrImg" src="" alt="VietQR" class="w-44 h-44 mx-auto object-contain">
+            </div>
+            <p class="text-[11px] text-gray-500 max-w-xs mx-auto">
+              Quét mã QR bằng ứng dụng Ngân hàng (MB, VCB, TCB...) hoặc MoMo để tự động điền số tiền và nội dung đơn.
+            </p>
+          </div>
+
+          <!-- Bank Details Table -->
+          <div class="space-y-2 text-xs bg-gray-50 p-3.5 rounded-2xl border border-gray-200">
+            <div class="flex justify-between items-center py-1 border-b border-gray-200">
+              <span class="text-gray-500">Ngân hàng:</span>
+              <span class="font-bold text-gray-900">MB Bank (Ngân hàng Quân Đội)</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-gray-200">
+              <span class="text-gray-500">Chủ tài khoản:</span>
+              <span class="font-bold text-amber-700 uppercase">VU SI TIEN</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-gray-200">
+              <span class="text-gray-500">Số tài khoản:</span>
+              <div class="flex items-center gap-1.5">
+                <span class="font-mono font-bold text-gray-900 text-sm">0388688999</span>
+                <button type="button" onclick="SOPHIA_PAYMENT.copyToClipboard('0388688999', 'Đã sao chép số tài khoản!')" class="px-2 py-0.5 rounded text-[11px] bg-gray-200 hover:bg-gray-300 font-semibold text-gray-800">
+                  Sao chép
+                </button>
               </div>
-              <span class="text-[10px] bg-amber-200 text-amber-800 px-2 py-0.5 rounded font-bold">Thử nghiệm</span>
             </div>
-          </label>
+            <div class="flex justify-between items-center py-1">
+              <span class="text-gray-500">Nội dung CK:</span>
+              <div class="flex items-center gap-1.5">
+                <span id="checkoutTransferSyntax" class="font-mono font-bold text-amber-800 text-sm">...</span>
+                <button type="button" onclick="copyCheckoutField('syntax')" class="px-2 py-0.5 rounded text-[11px] bg-gray-200 hover:bg-gray-300 font-semibold text-gray-800">
+                  Sao chép
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phone & Reference code input -->
+          <div class="space-y-2 pt-1">
+            <div>
+              <label class="block text-[11px] text-gray-600 mb-1 font-medium">Số điện thoại / Zalo để nhận đối soát *</label>
+              <input type="tel" id="checkoutPhoneInput" placeholder="09xxxxxxxx" class="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 bg-white text-gray-900 focus:ring-1 focus:ring-scholar-900 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] text-gray-600 mb-1 font-medium">Mã giao dịch / FT Code ngân hàng (sau khi đã chuyển)</label>
+              <input type="text" id="checkoutRefInput" placeholder="Ví dụ: FT26101299988 hoặc Mã tham chiếu" class="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 bg-white font-mono text-gray-900 focus:ring-1 focus:ring-scholar-900 focus:outline-none">
+            </div>
+            <p id="checkoutError" class="text-red-500 text-xs hidden"></p>
+          </div>
+
+          <!-- Submit Button -->
+          <button id="btnProceedCheckout" onclick="proceedCheckout()" class="w-full py-3.5 px-4 rounded-xl bg-scholar-900 text-amber-200 font-bold hover:bg-scholar-800 transition-colors shadow-md flex justify-center items-center gap-2 text-xs sm:text-sm">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>Tôi Đã Chuyển Khoản - Gửi Xác Nhận Kích Hoạt</span>
+          </button>
         </div>
+
+        <!-- STEP C: RECEIPT (Sau khi gửi xác nhận) -->
+        <div id="checkoutReceipt" class="hidden text-center py-2 space-y-4">
+          <div class="w-14 h-14 mx-auto rounded-full bg-green-100 text-green-700 flex items-center justify-center">
+            <i data-lucide="check" class="w-7 h-7"></i>
+          </div>
+          <div class="space-y-1">
+            <h4 class="font-display font-bold text-lg text-gray-900">Đã Tiếp Nhận Xác Nhận Thanh Toán!</h4>
+            <p class="text-xs text-gray-500">Hệ thống đang tiến hành đối soát và kích hoạt trong 1 - 5 phút.</p>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 text-left text-xs space-y-2">
+            <div class="flex justify-between py-1 border-b border-gray-200">
+              <span class="text-gray-500">Mã đơn hàng:</span>
+              <span class="font-mono font-bold text-gray-900" id="receiptOrderCode">...</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-gray-200">
+              <span class="text-gray-500">Email tài khoản:</span>
+              <span class="font-mono text-gray-900" id="receiptEmail">...</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-gray-200">
+              <span class="text-gray-500">Gói đăng ký:</span>
+              <span class="font-bold text-gray-900" id="receiptPlan">...</span>
+            </div>
+            <div class="flex justify-between py-1">
+              <span class="text-gray-500">Trạng thái:</span>
+              <span class="font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded text-[10px]">⏳ Đang đối soát</span>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-left text-[11px] text-amber-900 leading-relaxed">
+            <strong>Cam kết uy tín tác giả:</strong> Đơn hàng đã được lưu an toàn. Nếu sau 5-10 phút tài khoản chưa kích hoạt hoặc có sai sót số tiền, tác giả cam kết hoàn tiền 100% qua Zalo 0388.688.999.
+          </div>
+
+          <div class="space-y-2 pt-1">
+            <a id="receiptZaloBtn" href="https://zalo.me/0388688999" target="_blank" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-2">
+              <i data-lucide="message-circle" class="w-4 h-4"></i>
+              <span>Nhắn Tin Zalo Đối Soát Nhanh (0388.688.999)</span>
+            </a>
+            <button onclick="closeCheckout()" class="w-full py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs">
+              Đóng Cửa Sổ
+            </button>
+          </div>
+        </div>
+
       </div>
 
-      <div class="p-6 border-t border-gray-100 bg-gray-50">
-        <button id="btnProceedCheckout" onclick="proceedCheckout()" class="w-full py-3.5 px-4 rounded-xl bg-scholar-900 text-amber-200 font-bold hover:bg-scholar-800 transition-colors shadow-md flex justify-center items-center gap-2">
-          <span>Tiến Hành Thanh Toán</span>
-          <i data-lucide="arrow-right" class="w-4 h-4"></i>
-        </button>
-        <p id="checkoutError" class="text-red-500 text-xs mt-3 text-center hidden"></p>
-      </div>
     </div>
   </div>
 
   <!-- Scripts -->
   <script src="js/core/api.js"></script>
   <script src="js/core/auth.js"></script>
+  <script src="js/core/payment-config.js"></script>
   <script>
     if (window.lucide) {
       window.lucide.createIcons();
@@ -254,6 +368,7 @@
 
     // UI state
     let selectedPlan = 'month'; // 'month' or 'year'
+    let currentPricingOrder = null;
     
     // Elements
     const btnPlanMonth = document.getElementById('btnPlanMonth');
@@ -292,6 +407,20 @@
       if (window.lucide) window.lucide.createIcons();
     };
 
+    function getLoggedInReader() {
+      if (typeof Auth !== 'undefined' && Auth.getUser && Auth.getUser()) {
+        return Auth.getUser();
+      }
+      try {
+        const raw = localStorage.getItem('sophia_user');
+        if (raw) {
+          const u = JSON.parse(raw);
+          if (u && (u.email || u.id)) return u;
+        }
+      } catch(e) {}
+      return null;
+    }
+
     // Authentication UI update
     async function updateAuthUI() {
       let user = null;
@@ -302,10 +431,7 @@
       } catch(e) {}
 
       if (!user) {
-        try {
-          const localStr = localStorage.getItem('sophia_user');
-          if (localStr) user = JSON.parse(localStr);
-        } catch(e) {}
+        user = getLoggedInReader();
       }
 
       if (user) {
@@ -325,12 +451,59 @@
     const modal = document.getElementById('checkoutModal');
     
     window.openCheckout = function() {
-      if (selectedPlan === 'month') {
-        modalPlanName.innerText = 'Sophia Premium - Gói Tháng (30 ngày)';
-        modalPlanPrice.innerText = '49.000đ';
+      const user = getLoggedInReader();
+      const authBox = document.getElementById('checkoutAuthRequired');
+      const contentBox = document.getElementById('checkoutContent');
+      const receiptBox = document.getElementById('checkoutReceipt');
+
+      if (receiptBox) receiptBox.classList.add('hidden');
+
+      if (!user) {
+        // YÊU CẦU ĐĂNG KÝ / ĐĂNG NHẬP
+        if (authBox) authBox.classList.remove('hidden');
+        if (contentBox) contentBox.classList.add('hidden');
       } else {
-        modalPlanName.innerText = 'Sophia Premium - Gói Năm (365 ngày)';
-        modalPlanPrice.innerText = '399.000đ';
+        // ĐÃ ĐĂNG NHẬP: Tạo đơn hàng và hiển thị VietQR
+        if (authBox) authBox.classList.add('hidden');
+        if (contentBox) contentBox.classList.remove('hidden');
+
+        const isMonth = selectedPlan === 'month';
+        const planCode = isMonth ? 'PREMIUM_1M' : 'PREMIUM_1Y';
+        const planTitle = isMonth ? 'Sophia Premium - Gói Tháng' : 'Sophia Premium - Gói Năm (Tiết kiệm 32%)';
+        const amount = isMonth ? 49000 : 399000;
+        const formattedAmount = isMonth ? '49.000đ' : '399.000đ';
+
+        modalPlanName.innerText = planTitle;
+        modalPlanPrice.innerText = formattedAmount;
+
+        const emailEl = document.getElementById('checkoutUserEmail');
+        if (emailEl) emailEl.innerText = user.email || 'reader@sophiacodex.vn';
+
+        const orderCode = typeof SOPHIA_PAYMENT !== 'undefined' ? SOPHIA_PAYMENT.generateOrderCode() : ('SC-' + Date.now().toString().slice(-8));
+        const vietQrUrl = typeof SOPHIA_PAYMENT !== 'undefined' ? SOPHIA_PAYMENT.getVietQrUrl(orderCode, amount) : `https://img.vietqr.io/image/MB-0388688999-compact2.png?amount=${amount}&addInfo=${orderCode}&accountName=VU%20SI%20TIEN`;
+
+        currentPricingOrder = {
+          orderCode,
+          planCode,
+          planName: planTitle,
+          amountVnd: amount,
+          formattedAmount,
+          customerEmail: user.email || '',
+          customerName: user.displayName || user.name || 'Hội Viên Tri Thức',
+          vietQrUrl
+        };
+
+        if (typeof SOPHIA_PAYMENT !== 'undefined') {
+          SOPHIA_PAYMENT.saveLocalOrder(currentPricingOrder);
+        }
+
+        const codeEl = document.getElementById('checkoutOrderCode');
+        const syntaxEl = document.getElementById('checkoutTransferSyntax');
+        const qrEl = document.getElementById('checkoutVietQrImg');
+
+        if (codeEl) codeEl.innerText = orderCode;
+        if (syntaxEl) syntaxEl.innerText = orderCode;
+        if (qrEl) qrEl.src = vietQrUrl;
       }
       
       modal.classList.remove('hidden');
@@ -339,6 +512,7 @@
         modal.classList.remove('opacity-0');
         modal.querySelector('div').classList.remove('scale-95');
       }, 10);
+      if (window.lucide) window.lucide.createIcons();
     };
 
     window.closeCheckout = function() {
@@ -351,70 +525,61 @@
       }, 300);
     };
 
-    // Quick sandbox activation for testing
-    window.quickSandboxActivate = function() {
-      activatePremiumLocally(selectedPlan === 'month' ? 30 : 365);
-      alert('🎉 Chúc mừng! Bạn đã kích hoạt thành công Gói Sophia Premium!\nToàn bộ các kiệt tác triết học và tính năng đặc quyền đã được mở khóa.');
-      window.location.href = 'index.html';
-    };
-
-    function activatePremiumLocally(days) {
-      let user = null;
-      try {
-        const u = localStorage.getItem('sophia_user');
-        if (u) user = JSON.parse(u);
-      } catch(e) {}
-
-      if (!user) {
-        user = {
-          id: 'usr_' + Date.now(),
-          email: 'reader@sophiacodex.vn',
-          displayName: 'Độc Giả Tri Thức',
-          level: 2,
-          xp: 400
-        };
+    window.copyCheckoutField = function(type) {
+      if (!currentPricingOrder || typeof SOPHIA_PAYMENT === 'undefined') return;
+      if (type === 'orderCode' || type === 'syntax') {
+        SOPHIA_PAYMENT.copyToClipboard(currentPricingOrder.orderCode, 'Đã sao chép mã đơn hàng: ' + currentPricingOrder.orderCode);
       }
-
-      user.isPremium = true;
-      user.premiumUntil = new Date(Date.now() + days * 86400000).toISOString();
-      localStorage.setItem('sophia_user', JSON.stringify(user));
-    }
+    };
 
     window.proceedCheckout = async function() {
       const btn = document.getElementById('btnProceedCheckout');
       const errorEl = document.getElementById('checkoutError');
-      const providerInput = document.querySelector('input[name="provider"]:checked');
-      const provider = providerInput ? providerInput.value : 'SANDBOX';
-      const planCode = selectedPlan === 'month' ? 'PREMIUM_1M' : 'PREMIUM_1Y';
-      
-      // If sandbox selected, instant activate
-      if (provider === 'SANDBOX') {
-        window.quickSandboxActivate();
+      const phoneInput = document.getElementById('checkoutPhoneInput');
+      const refInput = document.getElementById('checkoutRefInput');
+
+      const phone = phoneInput ? phoneInput.value.trim() : '';
+      const refCode = refInput ? refInput.value.trim() : '';
+
+      if (!phone || phone.length < 8) {
+        errorEl.textContent = 'Vui lòng nhập số điện thoại hoặc Zalo để phục vụ đối soát giao dịch.';
+        errorEl.classList.remove('hidden');
         return;
       }
-
-      btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>Đang kết nối cổng thanh toán...</span>`;
-      if (window.lucide) window.lucide.createIcons();
       errorEl.classList.add('hidden');
 
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>Đang ghi nhận xác nhận...</span>`;
+      if (window.lucide) window.lucide.createIcons();
+
       try {
-        if (typeof API !== 'undefined' && window.location.protocol.startsWith('http')) {
-          const result = await API.post('/payments/checkout', { planCode, provider });
-          if (result && result.data && result.data.payUrl) {
-            window.location.href = result.data.payUrl;
-            return;
-          }
+        if (typeof API !== 'undefined' && currentPricingOrder) {
+          await API.post(`/payments/orders/${currentPricingOrder.orderCode}/verify`, {
+            transactionRef: refCode || 'REF_' + Date.now(),
+            customerPhone: phone,
+            senderNote: 'Chuyển khoản gói ' + currentPricingOrder.planName
+          });
         }
-        // Fallback if payment gateway sandbox is in demo mode
-        activatePremiumLocally(selectedPlan === 'month' ? 30 : 365);
-        window.location.href = `payment-result.html?code=SIM_${Date.now()}&provider=${provider}&status=success`;
-      } catch (error) {
-        // Fallback friendly demo activation
-        console.warn('API checkout fallback:', error);
-        activatePremiumLocally(selectedPlan === 'month' ? 30 : 365);
-        window.location.href = `payment-result.html?code=DEMO_${Date.now()}&provider=${provider}&status=success`;
+      } catch(e) {
+        console.warn('Verify API notice:', e.message);
       }
+
+      // Chuyển sang Bước Receipt
+      const rCode = document.getElementById('receiptOrderCode');
+      const rEmail = document.getElementById('receiptEmail');
+      const rPlan = document.getElementById('receiptPlan');
+      const rZalo = document.getElementById('receiptZaloBtn');
+
+      if (currentPricingOrder) {
+        if (rCode) rCode.innerText = currentPricingOrder.orderCode;
+        if (rEmail) rEmail.innerText = currentPricingOrder.customerEmail;
+        if (rPlan) rPlan.innerText = currentPricingOrder.planName;
+        if (rZalo) rZalo.href = `https://zalo.me/0388688999?text=${encodeURIComponent('Xác nhận kích hoạt đơn hàng: ' + currentPricingOrder.orderCode + ' (' + currentPricingOrder.customerEmail + ')')}`;
+      }
+
+      document.getElementById('checkoutContent').classList.add('hidden');
+      document.getElementById('checkoutReceipt').classList.remove('hidden');
+      if (window.lucide) window.lucide.createIcons();
     };
   </script>
 </body>

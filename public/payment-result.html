@@ -103,10 +103,12 @@
     </div>
   </div>
 
-  <script type="module">
-    import { API } from './js/api.js';
-
-    lucide.createIcons();
+  <script src="js/core/api.js"></script>
+  <script src="js/core/payment-config.js"></script>
+  <script>
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
 
     const loadingState = document.getElementById('loadingState');
     const successState = document.getElementById('successState');

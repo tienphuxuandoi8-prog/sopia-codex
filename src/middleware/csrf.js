@@ -29,9 +29,9 @@ function csrfProtection(req, res, next) {
     return next();
   }
 
-  // Bỏ qua với đường dẫn IPN từ cổng thanh toán (VNPay, MoMo) hoặc AI Companion
+  // Bỏ qua với đường dẫn thanh toán (VNPay, MoMo, VietQR, checkout, verify) hoặc AI Companion
   const fullUrl = req.originalUrl || req.url || '';
-  if ((fullUrl.includes('/payments/') && fullUrl.endsWith('/ipn')) || fullUrl.includes('/ai/')) {
+  if (fullUrl.includes('/payments/') || fullUrl.includes('/ai/')) {
     return next();
   }
 

@@ -869,27 +869,73 @@ window.openBookFromStudio = function() {
    10. SOPHIA PREMIUM MEMBERSHIP CONTROLLER
    ========================================================================== */
 
+let currentModalPlan = 'month';
+let currentActiveOrder = null;
+
+function getLoggedInUser() {
+  if (typeof Auth !== 'undefined' && Auth.getUser && Auth.getUser()) {
+    return Auth.getUser();
+  }
+  try {
+    const raw = localStorage.getItem('sophia_user');
+    if (raw) {
+      const u = JSON.parse(raw);
+      if (u && (u.email || u.id)) return u;
+    }
+  } catch(e) {}
+  return null;
+}
+
 window.openSophiaPremiumModal = function() {
   const modal = document.getElementById('premium-modal');
   if (!modal) return;
 
-  let user = null;
-  try {
-    const u = localStorage.getItem('sophia_user');
-    if (u) user = JSON.parse(u);
-  } catch(e) {}
+  const user = getLoggedInUser();
 
-  const badge = document.getElementById('premium-status-badge');
-  const badgeText = document.getElementById('premium-status-text');
+  const stepAuthRequired = document.getElementById('modal-step-auth-required');
+  const stepPlans = document.getElementById('modal-step-plans');
+  const stepPayment = document.getElementById('modal-step-payment');
+  const stepReceipt = document.getElementById('modal-step-receipt');
 
-  if (user && user.isSuperAdmin) {
-    if (badge) badge.classList.remove('hidden');
-    if (badgeText) badgeText.textContent = 'Bạn đang đăng nhập với quyền Quản Trị Viên (Toàn quyền Premium vĩnh viễn).';
-  } else if (user && user.isPremium) {
-    if (badge) badge.classList.remove('hidden');
-    if (badgeText) badgeText.textContent = 'Bạn hiện đang là Hội viên Sophia Premium.';
+  // Reset các bước
+  if (stepPayment) stepPayment.classList.add('hidden');
+  if (stepReceipt) stepReceipt.classList.add('hidden');
+
+  if (!user) {
+    // CHƯA ĐĂNG NHẬP: Bắt buộc đăng ký hoặc đăng nhập mới được mua gói
+    if (stepAuthRequired) stepAuthRequired.classList.remove('hidden');
+    if (stepPlans) stepPlans.classList.add('hidden');
   } else {
-    if (badge) badge.classList.add('hidden');
+    // ĐÃ ĐĂNG NHẬP: Hiển thị form chọn gói & thông tin tài khoản
+    if (stepAuthRequired) stepAuthRequired.classList.add('hidden');
+    if (stepPlans) stepPlans.classList.remove('hidden');
+
+    // Tự động điền thông tin tài khoản đã đăng nhập
+    const nameInput = document.getElementById('modal-cust-name');
+    const emailInput = document.getElementById('modal-cust-email');
+    if (nameInput) nameInput.value = user.displayName || user.name || '';
+    if (emailInput) {
+      emailInput.value = user.email || '';
+      emailInput.readOnly = true; // Khóa email để gắn chặt với tài khoản đã đăng nhập
+    }
+
+    // Hiển thị badge quyền hạn nếu có
+    const badge = document.getElementById('premium-status-badge');
+    const badgeText = document.getElementById('premium-status-text');
+    const adminLink = document.getElementById('btn-admin-portal-link');
+
+    if (user.isSuperAdmin) {
+      if (badge) badge.classList.remove('hidden');
+      if (badgeText) badgeText.textContent = 'Tài khoản Quản Trị Viên sở hữu toàn quyền Premium vĩnh viễn.';
+      if (adminLink) adminLink.classList.remove('hidden');
+    } else if (user.isPremium) {
+      if (badge) badge.classList.remove('hidden');
+      if (badgeText) badgeText.textContent = 'Bạn hiện đang là Hội viên Sophia Premium.';
+      if (adminLink) adminLink.classList.add('hidden');
+    } else {
+      if (badge) badge.classList.add('hidden');
+      if (adminLink) adminLink.classList.add('hidden');
+    }
   }
 
   modal.classList.remove('hidden');
@@ -906,6 +952,7 @@ window.closePremiumModal = function() {
 };
 
 window.toggleModalPlan = function(plan) {
+  currentModalPlan = plan;
   const btnMonth = document.getElementById('modal-plan-month-btn');
   const btnYear = document.getElementById('modal-plan-year-btn');
   if (plan === 'month') {
@@ -917,33 +964,161 @@ window.toggleModalPlan = function(plan) {
   }
 };
 
-window.activatePremiumFromModal = function() {
-  let user = null;
-  try {
-    const u = localStorage.getItem('sophia_user');
-    if (u) user = JSON.parse(u);
-  } catch(e) {}
-
+window.proceedToPaymentStep = async function() {
+  const user = getLoggedInUser();
   if (!user) {
-    user = {
-      id: 'usr_' + Date.now(),
-      email: 'reader@sophiacodex.vn',
-      displayName: 'Độc Giả Tri Thức',
-      level: 2,
-      xp: 450
-    };
+    window.location.href = 'login.html?next=pricing.html';
+    return;
   }
 
-  user.isPremium = true;
-  user.premiumUntil = new Date(Date.now() + 30 * 86400000).toISOString();
-  localStorage.setItem('sophia_user', JSON.stringify(user));
+  const nameInput = document.getElementById('modal-cust-name');
+  const phoneInput = document.getElementById('modal-cust-phone');
+  const emailInput = document.getElementById('modal-cust-email');
+  const errorEl = document.getElementById('modal-step1-error');
 
-  closePremiumModal();
-  alert('🎉 Kích hoạt thành công Gói Sophia Premium!\nBạn đã mở khóa toàn bộ 100% sách toàn văn, Audio Studio và Socrates AI.');
-  
-  if (typeof Auth !== 'undefined' && Auth.loadMe) {
-    Auth.loadMe();
+  const fullName = nameInput ? nameInput.value.trim() : (user.displayName || '');
+  const phone = phoneInput ? phoneInput.value.trim() : '';
+  const email = emailInput ? emailInput.value.trim() : user.email;
+
+  if (!fullName) {
+    if (errorEl) {
+      errorEl.textContent = 'Vui lòng nhập họ và tên của Quý độc giả.';
+      errorEl.classList.remove('hidden');
+    }
+    return;
   }
+
+  if (!phone || phone.length < 8) {
+    if (errorEl) {
+      errorEl.textContent = 'Vui lòng nhập số điện thoại hoặc Zalo để phục vụ đối soát giao dịch.';
+      errorEl.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (errorEl) errorEl.classList.add('hidden');
+
+  const planCode = currentModalPlan === 'month' ? 'PREMIUM_1M' : 'PREMIUM_1Y';
+  const planName = currentModalPlan === 'month' ? 'Sophia Premium - Gói Tháng' : 'Sophia Premium - Gói Năm (Tiết kiệm 32%)';
+  const amountVnd = currentModalPlan === 'month' ? 49000 : 399000;
+  const formattedAmount = currentModalPlan === 'month' ? '49.000đ' : '399.000đ';
+
+  const orderCode = typeof SOPHIA_PAYMENT !== 'undefined' ? SOPHIA_PAYMENT.generateOrderCode() : ('SC-' + Date.now().toString().slice(-8));
+  const vietQrUrl = typeof SOPHIA_PAYMENT !== 'undefined' ? SOPHIA_PAYMENT.getVietQrUrl(orderCode, amountVnd) : `https://img.vietqr.io/image/MB-0388688999-compact2.png?amount=${amountVnd}&addInfo=${orderCode}&accountName=VU%20SI%20TIEN`;
+
+  currentActiveOrder = {
+    orderCode,
+    planCode,
+    planName,
+    amountVnd,
+    formattedAmount,
+    customerName: fullName,
+    customerPhone: phone,
+    customerEmail: email,
+    vietQrUrl,
+    createdAt: new Date().toISOString()
+  };
+
+  if (typeof SOPHIA_PAYMENT !== 'undefined') {
+    SOPHIA_PAYMENT.saveLocalOrder(currentActiveOrder);
+  }
+
+  // Gửi tạo đơn lên server
+  try {
+    if (typeof API !== 'undefined' && API.post) {
+      await API.post('/payments/checkout', {
+        planCode,
+        provider: 'VIETQR',
+        customerName: fullName,
+        customerPhone: phone,
+        customerEmail: email
+      });
+    }
+  } catch(e) {
+    console.warn('API checkout notice:', e.message);
+  }
+
+  // Cập nhật giao diện Bước 2
+  const payOrderCode = document.getElementById('modal-pay-order-code');
+  const payPlanName = document.getElementById('modal-pay-plan-name');
+  const payAmount = document.getElementById('modal-pay-amount');
+  const payCopyAmount = document.getElementById('modal-pay-copy-amount');
+  const paySyntax = document.getElementById('modal-pay-transfer-syntax');
+  const qrImg = document.getElementById('modal-vietqr-img');
+
+  if (payOrderCode) payOrderCode.textContent = orderCode;
+  if (payPlanName) payPlanName.textContent = planName;
+  if (payAmount) payAmount.textContent = formattedAmount;
+  if (payCopyAmount) payCopyAmount.textContent = formattedAmount;
+  if (paySyntax) paySyntax.textContent = orderCode;
+  if (qrImg) qrImg.src = vietQrUrl;
+
+  document.getElementById('modal-step-plans').classList.add('hidden');
+  document.getElementById('modal-step-payment').classList.remove('hidden');
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.backToPlanStep = function() {
+  document.getElementById('modal-step-payment').classList.add('hidden');
+  document.getElementById('modal-step-plans').classList.remove('hidden');
+};
+
+window.copyAmountText = function() {
+  if (currentActiveOrder && typeof SOPHIA_PAYMENT !== 'undefined') {
+    SOPHIA_PAYMENT.copyToClipboard(String(currentActiveOrder.amountVnd), 'Đã sao chép số tiền: ' + currentActiveOrder.formattedAmount);
+  }
+};
+
+window.copySyntaxText = function() {
+  if (currentActiveOrder && typeof SOPHIA_PAYMENT !== 'undefined') {
+    SOPHIA_PAYMENT.copyToClipboard(currentActiveOrder.orderCode, 'Đã sao chép cú pháp chuyển khoản: ' + currentActiveOrder.orderCode);
+  }
+};
+
+window.submitPaymentVerification = async function() {
+  const refInput = document.getElementById('modal-pay-ref-input');
+  const btn = document.getElementById('btn-submit-verify');
+
+  const refCode = refInput ? refInput.value.trim() : '';
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>Đang ghi nhận xác thực...</span>`;
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  try {
+    if (typeof API !== 'undefined' && currentActiveOrder) {
+      await API.post(`/payments/orders/${currentActiveOrder.orderCode}/verify`, {
+        transactionRef: refCode || 'REF_' + Date.now(),
+        customerPhone: currentActiveOrder.customerPhone,
+        senderNote: 'Chuyển khoản gói ' + currentActiveOrder.planName
+      });
+    }
+  } catch(e) {
+    console.warn('Verify API notice:', e.message);
+  }
+
+  // Cập nhật giao diện Bước 3 (Biên lai điện tử)
+  const rCode = document.getElementById('receipt-order-code');
+  const rName = document.getElementById('receipt-cust-name');
+  const rEmail = document.getElementById('receipt-cust-email');
+  const rPlan = document.getElementById('receipt-plan-name');
+  const rAmount = document.getElementById('receipt-amount');
+  const rZalo = document.getElementById('receipt-zalo-link');
+
+  if (currentActiveOrder) {
+    if (rCode) rCode.textContent = currentActiveOrder.orderCode;
+    if (rName) rName.textContent = currentActiveOrder.customerName;
+    if (rEmail) rEmail.textContent = currentActiveOrder.customerEmail;
+    if (rPlan) rPlan.textContent = currentActiveOrder.planName;
+    if (rAmount) rAmount.textContent = currentActiveOrder.formattedAmount;
+    if (rZalo) rZalo.href = `https://zalo.me/0388688999?text=${encodeURIComponent('Xác nhận kích hoạt đơn hàng: ' + currentActiveOrder.orderCode + ' (' + currentActiveOrder.customerEmail + ')')}`;
+  }
+
+  document.getElementById('modal-step-payment').classList.add('hidden');
+  document.getElementById('modal-step-receipt').classList.remove('hidden');
+  if (window.lucide) window.lucide.createIcons();
 };
 
 /* ==========================================================================

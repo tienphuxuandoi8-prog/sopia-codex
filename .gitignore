@@ -21,6 +21,7 @@ Thumbs.db
 *.db-shm
 *.db-wal
 data/backups/
+data/local_orders.json
 
 # Prisma
 prisma/*.db

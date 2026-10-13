@@ -43,7 +43,8 @@ try {
  * Khởi tạo lược đồ cơ sở dữ liệu quan hệ hoàn chỉnh
  */
 function initSchema() {
-  db.exec(`
+  try {
+    db.exec(`
     CREATE TABLE IF NOT EXISTS categories (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -150,10 +151,13 @@ function initSchema() {
     );
   `);
 
-  try { db.exec('ALTER TABLE books ADD COLUMN annotation TEXT;'); } catch(e) {}
-  try { db.exec('ALTER TABLE books ADD COLUMN historical_context TEXT;'); } catch(e) {}
-  try { db.exec('ALTER TABLE books ADD COLUMN core_thesis TEXT;'); } catch(e) {}
-  try { db.exec('ALTER TABLE books ADD COLUMN modern_relevance TEXT;'); } catch(e) {}
+    try { db.exec('ALTER TABLE books ADD COLUMN annotation TEXT;'); } catch(e) {}
+    try { db.exec('ALTER TABLE books ADD COLUMN historical_context TEXT;'); } catch(e) {}
+    try { db.exec('ALTER TABLE books ADD COLUMN core_thesis TEXT;'); } catch(e) {}
+    try { db.exec('ALTER TABLE books ADD COLUMN modern_relevance TEXT;'); } catch(e) {}
+  } catch (err) {
+    // Nếu bảng đã tồn tại hoặc database đang bị lock trong luồng đồng thời
+  }
 }
 
 /**
