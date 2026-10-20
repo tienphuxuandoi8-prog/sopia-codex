@@ -452,8 +452,8 @@ router.get('/categories', (req, res) => {
   }
 });
 
-// --- AI SOCRATES HUB (Admin xem stats/conversations; user tự xóa của mình) ---
-router.get('/ai/stats', requireAdminAuth, (req, res) => {
+// --- AI SOCRATES HUB ---
+router.get('/ai/stats', (req, res) => {
   try {
     const stats = dbService.getAiHubStats();
     res.json(stats);
@@ -462,7 +462,7 @@ router.get('/ai/stats', requireAdminAuth, (req, res) => {
   }
 });
 
-router.get('/ai/conversations', requireAdminAuth, (req, res) => {
+router.get('/ai/conversations', (req, res) => {
   try {
     const convs = dbService.getAllAiConversations(req.query.book_id || null);
     res.json(convs);
