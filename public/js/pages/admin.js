@@ -127,11 +127,13 @@ const BOOK_METADATA_MAP = {
 };
 
 const PHILOSOPHER_AVATAR_MAP = {
-  'marcus-aurelius': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Marcus_Aurelius_Louvre_MR561_n01.jpg/400px-Marcus_Aurelius_Louvre_MR561_n01.jpg',
-  'plato': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg/400px-%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg',
-  'lao-tu': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Zhang_Lu-Laozi_Riding_an_Ox.jpg/400px-Zhang_Lu-Laozi_Riding_an_Ox.jpg',
-  'nietzsche': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/400px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg',
-  'john-stuart-mill': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/John_Stuart_Mill_by_London_Stereoscopic_Company%2C_c1870.jpg/400px-John_Stuart_Mill_by_London_Stereoscopic_Company%2C_c1870.jpg'
+  'marcus-aurelius': '/assets/philosophers/marcus-aurelius.jpg',
+  'plato': '/assets/philosophers/socrates-plato.jpg',
+  'socrates': '/assets/philosophers/socrates-plato.jpg',
+  'lao-tzu': '/assets/philosophers/lao-tzu.jpg',
+  'lao-tu': '/assets/philosophers/lao-tzu.jpg',
+  'nietzsche': '/assets/philosophers/nietzsche.jpg',
+  'john-stuart-mill': '/assets/philosophers/john-stuart-mill.jpg'
 };
 
 /**
