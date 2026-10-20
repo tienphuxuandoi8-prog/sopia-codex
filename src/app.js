@@ -26,6 +26,8 @@ const communityRoutes = require('./modules/community/routes');
 const gamificationRoutes = require('./modules/gamification/routes');
 const aiRoutes = require('./modules/ai/routes');
 const paymentsRoutes = require('./modules/payments/routes');
+const blogRoutes = require('./modules/blog/routes');
+const seoRoutes = require('./modules/seo/routes');
 const { prisma } = require('./lib/prisma');
 
 // Khởi tạo Express app
@@ -126,10 +128,20 @@ apiV1Router.get('/cron/daily', async (req, res) => {
       });
     }
 
+    // 4. Tự động dọn dẹp các mục trong Thùng Rác SQLite đã quá hạn 30 ngày
+    let purgedTrash = { purgedBooks: 0, purgedChapters: 0 };
+    try {
+      const dbService = require('../server/db');
+      purgedTrash = dbService.purgeExpiredTrash();
+    } catch (e) {
+      logger.warn({ e }, 'Không thể dọn dẹp thùng rác SQLite trong cron');
+    }
+
     res.json({
       success: true,
       timestamp: now,
-      cleanedOrders
+      cleanedOrders,
+      purgedTrash
     });
   } catch (err) {
     logger.error({ err }, 'Lỗi khi chạy Daily Cron');
@@ -139,6 +151,10 @@ apiV1Router.get('/cron/daily', async (req, res) => {
 
 // Gắn API v1 Router
 app.use('/api/v1', apiV1Router);
+
+// --- 5.1 Blog & SEO / AI Crawler Routes ---
+app.use('/', seoRoutes);
+app.use('/blog', blogRoutes);
 
 // --- 6. SQLite API Router (hỗ trợ toàn bộ Admin Studio & REST API) ---
 const sqliteApiRouter = require('./modules/sqlite-api');

@@ -93,6 +93,7 @@ function initSchema() {
       core_thesis TEXT,
       modern_relevance TEXT,
       status TEXT DEFAULT 'published',
+      deleted_at DATETIME DEFAULT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE SET NULL
@@ -110,6 +111,7 @@ function initSchema() {
       audio_url TEXT,
       takeaways_json TEXT,
       is_published INTEGER DEFAULT 1,
+      deleted_at DATETIME DEFAULT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(book_id) REFERENCES books(id) ON DELETE CASCADE
     );
@@ -149,12 +151,36 @@ function initSchema() {
       key TEXT PRIMARY KEY,
       value TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS blog_posts (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      slug TEXT UNIQUE NOT NULL,
+      summary TEXT,
+      content TEXT NOT NULL,
+      cover_image TEXT,
+      author TEXT DEFAULT 'Sophia Codex',
+      category TEXT DEFAULT 'Triết học & Đời sống',
+      tags TEXT,
+      status TEXT DEFAULT 'PUBLISHED',
+      reading_time INTEGER DEFAULT 5,
+      meta_title TEXT,
+      meta_desc TEXT,
+      faq_json TEXT,
+      views INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
     try { db.exec('ALTER TABLE books ADD COLUMN annotation TEXT;'); } catch(e) {}
     try { db.exec('ALTER TABLE books ADD COLUMN historical_context TEXT;'); } catch(e) {}
     try { db.exec('ALTER TABLE books ADD COLUMN core_thesis TEXT;'); } catch(e) {}
     try { db.exec('ALTER TABLE books ADD COLUMN modern_relevance TEXT;'); } catch(e) {}
+    try { db.exec('ALTER TABLE books ADD COLUMN deleted_at DATETIME DEFAULT NULL;'); } catch(e) {}
+    try { db.exec('ALTER TABLE chapters ADD COLUMN deleted_at DATETIME DEFAULT NULL;'); } catch(e) {}
+    try { db.exec('ALTER TABLE quotes ADD COLUMN deleted_at DATETIME DEFAULT NULL;'); } catch(e) {}
+    try { db.exec('ALTER TABLE blog_posts ADD COLUMN deleted_at DATETIME DEFAULT NULL;'); } catch(e) {}
   } catch (err) {
     // Nếu bảng đã tồn tại hoặc database đang bị lock trong luồng đồng thời
   }
@@ -381,11 +407,16 @@ seedInitialDataIfEmpty();
  * 1. Lấy dữ liệu tổng quan cho Dashboard
  */
 function getOverviewStats() {
-  const booksCount = db.prepare('SELECT COUNT(*) as total FROM books').get().total;
-  const chaptersCount = db.prepare('SELECT COUNT(*) as total FROM chapters').get().total;
-  const quotesCount = db.prepare('SELECT COUNT(*) as total FROM quotes').get().total;
-  const sharesTotal = db.prepare('SELECT COALESCE(SUM(shares_count), 0) as total FROM quotes').get().total;
+  const booksCount = db.prepare('SELECT COUNT(*) as total FROM books WHERE deleted_at IS NULL').get().total;
+  const chaptersCount = db.prepare('SELECT COUNT(*) as total FROM chapters WHERE deleted_at IS NULL').get().total;
+  const quotesCount = db.prepare('SELECT COUNT(*) as total FROM quotes WHERE deleted_at IS NULL').get().total;
+  const sharesTotal = db.prepare('SELECT COALESCE(SUM(shares_count), 0) as total FROM quotes WHERE deleted_at IS NULL').get().total;
   
+  // Tổng số lượng mục đang trong thùng rác
+  const trashedBooksCount = db.prepare('SELECT COUNT(*) as total FROM books WHERE deleted_at IS NOT NULL').get().total;
+  const trashedChapsCount = db.prepare('SELECT COUNT(*) as total FROM chapters WHERE deleted_at IS NOT NULL').get().total;
+  const trashTotal = trashedBooksCount + trashedChapsCount;
+
   // Tính tổng giờ đọc sâu từ reading_logs
   const readSecondsRow = db.prepare('SELECT COALESCE(SUM(duration_seconds), 0) as total FROM reading_logs').get();
   const totalReadHours = (readSecondsRow.total / 3600).toFixed(1);
@@ -397,6 +428,7 @@ function getOverviewStats() {
            COALESCE(SUM(l.duration_seconds), 0) as total_seconds
     FROM books b
     LEFT JOIN reading_logs l ON b.id = l.book_id
+    WHERE b.deleted_at IS NULL
     GROUP BY b.id
     ORDER BY total_seconds DESC
     LIMIT 5
@@ -406,13 +438,13 @@ function getOverviewStats() {
   const schoolDistribution = db.prepare(`
     SELECT c.name, COUNT(b.id) as book_count
     FROM categories c
-    LEFT JOIN books b ON c.id = b.category_id
+    LEFT JOIN books b ON c.id = b.category_id AND b.deleted_at IS NULL
     GROUP BY c.id
   `).all();
 
   // Danh ngôn của ngày hiện tại
-  const dailyQuote = db.prepare('SELECT * FROM quotes WHERE is_daily = 1 LIMIT 1').get() ||
-                     db.prepare('SELECT * FROM quotes ORDER BY id DESC LIMIT 1').get();
+  const dailyQuote = db.prepare('SELECT * FROM quotes WHERE is_daily = 1 AND deleted_at IS NULL LIMIT 1').get() ||
+                     db.prepare('SELECT * FROM quotes WHERE deleted_at IS NULL ORDER BY id DESC LIMIT 1').get();
 
   // 5 Hoạt động tương tác AI gần nhất
   const recentAiQuestions = db.prepare(`
@@ -432,6 +464,7 @@ function getOverviewStats() {
       totalChapters: chaptersCount,
       totalQuotes: quotesCount,
       totalShares: sharesTotal,
+      trashCount: trashTotal,
       deepReadingHours: totalReadHours,
       activeReaders: "68,400+"
     },
@@ -483,26 +516,37 @@ function formatBookRow(book) {
 /**
  * 2. Quản lý Sách (Books CRUD)
  */
-function getAllBooks(categoryId = null) {
+function getAllBooks(categoryId = null, includeDeleted = false) {
   let query = `
-    SELECT b.*, (SELECT COUNT(*) FROM chapters c WHERE c.book_id = b.id) as chapters_count 
+    SELECT b.*, (SELECT COUNT(*) FROM chapters c WHERE c.book_id = b.id AND (c.deleted_at IS NULL OR ? = 1)) as chapters_count 
     FROM books b
+    WHERE (? = 1 OR b.deleted_at IS NULL)
   `;
-  let rows;
+  const params = [includeDeleted ? 1 : 0, includeDeleted ? 1 : 0];
+
   if (categoryId && categoryId !== 'all') {
-    query += ' WHERE b.category_id = ? ORDER BY b.created_at DESC';
-    rows = db.prepare(query).all(categoryId);
+    query += ' AND b.category_id = ? ORDER BY b.created_at DESC';
+    params.push(categoryId);
   } else {
     query += ' ORDER BY b.created_at DESC';
-    rows = db.prepare(query).all();
   }
+  const rows = db.prepare(query).all(...params);
   return rows.map(formatBookRow);
 }
 
-function getBookById(id) {
-  const book = db.prepare('SELECT * FROM books WHERE id = ?').get(id);
+function getBookById(id, includeDeleted = false) {
+  let query = 'SELECT * FROM books WHERE id = ?';
+  if (!includeDeleted) {
+    query += ' AND deleted_at IS NULL';
+  }
+  const book = db.prepare(query).get(id);
   if (!book) return null;
-  book.chapters = db.prepare('SELECT * FROM chapters WHERE book_id = ? ORDER BY chapter_index ASC').all(id);
+
+  const chapQuery = includeDeleted 
+    ? 'SELECT * FROM chapters WHERE book_id = ? ORDER BY chapter_index ASC'
+    : 'SELECT * FROM chapters WHERE book_id = ? AND deleted_at IS NULL ORDER BY chapter_index ASC';
+  book.chapters = db.prepare(chapQuery).all(id);
+
   // Parse JSON fields
   for (const chap of book.chapters) {
     try { chap.paragraphs = JSON.parse(chap.paragraphs_json); } catch(e) { chap.paragraphs = []; }
@@ -514,12 +558,40 @@ function getBookById(id) {
 }
 
 function createBook(book) {
+  // Tạo slug định danh an toàn, xử lý triệt để tiếng Việt có dấu
+  let bookId = book.id;
+  if (!bookId) {
+    bookId = (book.title || 'tac-pham')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'd')
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+  if (!bookId || bookId.length === 0) {
+    bookId = 'book-' + Date.now();
+  }
+
+  // Đảm bảo không trùng ID bằng cách sinh hậu tố nếu trùng
+  let candidateId = bookId;
+  let counter = 1;
+  while (true) {
+    const existing = db.prepare('SELECT id FROM books WHERE id = ?').get(candidateId);
+    if (!existing) break;
+    candidateId = `${bookId}-${counter++}`;
+  }
+  book.id = candidateId;
+
   const insert = db.prepare(`
     INSERT INTO books (
       id, title, original_title, author, author_role, school, category_id,
       read_time, audio_duration, year, rating, readers_count, featured, tagline,
-      cover_image, fallback_cover, bgm_theme, studio_audio_url, cover_theme_json, summary, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      cover_image, fallback_cover, bgm_theme, studio_audio_url, cover_theme_json, summary,
+      annotation, historical_context, core_thesis, modern_relevance, status, deleted_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
   `);
   
   insert.run(
@@ -543,9 +615,13 @@ function createBook(book) {
     book.studio_audio_url || book.studioAudioUrl || '',
     typeof book.coverTheme === 'object' ? JSON.stringify(book.coverTheme) : (book.cover_theme_json || '{}'),
     book.summary || '',
+    book.annotation || '',
+    book.historical_context || book.historicalContext || '',
+    book.core_thesis || book.coreThesis || '',
+    book.modern_relevance || book.modernRelevance || '',
     book.status || 'published'
   );
-  return getBookById(book.id);
+  return getBookById(book.id, true);
 }
 
 function updateBook(id, book) {
@@ -556,12 +632,18 @@ function updateBook(id, book) {
     title: book.title,
     original_title: book.original_title ?? book.originalTitle,
     author: book.author,
+    author_role: book.author_role ?? book.authorRole,
     school: book.school,
     category_id: book.category_id ?? book.category,
     read_time: book.read_time ?? book.readTime,
     audio_duration: book.audio_duration ?? book.audioDuration,
+    year: book.year,
     tagline: book.tagline,
     summary: book.summary,
+    annotation: book.annotation,
+    historical_context: book.historical_context ?? book.historicalContext,
+    core_thesis: book.core_thesis ?? book.coreThesis,
+    modern_relevance: book.modern_relevance ?? book.modernRelevance,
     bgm_theme: book.bgm_theme ?? book.bgmTheme,
     studio_audio_url: book.studio_audio_url ?? book.studioAudioUrl,
     cover_image: book.cover_image ?? book.coverImage,
@@ -581,19 +663,44 @@ function updateBook(id, book) {
     values.push(id);
     db.prepare(`UPDATE books SET ${fields.join(', ')} WHERE id = ?`).run(...values);
   }
-  return getBookById(id);
+  return getBookById(id, true);
 }
 
-function deleteBook(id) {
-  db.prepare('DELETE FROM books WHERE id = ?').run(id);
-  return { success: true, id };
+function deleteBook(id, permanent = false) {
+  if (permanent) {
+    db.prepare('DELETE FROM reading_logs WHERE book_id = ?').run(id);
+    db.prepare('DELETE FROM chapters WHERE book_id = ?').run(id);
+    db.prepare('DELETE FROM books WHERE id = ?').run(id);
+    return { success: true, id, permanent: true, message: 'Đã xóa vĩnh viễn tác phẩm.' };
+  } else {
+    // Soft Delete: Chuyển vào Thùng rác, lưu trữ trong 30 ngày
+    db.prepare("UPDATE books SET deleted_at = CURRENT_TIMESTAMP, status = 'in_trash' WHERE id = ?").run(id);
+    db.prepare("UPDATE chapters SET deleted_at = CURRENT_TIMESTAMP WHERE book_id = ?").run(id);
+    return { 
+      success: true, 
+      id, 
+      permanent: false, 
+      message: 'Đã chuyển tác phẩm vào Thùng Rác. Dữ liệu được bảo lưu 30 ngày và có thể khôi phục bất cứ lúc nào.' 
+    };
+  }
+}
+
+function restoreBook(id) {
+  db.prepare("UPDATE books SET deleted_at = NULL, status = 'published' WHERE id = ?").run(id);
+  db.prepare("UPDATE chapters SET deleted_at = NULL WHERE book_id = ?").run(id);
+  return { success: true, id, message: 'Đã khôi phục tác phẩm và các chương liên quan thành công.' };
 }
 
 /**
  * 3. Quản lý Chương (Chapters CRUD)
  */
-function getChaptersByBook(bookId) {
-  const rows = db.prepare('SELECT * FROM chapters WHERE book_id = ? ORDER BY chapter_index ASC').all(bookId);
+function getChaptersByBook(bookId, includeDeleted = false) {
+  let query = 'SELECT * FROM chapters WHERE book_id = ?';
+  if (!includeDeleted) {
+    query += ' AND deleted_at IS NULL';
+  }
+  query += ' ORDER BY chapter_index ASC';
+  const rows = db.prepare(query).all(bookId);
   return rows.map(r => {
     try { r.paragraphs = JSON.parse(r.paragraphs_json); } catch(e) { r.paragraphs = []; }
     try { r.takeaways = JSON.parse(r.takeaways_json); } catch(e) { r.takeaways = []; }
@@ -625,8 +732,8 @@ function createChapter(chap) {
   const insert = db.prepare(`
     INSERT INTO chapters (
       id, book_id, chapter_index, chapter_number, title, subtitle,
-      paragraphs_json, reading_time_minutes, audio_url, takeaways_json, is_published
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      paragraphs_json, reading_time_minutes, audio_url, takeaways_json, is_published, deleted_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
   `);
 
   insert.run(
@@ -645,8 +752,12 @@ function createChapter(chap) {
   return chapId;
 }
 
-function getChapterById(id) {
-  const row = db.prepare('SELECT * FROM chapters WHERE id = ?').get(id);
+function getChapterById(id, includeDeleted = false) {
+  let query = 'SELECT * FROM chapters WHERE id = ?';
+  if (!includeDeleted) {
+    query += ' AND deleted_at IS NULL';
+  }
+  const row = db.prepare(query).get(id);
   if (!row) return null;
   try { row.paragraphs = JSON.parse(row.paragraphs_json); } catch(e) { row.paragraphs = []; }
   try { row.takeaways = JSON.parse(row.takeaways_json); } catch(e) { row.takeaways = []; }
@@ -696,12 +807,27 @@ function updateChapter(id, chap) {
     values.push(id);
     db.prepare(`UPDATE chapters SET ${fields.join(', ')} WHERE id = ?`).run(...values);
   }
-  return getChapterById(id);
+  return getChapterById(id, true);
 }
 
-function deleteChapter(id) {
-  db.prepare('DELETE FROM chapters WHERE id = ?').run(id);
-  return { success: true, id };
+function deleteChapter(id, permanent = false) {
+  if (permanent) {
+    db.prepare('DELETE FROM chapters WHERE id = ?').run(id);
+    return { success: true, id, permanent: true, message: 'Đã xóa vĩnh viễn chương.' };
+  } else {
+    db.prepare('UPDATE chapters SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?').run(id);
+    return { 
+      success: true, 
+      id, 
+      permanent: false, 
+      message: 'Đã chuyển chương vào Thùng Rác. Dữ liệu được bảo lưu 30 ngày và có thể khôi phục bất cứ lúc nào.' 
+    };
+  }
+}
+
+function restoreChapter(id) {
+  db.prepare('UPDATE chapters SET deleted_at = NULL WHERE id = ?').run(id);
+  return { success: true, id, message: 'Đã khôi phục chương thành công.' };
 }
 
 function smartIngestChapters(bookId, rawText) {
@@ -709,16 +835,22 @@ function smartIngestChapters(bookId, rawText) {
     throw new Error('Nội dung văn bản không hợp lệ');
   }
 
-  // Chia theo tiêu đề chương: Chương X:, Quyển X:, Chapter X:...
-  const chapterRegex = /(?:^|\n)(?:Chương|Quyển|Hồi|Chapter|Phần)\s*([0-9IVXLCDMivxlcdm]+|[A-Za-z0-9\s]+)[:\.\-\—\–]?\s*([^\n]*)/gi;
+  // Đảm bảo tác phẩm tồn tại
+  const book = db.prepare('SELECT id, title FROM books WHERE id = ?').get(bookId);
+  if (!book) {
+    throw new Error(`Tác phẩm với mã "${bookId}" không tồn tại trong hệ thống.`);
+  }
+
+  // Chia theo tiêu đề chương: Chương X:, Quyển X:, Chapter X:, Phần X:, Tiết X:, Bài X:, hoặc Markdown # Chương
+  const chapterRegex = /(?:^|\n)(?:#+\s*|(?:Chương|Quyển|Hồi|Chapter|Phần|Tiết|Bài)\s*([0-9IVXLCDMivxlcdm]+|[A-Za-z0-9\s]+)[:\.\-\—\–]?\s*)([^\n]*)/gi;
   let matches = [];
   let match;
   while ((match = chapterRegex.exec(rawText)) !== null) {
     matches.push({
       index: match.index,
       fullTitle: match[0].trim(),
-      numberStr: match[1].trim(),
-      titleStr: match[2].trim()
+      numberStr: (match[1] || '').trim(),
+      titleStr: (match[2] || '').trim()
     });
   }
 
@@ -731,7 +863,7 @@ function smartIngestChapters(bookId, rawText) {
     parsedChapters.push({
       chapter_number: `Chương ${currentCount + 1}`,
       title: `Tiết mục mới ${currentCount + 1}`,
-      paragraphs: paras,
+      paragraphs: paras.length > 0 ? paras : [rawText.trim()],
       takeaways: [
         { title: "Đúc Kết Trọng Tâm", desc: "Nghiền ngẫm luận điểm cốt lõi và vận dụng vào thói quen hàng ngày." },
         { title: "Kiểm Soát Nhận Thức", desc: "Giữ tâm trí tĩnh lặng trước các phán xét chủ quan bên ngoài." },
@@ -746,13 +878,13 @@ function smartIngestChapters(bookId, rawText) {
       const contentChunk = rawText.substring(startPos, endPos).trim();
       
       const paras = contentChunk.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
-      const chapNumber = isNaN(current.numberStr) ? current.numberStr : `Chương ${current.numberStr}`;
+      const chapNumber = isNaN(current.numberStr) && current.numberStr ? current.numberStr : `Chương ${current.numberStr || (i + 1)}`;
       const chapTitle = current.titleStr || `Chương ${i + 1}`;
 
       parsedChapters.push({
         chapter_number: chapNumber,
         title: chapTitle,
-        paragraphs: paras.length > 0 ? paras : [contentChunk],
+        paragraphs: paras.length > 0 ? paras : [contentChunk || `Nội dung ${chapTitle}`],
         takeaways: [
           { title: "Chiêm Nghiệm Thực Tiễn", desc: `Áp dụng tư tưởng của ${chapTitle} vào công việc và ứng xử.` },
           { title: "Rèn Luyện Bản Lĩnh", desc: "Thực hành việc tự vấn nội tâm và phân định điều trong tầm kiểm soát." },
@@ -762,31 +894,107 @@ function smartIngestChapters(bookId, rawText) {
     }
   }
 
-  // Lưu từng chương vào database
+  // Bọc trong transaction an toàn, chống dở dang dữ liệu
+  db.exec('BEGIN TRANSACTION;');
   let inserted = [];
-  let chapIdx = currentCount + 1;
-  for (const item of parsedChapters) {
-    const chapId = `${bookId}-chap-${Date.now()}-${chapIdx}`;
-    createChapter({
-      id: chapId,
-      book_id: bookId,
-      chapter_index: chapIdx,
-      chapter_number: item.chapter_number,
-      title: item.title,
-      subtitle: '',
-      paragraphs: item.paragraphs,
-      reading_time_minutes: Math.max(3, Math.ceil(item.paragraphs.join(' ').length / 800)),
-      takeaways: item.takeaways,
-      is_published: 1
-    });
-    inserted.push(chapId);
-    chapIdx++;
+  try {
+    let chapIdx = currentCount + 1;
+    for (const item of parsedChapters) {
+      const chapId = `${bookId}-chap-${Date.now()}-${chapIdx}-${Math.random().toString(36).substring(2, 6)}`;
+      createChapter({
+        id: chapId,
+        book_id: bookId,
+        chapter_index: chapIdx,
+        chapter_number: item.chapter_number,
+        title: item.title,
+        subtitle: '',
+        paragraphs: item.paragraphs,
+        reading_time_minutes: Math.max(3, Math.ceil(item.paragraphs.join(' ').length / 800)),
+        takeaways: item.takeaways,
+        is_published: 1
+      });
+      inserted.push(chapId);
+      chapIdx++;
+    }
+    db.exec('COMMIT;');
+  } catch(err) {
+    try { db.exec('ROLLBACK;'); } catch(e) {}
+    throw err;
   }
 
   return {
     success: true,
     totalParsed: parsedChapters.length,
     insertedIds: inserted
+  };
+}
+
+/**
+ * QUẢN LÝ THÙNG RÁC (RECYCLE BIN & 30-DAY RETENTION)
+ */
+function getTrashItems() {
+  const books = db.prepare(`
+    SELECT 'book' as item_type, id, title, author, deleted_at, status, cover_image,
+      MAX(0, CAST(ROUND(30 - (julianday('now') - julianday(deleted_at))) AS INTEGER)) as days_remaining,
+      (SELECT COUNT(*) FROM chapters WHERE book_id = books.id) as chapters_count
+    FROM books
+    WHERE deleted_at IS NOT NULL
+    ORDER BY deleted_at DESC
+  `).all();
+
+  const chapters = db.prepare(`
+    SELECT 'chapter' as item_type, c.id, c.chapter_number, c.title, c.book_id, b.title as book_title, c.deleted_at,
+      MAX(0, CAST(ROUND(30 - (julianday('now') - julianday(c.deleted_at))) AS INTEGER)) as days_remaining
+    FROM chapters c
+    LEFT JOIN books b ON c.book_id = b.id
+    WHERE c.deleted_at IS NOT NULL
+      AND (b.deleted_at IS NULL OR b.id IS NULL)
+    ORDER BY c.deleted_at DESC
+  `).all();
+
+  return {
+    books,
+    chapters,
+    total: books.length + chapters.length
+  };
+}
+
+function purgeExpiredTrash() {
+  // 1. Xóa vĩnh viễn các chương độc lập đã xóa quá 30 ngày
+  const expiredChaps = db.prepare(`
+    DELETE FROM chapters
+    WHERE deleted_at IS NOT NULL AND deleted_at <= datetime('now', '-30 days')
+  `).run();
+
+  // 2. Xóa vĩnh viễn các sách đã xóa quá 30 ngày cùng toàn bộ quan hệ
+  const expiredBooks = db.prepare(`
+    SELECT id FROM books
+    WHERE deleted_at IS NOT NULL AND deleted_at <= datetime('now', '-30 days')
+  `).all();
+
+  for (const b of expiredBooks) {
+    db.prepare('DELETE FROM reading_logs WHERE book_id = ?').run(b.id);
+    db.prepare('DELETE FROM chapters WHERE book_id = ?').run(b.id);
+    db.prepare('DELETE FROM books WHERE id = ?').run(b.id);
+  }
+
+  return {
+    purgedBooks: expiredBooks.length,
+    purgedChapters: expiredChaps.changes
+  };
+}
+
+function emptyTrash() {
+  const trashedBooks = db.prepare('SELECT id FROM books WHERE deleted_at IS NOT NULL').all();
+  for (const b of trashedBooks) {
+    db.prepare('DELETE FROM reading_logs WHERE book_id = ?').run(b.id);
+    db.prepare('DELETE FROM chapters WHERE book_id = ?').run(b.id);
+    db.prepare('DELETE FROM books WHERE id = ?').run(b.id);
+  }
+  const chapsResult = db.prepare('DELETE FROM chapters WHERE deleted_at IS NOT NULL').run();
+  return {
+    deletedBooks: trashedBooks.length,
+    deletedChapters: chapsResult.changes
   };
 }
 
@@ -1077,6 +1285,153 @@ function backupDatabase() {
   };
 }
 
+// ==========================================
+// BLOG POST FUNCTIONS
+// ==========================================
+
+function getAllBlogPosts(options = {}) {
+  const { status, category, limit = 50, offset = 0, search } = options;
+  let query = 'SELECT * FROM blog_posts WHERE 1=1';
+  const params = [];
+
+  if (status && status !== 'ALL') {
+    query += ' AND status = ?';
+    params.push(status);
+  }
+  if (category && category !== 'ALL') {
+    query += ' AND category = ?';
+    params.push(category);
+  }
+  if (search) {
+    query += ' AND (title LIKE ? OR summary LIKE ? OR content LIKE ?)';
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+  }
+
+  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+  params.push(Number(limit), Number(offset));
+
+  const stmt = db.prepare(query);
+  return stmt.all(...params);
+}
+
+function getBlogPostBySlug(slug) {
+  const stmt = db.prepare('SELECT * FROM blog_posts WHERE slug = ?');
+  return stmt.get(slug);
+}
+
+function getBlogPostById(id) {
+  const stmt = db.prepare('SELECT * FROM blog_posts WHERE id = ?');
+  return stmt.get(id);
+}
+
+function createBlogPost(data) {
+  const id = data.id || 'post_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+  let slug = data.slug || data.title
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+
+  // Đảm bảo slug duy nhất
+  const checkStmt = db.prepare('SELECT id FROM blog_posts WHERE slug = ?');
+  let existing = checkStmt.get(slug);
+  if (existing) {
+    slug = `${slug}-${Date.now().toString().slice(-4)}`;
+  }
+
+  // Ước tính thời gian đọc (200 từ / phút)
+  const wordCount = (data.content || '').trim().split(/\s+/).length;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+  const stmt = db.prepare(`
+    INSERT INTO blog_posts (
+      id, title, slug, summary, content, cover_image, author,
+      category, tags, status, reading_time, meta_title, meta_desc, faq_json, views
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  stmt.run(
+    id,
+    data.title,
+    slug,
+    data.summary || '',
+    data.content,
+    data.cover_image || data.coverImage || '',
+    data.author || 'Sophia Codex',
+    data.category || 'Triết học & Đời sống',
+    data.tags || '',
+    data.status || 'PUBLISHED',
+    data.reading_time || readingTime,
+    data.meta_title || data.metaTitle || data.title,
+    data.meta_desc || data.metaDesc || data.summary || '',
+    typeof data.faq_json === 'object' ? JSON.stringify(data.faq_json) : (data.faq_json || '[]'),
+    data.views || 0
+  );
+
+  return getBlogPostById(id);
+}
+
+function updateBlogPost(id, data) {
+  const existing = getBlogPostById(id);
+  if (!existing) return null;
+
+  const wordCount = ((data.content !== undefined ? data.content : existing.content) || '').trim().split(/\s+/).length;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+  const stmt = db.prepare(`
+    UPDATE blog_posts SET
+      title = ?,
+      slug = ?,
+      summary = ?,
+      content = ?,
+      cover_image = ?,
+      author = ?,
+      category = ?,
+      tags = ?,
+      status = ?,
+      reading_time = ?,
+      meta_title = ?,
+      meta_desc = ?,
+      faq_json = ?,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `);
+
+  stmt.run(
+    data.title !== undefined ? data.title : existing.title,
+    data.slug !== undefined ? data.slug : existing.slug,
+    data.summary !== undefined ? data.summary : existing.summary,
+    data.content !== undefined ? data.content : existing.content,
+    data.cover_image !== undefined ? data.cover_image : (data.coverImage !== undefined ? data.coverImage : existing.cover_image),
+    data.author !== undefined ? data.author : existing.author,
+    data.category !== undefined ? data.category : existing.category,
+    data.tags !== undefined ? data.tags : existing.tags,
+    data.status !== undefined ? data.status : existing.status,
+    data.reading_time !== undefined ? data.reading_time : readingTime,
+    data.meta_title !== undefined ? data.meta_title : existing.meta_title,
+    data.meta_desc !== undefined ? data.meta_desc : existing.meta_desc,
+    typeof data.faq_json === 'object' ? JSON.stringify(data.faq_json) : (data.faq_json !== undefined ? data.faq_json : existing.faq_json),
+    id
+  );
+
+  return getBlogPostById(id);
+}
+
+function deleteBlogPost(id) {
+  const stmt = db.prepare('DELETE FROM blog_posts WHERE id = ?');
+  const result = stmt.run(id);
+  return result.changes > 0;
+}
+
+function incrementPostViews(id) {
+  try {
+    const stmt = db.prepare('UPDATE blog_posts SET views = views + 1 WHERE id = ?');
+    stmt.run(id);
+  } catch(e) {}
+}
+
 module.exports = {
   db,
   getOverviewStats,
@@ -1112,5 +1467,17 @@ module.exports = {
   getDbHealth,
   backupDatabase,
   reseedDatabase,
-  createReadingLog
+  createReadingLog,
+  getAllBlogPosts,
+  getBlogPostBySlug,
+  getBlogPostById,
+  createBlogPost,
+  updateBlogPost,
+  deleteBlogPost,
+  incrementPostViews,
+  restoreBook,
+  restoreChapter,
+  getTrashItems,
+  purgeExpiredTrash,
+  emptyTrash
 };

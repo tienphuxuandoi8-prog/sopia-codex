@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Minh Triết & Chiêm Nghiệm Cuộc Sống — Sophia Codex</title>
+  <meta name="description" content="Khám phá các bài viết sâu sắc về triết học phương Đông, phương Tây, chủ nghĩa Khắc kỷ và nghệ thuật sống an nhiên thời hiện đại.">
+  <link rel="canonical" href="/blog">
+
+  <!-- OpenGraph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Blog Minh Triết — Sophia Codex">
+  <meta property="og:description" content="Nơi hội tụ những góc nhìn khai phóng, chiêm nghiệm triết học và nghệ thuật sống thức tỉnh.">
+  <meta property="og:url" content="/blog">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            ui: ['"Be Vietnam Pro"', 'Inter', 'sans-serif'],
+            reading: ['Lora', 'Merriweather', 'serif'],
+            display: ['"Playfair Display"', 'Merriweather', 'serif'],
+            heading: ['"Playfair Display"', 'Merriweather', 'serif'],
+          },
+          colors: {
+            scholar: {
+              50: '#F5F8F6',
+              100: '#E4ECE7',
+              700: '#234C38',
+              800: '#163526',
+              900: '#10261C',
+              950: '#0B1A13'
+            },
+            parchment: {
+              50: '#FDFBF7',
+              100: '#F8F4EB',
+              200: '#EFE8D8',
+              300: '#E4D8BE'
+            },
+            gold: {
+              400: '#DDB35D',
+              500: '#C59B4B',
+              600: '#A97F33'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-parchment-50 dark:bg-[#0A1610] text-stone-900 dark:text-stone-100 font-ui antialiased min-h-screen flex flex-col transition-colors">
+
+  <!-- HEADER NAVIGATION -->
+  <header class="sticky top-0 z-40 bg-parchment-50/90 dark:bg-[#0A1610]/90 backdrop-blur-md border-b border-stone-200 dark:border-emerald-900/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-950 to-[#0A1610] border border-amber-500/50 flex items-center justify-center text-amber-400 shadow-md">
+          <i data-lucide="book-open" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="font-display font-bold text-lg md:text-xl tracking-wider text-emerald-950 dark:text-amber-300">SOPHIA</span>
+          <span class="font-reading italic text-[11px] block text-stone-500 -mt-1 dark:text-stone-400">CODEX • Thư Viện Minh Triết</span>
+        </div>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+        <a href="/" class="text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Trang Chủ</a>
+        <a href="/library.html" class="text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Tủ Sách</a>
+        <a href="/blog" class="text-amber-600 dark:text-amber-400 font-bold border-b-2 border-amber-500 pb-0.5">Blog & Chiêm Nghiệm</a>
+        <a href="/pricing.html" class="text-stone-600 dark:text-stone-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Gói Hội Viên</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <!-- Nút Theme -->
+        <button id="theme-toggle" class="p-2 rounded-full hover:bg-stone-200 dark:hover:bg-emerald-900 text-stone-600 dark:text-stone-300 transition-colors">
+          <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+          <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-amber-400"></i>
+        </button>
+        <a href="/login.html" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-emerald-950 hover:bg-emerald-900 text-amber-200 border border-amber-600/30 transition-all shadow-sm">
+          Đăng Nhập
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="py-12 md:py-20 border-b border-stone-200 dark:border-emerald-900/60 bg-gradient-to-b from-stone-100/50 to-transparent dark:from-emerald-950/20">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30 mb-4">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Chiêm Nghiệm & Khai Phóng
+      </span>
+      <h1 class="font-display font-extrabold text-3xl md:text-5xl text-stone-900 dark:text-stone-100 tracking-tight leading-tight mb-4">
+        Góc Nhìn Minh Triết Trong Thời Đại Số
+      </h1>
+      <p class="font-reading text-base md:text-lg text-stone-600 dark:text-stone-300 max-w-2xl mx-auto leading-relaxed mb-8">
+        Nơi hội tụ các bài nghiên cứu, góc nhìn thực hành Khắc kỷ, đạo học phương Đông và những câu hỏi thức tỉnh tâm trí hiện đại.
+      </p>
+
+      <!-- Thanh tìm kiếm bài viết -->
+      <form action="/blog" method="GET" class="max-w-xl mx-auto relative flex items-center">
+        <i data-lucide="search" class="w-5 h-5 text-stone-400 absolute left-4"></i>
+        <input type="text" name="q" value="{{SEARCH_VALUE}}" placeholder="Tìm kiếm bài viết theo từ khóa, chủ đề..." class="w-full pl-12 pr-28 py-3 rounded-full bg-white dark:bg-emerald-950/70 border border-stone-300 dark:border-emerald-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm">
+        <button type="submit" class="absolute right-1.5 px-5 py-2 rounded-full bg-emerald-950 hover:bg-emerald-900 text-amber-300 text-xs font-semibold transition-colors">
+          Tìm Kiếm
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- DANH SÁCH BÀI VIẾT -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-12 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- BLOG_CARDS_PLACEHOLDER -->
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-stone-100 dark:bg-[#07100B] border-t border-stone-200 dark:border-emerald-900/60 py-10 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p class="text-xs text-stone-500 dark:text-stone-400">© 2026 Sophia Codex. Nền tảng triết học toàn văn & chiêm nghiệm thông minh.</p>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+</body>
+</html>

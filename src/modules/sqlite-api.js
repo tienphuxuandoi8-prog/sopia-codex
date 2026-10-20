@@ -8,32 +8,87 @@
 
 const express = require('express');
 const router = express.Router();
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const dbService = require('../../server/db');
+
+// Cấu hình Multer upload ảnh cho bài viết blog
+const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', 'posts');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'post-' + uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: function (req, file, cb) {
+    const allowed = /jpeg|jpg|png|webp|gif|svg/;
+    const extname = allowed.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowed.test(file.mimetype);
+    if (extname && mimetype) {
+      return cb(null, true);
+    }
+    cb(new Error('Chỉ hỗ trợ upload các định dạng ảnh: JPG, PNG, WEBP, GIF, SVG'));
+  }
+});
 
 /**
  * Server-side Admin Auth Middleware cho SQLite API
  * Kiểm tra session hợp lệ và quyền admin từ req.user (được gán bởi sessionMiddleware)
- * Không phụ thuộc vào localStorage phía client.
+ * Hỗ trợ fallback Authorization Bearer Token
  */
 function requireAdminAuth(req, res, next) {
-  const user = req.user;
+  let user = req.user;
 
-  // Kiểm tra người dùng đã đăng nhập chưa (req.user được gán bởi session middleware)
+  // Fallback nếu req.user chưa có (ví dụ qua Authorization header token)
+  if (!user) {
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      try {
+        const localUserStore = require('../lib/localUserStore');
+        const sessionData = localUserStore.getSession(token);
+        if (sessionData && sessionData.user) {
+          user = sessionData.user;
+          req.user = user;
+        }
+      } catch (e) {}
+    }
+  }
+
+  // Kiểm tra người dùng đã đăng nhập chưa
   if (!user) {
     return res.status(401).json({
-      error: { code: 'UNAUTHORIZED', message: 'Yêu cầu đăng nhập để thực hiện thao tác này.' }
+      error: { code: 'UNAUTHORIZED', message: 'Yêu cầu đăng nhập tài khoản Quản Trị để thực hiện thao tác này.' }
     });
   }
 
-  // Kiểm tra quyền admin: isSuperAdmin hoặc có permission 'admin' hoặc '*'
+  // Kiểm tra quyền admin: isSuperAdmin hoặc có email admin hoặc quyền quản trị
   const isAdmin = (
     user.isSuperAdmin === true ||
+    user.email === 'admin@sophiacodex.vn' ||
     (Array.isArray(user.permissions) && (
       user.permissions.includes('*') ||
       user.permissions.includes('admin') ||
       user.permissions.some(p => typeof p === 'string' && p.startsWith('admin.'))
     )) ||
-    (Array.isArray(user.roles) && user.roles.includes('admin'))
+    (Array.isArray(user.roles) && (
+      user.roles.includes('admin') ||
+      user.roles.includes('super_admin') ||
+      user.roles.some(r => r === 'admin' || (r && r.key === 'super_admin'))
+    ))
   );
 
   if (!isAdmin) {
@@ -55,11 +110,77 @@ router.get('/overview', (req, res) => {
   }
 });
 
+// --- THÙNG RÁC (RECYCLE BIN & 30-DAY RETENTION) ---
+router.get('/trash', requireAdminAuth, (req, res) => {
+  try {
+    const items = dbService.getTrashItems();
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/trash/restore', requireAdminAuth, (req, res) => {
+  try {
+    const { type, id } = req.body;
+    if (!type || !id) {
+      return res.status(400).json({ error: 'Loại mục (type) và ID là bắt buộc' });
+    }
+    if (type === 'book') {
+      const result = dbService.restoreBook(id);
+      return res.json(result);
+    } else if (type === 'chapter') {
+      const result = dbService.restoreChapter(id);
+      return res.json(result);
+    } else {
+      return res.status(400).json({ error: 'Loại mục không hợp lệ' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete('/trash/:type/:id', requireAdminAuth, (req, res) => {
+  try {
+    const { type, id } = req.params;
+    if (type === 'book') {
+      const result = dbService.deleteBook(id, true);
+      return res.json(result);
+    } else if (type === 'chapter') {
+      const result = dbService.deleteChapter(id, true);
+      return res.json(result);
+    } else {
+      return res.status(400).json({ error: 'Loại mục không hợp lệ' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/trash/purge-expired', requireAdminAuth, (req, res) => {
+  try {
+    const result = dbService.purgeExpiredTrash();
+    res.json({ success: true, ...result, message: 'Đã dọn dẹp các mục quá hạn 30 ngày trong thùng rác.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/trash/empty', requireAdminAuth, (req, res) => {
+  try {
+    const result = dbService.emptyTrash();
+    res.json({ success: true, ...result, message: 'Đã xóa sạch toàn bộ thùng rác.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // --- BOOKS CRUD & CHAPTERS ---
 router.get('/books', (req, res) => {
   try {
     const category = req.query.category || null;
-    const books = dbService.getAllBooks(category);
+    const includeDeleted = req.query.include_deleted === 'true';
+    const books = dbService.getAllBooks(category, includeDeleted);
     res.json(books);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -68,7 +189,8 @@ router.get('/books', (req, res) => {
 
 router.get('/books/:id', (req, res) => {
   try {
-    const book = dbService.getBookById(req.params.id);
+    const includeDeleted = req.query.include_deleted === 'true';
+    const book = dbService.getBookById(req.params.id, includeDeleted);
     if (!book) return res.status(404).json({ error: 'Không tìm thấy tác phẩm' });
     res.json(book);
   } catch (err) {
@@ -82,9 +204,6 @@ router.post('/books', requireAdminAuth, (req, res) => {
     if (!body.title || !body.author) {
       return res.status(400).json({ error: 'Tiêu đề và Tác giả là bắt buộc' });
     }
-    if (!body.id) {
-      body.id = body.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
-    }
     const newBook = dbService.createBook(body);
     res.status(201).json(newBook);
   } catch (err) {
@@ -95,6 +214,9 @@ router.post('/books', requireAdminAuth, (req, res) => {
 router.put('/books/:id', requireAdminAuth, (req, res) => {
   try {
     const updated = dbService.updateBook(req.params.id, req.body);
+    if (!updated) {
+      return res.status(404).json({ error: 'Không tìm thấy tác phẩm để cập nhật' });
+    }
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -103,7 +225,17 @@ router.put('/books/:id', requireAdminAuth, (req, res) => {
 
 router.delete('/books/:id', requireAdminAuth, (req, res) => {
   try {
-    const result = dbService.deleteBook(req.params.id);
+    const permanent = req.query.permanent === 'true';
+    const result = dbService.deleteBook(req.params.id, permanent);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/books/:id/restore', requireAdminAuth, (req, res) => {
+  try {
+    const result = dbService.restoreBook(req.params.id);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -112,7 +244,8 @@ router.delete('/books/:id', requireAdminAuth, (req, res) => {
 
 router.get('/books/:id/chapters', (req, res) => {
   try {
-    const chapters = dbService.getChaptersByBook(req.params.id);
+    const includeDeleted = req.query.include_deleted === 'true';
+    const chapters = dbService.getChaptersByBook(req.params.id, includeDeleted);
     res.json(chapters);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -134,7 +267,8 @@ router.post('/books/:id/smart-ingest', requireAdminAuth, (req, res) => {
 // --- CHAPTERS CRUD ---
 router.get('/chapters/:id', (req, res) => {
   try {
-    const chap = dbService.getChapterById(req.params.id);
+    const includeDeleted = req.query.include_deleted === 'true';
+    const chap = dbService.getChapterById(req.params.id, includeDeleted);
     if (!chap) return res.status(404).json({ error: 'Không tìm thấy chương' });
     res.json(chap);
   } catch (err) {
@@ -162,7 +296,17 @@ router.put('/chapters/:id', requireAdminAuth, (req, res) => {
 
 router.delete('/chapters/:id', requireAdminAuth, (req, res) => {
   try {
-    const result = dbService.deleteChapter(req.params.id);
+    const permanent = req.query.permanent === 'true';
+    const result = dbService.deleteChapter(req.params.id, permanent);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/chapters/:id/restore', requireAdminAuth, (req, res) => {
+  try {
+    const result = dbService.restoreChapter(req.params.id);
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -382,6 +526,103 @@ router.post('/db/reseed', requireAdminAuth, (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// --- BLOG POSTS API ---
+// Public: Xem danh sách bài viết đã xuất bản
+router.get('/posts', (req, res) => {
+  try {
+    const { status = 'PUBLISHED', category, limit, offset, search } = req.query;
+    const posts = dbService.getAllBlogPosts({ status, category, limit, offset, search });
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Xem tất cả bài viết (kể cả nháp)
+router.get('/admin/posts', requireAdminAuth, (req, res) => {
+  try {
+    const { status, category, limit, offset, search } = req.query;
+    const posts = dbService.getAllBlogPosts({ status, category, limit, offset, search });
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Public: Chi tiết bài viết theo slug
+router.get('/posts/:slug', (req, res) => {
+  try {
+    const post = dbService.getBlogPostBySlug(req.params.slug);
+    if (!post) {
+      return res.status(404).json({ error: 'Bài viết không tồn tại' });
+    }
+    // Tăng view
+    dbService.incrementPostViews(post.id);
+    res.json(post);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Tạo bài viết mới
+router.post('/posts', requireAdminAuth, (req, res) => {
+  try {
+    if (!req.body.title || !req.body.content) {
+      return res.status(400).json({ error: 'Tiêu đề và nội dung bài viết không được để trống' });
+    }
+    const newPost = dbService.createBlogPost(req.body);
+    res.status(201).json(newPost);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Cập nhật bài viết
+router.put('/posts/:id', requireAdminAuth, (req, res) => {
+  try {
+    const updated = dbService.updateBlogPost(req.params.id, req.body);
+    if (!updated) {
+      return res.status(404).json({ error: 'Không tìm thấy bài viết để cập nhật' });
+    }
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Xoá bài viết
+router.delete('/posts/:id', requireAdminAuth, (req, res) => {
+  try {
+    const ok = dbService.deleteBlogPost(req.params.id);
+    if (!ok) {
+      return res.status(404).json({ error: 'Không tìm thấy bài viết' });
+    }
+    res.json({ success: true, message: 'Đã xóa bài viết' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Admin: Upload hình ảnh cho bài viết (hỗ trợ kéo thả / dán trực tiếp trong editor)
+router.post('/posts/upload-image', requireAdminAuth, (req, res) => {
+  upload.single('image')(req, res, function (err) {
+    if (err) {
+      return res.status(400).json({ error: err.message || 'Lỗi khi tải ảnh lên' });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: 'Không có tập tin ảnh nào được tải lên' });
+    }
+    // Trả về đường dẫn ảnh
+    const imageUrl = `/uploads/posts/${req.file.filename}`;
+    res.json({
+      success: true,
+      url: imageUrl,
+      filename: req.file.filename,
+      size: req.file.size
+    });
+  });
 });
 
 module.exports = router;

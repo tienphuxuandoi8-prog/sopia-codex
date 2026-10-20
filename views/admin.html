@@ -239,6 +239,15 @@
           </button>
 
           <!-- Item: Cài đặt & Cơ sở dữ liệu -->
+          <!-- Item: Thùng Rác (30 Ngày) -->
+          <button id="nav-btn-trash" onclick="switchAdminTab('trash')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="trash-2" class="w-4 h-4 text-rose-400"></i>
+              <span>Thùng Rác (30 Ngày)</span>
+            </div>
+            <span id="nav-trash-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 hidden">0</span>
+          </button>
+
           <button id="nav-btn-settings" onclick="openDbHealthModal()" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
             <div class="flex items-center gap-3">
               <i data-lucide="database" class="w-4 h-4 text-stone-400"></i>
@@ -1497,7 +1506,90 @@
           </div>
         </section>
 
-      </main>
+      
+        <!-- ========================================================================= -->
+        <!-- TAB 11: THÙNG RÁC & BẢO LƯU 30 NGÀY (RECYCLE BIN & RESTORE) -->
+        <!-- ========================================================================= -->
+        <section id="tab-trash" class="hidden space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-stone-200 dark:border-emerald-900/60">
+            <div>
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-500 flex items-center justify-center font-bold">
+                  <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h2 class="font-bold tracking-tight text-xl text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                    <span>Thùng Rác & Khôi Phục Dữ Liệu</span>
+                    <span id="trash-total-count-badge" class="px-2 py-0.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-500 border border-rose-500/30">0 mục</span>
+                  </h2>
+                  <p class="text-xs text-stone-500">Các mục xóa sẽ được bảo lưu an toàn trong 30 ngày. Bạn có thể khôi phục bất cứ lúc nào trước khi bị xóa vĩnh viễn.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button onclick="purgeExpiredTrashItems()" class="px-3.5 py-2 rounded-xl bg-stone-100 dark:bg-emerald-950/60 hover:bg-stone-200 dark:hover:bg-emerald-900 text-stone-700 dark:text-stone-300 font-semibold text-xs border border-stone-300 dark:border-emerald-800 flex items-center gap-1.5 transition-all" title="Dọn dẹp các mục nằm trong thùng rác quá 30 ngày">
+                <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-500"></i>
+                <span>Dọn Mục Hết Hạn (>30 ngày)</span>
+              </button>
+              <button onclick="confirmEmptyTrash()" class="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold text-xs border border-rose-500/30 flex items-center gap-1.5 transition-all">
+                <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                <span>Dọn Sạch Thùng Rác</span>
+              </button>
+              <button onclick="loadTrashList()" class="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-emerald-900 transition-colors" title="Làm mới">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Alert Note 30 Days -->
+          <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-3">
+            <i data-lucide="shield-alert" class="w-5 h-5 flex-shrink-0 mt-0.5 text-amber-500"></i>
+            <div>
+              <span class="font-bold">Cơ chế an toàn 30 ngày:</span>
+              Mọi hành động xóa Tác phẩm hoặc Chương mục sẽ không xóa vĩnh viễn ngay lập tức. Dữ liệu được tạm ẩn khỏi độc giả và lưu trong Thùng Rác này đúng 30 ngày. Trong 30 ngày này, bạn có thể ấn <b>"Khôi phục"</b> để đưa dữ liệu trở lại tủ sách ngay lập tức mà không mất bất kỳ thông tin nào.
+            </div>
+          </div>
+
+          <!-- Filter & Tab for Trash -->
+          <div class="flex items-center gap-2 border-b border-stone-200 dark:border-emerald-900 pb-2">
+            <button id="trash-filter-all" onclick="filterTrashTab('all')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-stone-950">
+              Tất Cả (<span id="trash-count-all">0</span>)
+            </button>
+            <button id="trash-filter-books" onclick="filterTrashTab('book')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100">
+              Tác Phẩm (<span id="trash-count-books">0</span>)
+            </button>
+            <button id="trash-filter-chapters" onclick="filterTrashTab('chapter')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100">
+              Chương Mục (<span id="trash-count-chapters">0</span>)
+            </button>
+          </div>
+
+          <!-- Trash Table -->
+          <div class="bg-white dark:bg-[#111E17] border border-stone-200 dark:border-emerald-900/60 rounded-2xl overflow-hidden shadow-sm">
+            <table class="w-full text-left text-xs text-stone-700 dark:text-stone-300">
+              <thead class="bg-stone-50 dark:bg-emerald-950/40 border-b border-stone-200 dark:border-emerald-900/60 font-bold uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="px-4 py-3">Loại</th>
+                  <th class="px-4 py-3">Tiêu đề / Tên mục</th>
+                  <th class="px-4 py-3">Thuộc tác phẩm</th>
+                  <th class="px-4 py-3">Thời điểm xóa</th>
+                  <th class="px-4 py-3">Thời hạn còn lại</th>
+                  <th class="px-4 py-3 text-right">Thao tác an toàn</th>
+                </tr>
+              </thead>
+              <tbody id="trash-table-body" class="divide-y divide-stone-100 dark:divide-emerald-900/40">
+                <tr>
+                  <td colspan="6" class="px-4 py-8 text-center text-stone-400">
+                    <i data-lucide="check-circle" class="w-8 h-8 mx-auto mb-2 text-emerald-500 opacity-60"></i>
+                    <div>Thùng rác đang trống. Không có mục nào cần xử lý.</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+</main>
 
     </div>
 

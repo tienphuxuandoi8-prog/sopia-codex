@@ -42,6 +42,12 @@ enum ChapterStatus {
   PUBLISHED
 }
 
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 enum ShelfType {
   WANT
   READING
@@ -657,4 +663,28 @@ model Subscription {
   @@index([planId])
   @@index([orderId])
   @@map("subscriptions")
+}
+
+model BlogPost {
+  id             String      @id @default(uuid())
+  title          String
+  slug           String      @unique
+  summary        String?
+  content        String
+  coverImage     String?     @map("cover_image")
+  author         String      @default("Sophia Codex")
+  category       String      @default("Triết học & Đời sống")
+  tags           String?     // Chuỗi phân tách bằng dấu phẩy
+  status         PostStatus  @default(PUBLISHED)
+  readingTime    Int         @default(5) @map("reading_time")
+  metaTitle      String?     @map("meta_title")
+  metaDesc       String?     @map("meta_desc")
+  faqJson        String?     @map("faq_json")
+  views          Int         @default(0)
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @default(now()) @updatedAt @map("updated_at")
+
+  @@index([slug])
+  @@index([status])
+  @@map("blog_posts")
 }
