@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
-const { marked } = require('marked');
+const marked = require('../../lib/markdown');
 const dbService = require('../../../server/db');
 
 // Đọc template blog-detail.html và blog-list.html
@@ -50,12 +50,12 @@ router.get('/', (req, res) => {
       `;
     } else {
       cardsHtml = posts.map(post => {
-        const coverImg = post.cover_image || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=800&auto=format&fit=crop';
+        const coverImg = post.cover_image || '/assets/blog/blog-default.jpg';
         const dateStr = new Date(post.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
         return `
           <article class="group bg-white dark:bg-emerald-950/40 rounded-2xl border border-stone-200 dark:border-emerald-800/60 overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col h-full">
             <a href="/blog/${escapeHtml(post.slug)}" class="block aspect-video overflow-hidden relative">
-              <img src="${escapeHtml(coverImg)}" alt="${escapeHtml(post.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+              <img src="${escapeHtml(coverImg)}" alt="${escapeHtml(post.title)}" onerror="this.onerror=null; this.src='/assets/blog/blog-default.jpg';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
               <span class="absolute top-3 left-3 px-2.5 py-1 text-[11px] font-semibold bg-emerald-950/80 backdrop-blur-md text-amber-300 rounded-full border border-amber-500/30">
                 ${escapeHtml(post.category)}
               </span>
@@ -156,7 +156,7 @@ router.get('/:slug', (req, res) => {
     const host = req.get('host') || 'localhost:3000';
     const protocol = req.protocol || 'http';
     const canonicalUrl = `${protocol}://${host}/blog/${post.slug}`;
-    const coverImage = post.cover_image || `${protocol}://${host}/assets/images/og-blog-default.jpg`;
+    const coverImage = post.cover_image || `${protocol}://${host}/assets/blog/blog-default.jpg`;
     const publishDateIso = new Date(post.created_at).toISOString();
     const updateDateIso = new Date(post.updated_at || post.created_at).toISOString();
 

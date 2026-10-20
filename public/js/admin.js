@@ -127,11 +127,13 @@ const BOOK_METADATA_MAP = {
 };
 
 const PHILOSOPHER_AVATAR_MAP = {
-  'marcus-aurelius': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Marcus_Aurelius_Louvre_MR561_n01.jpg/400px-Marcus_Aurelius_Louvre_MR561_n01.jpg',
-  'plato': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg/400px-%22The_School_of_Athens%22_by_Raffaello_Sanzio_da_Urbino.jpg',
-  'lao-tu': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Zhang_Lu-Laozi_Riding_an_Ox.jpg/400px-Zhang_Lu-Laozi_Riding_an_Ox.jpg',
-  'nietzsche': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/400px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg',
-  'john-stuart-mill': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/John_Stuart_Mill_by_London_Stereoscopic_Company%2C_c1870.jpg/400px-John_Stuart_Mill_by_London_Stereoscopic_Company%2C_c1870.jpg'
+  'marcus-aurelius': '/assets/philosophers/marcus-aurelius.jpg',
+  'plato': '/assets/philosophers/socrates-plato.jpg',
+  'socrates': '/assets/philosophers/socrates-plato.jpg',
+  'lao-tzu': '/assets/philosophers/lao-tzu.jpg',
+  'lao-tu': '/assets/philosophers/lao-tzu.jpg',
+  'nietzsche': '/assets/philosophers/nietzsche.jpg',
+  'john-stuart-mill': '/assets/philosophers/john-stuart-mill.jpg'
 };
 
 /**
@@ -3739,7 +3741,7 @@ async function loadAdminBlogPosts() {
           <td class="py-3 px-4">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-lg bg-stone-200 dark:bg-emerald-900 overflow-hidden shrink-0">
-                <img src="${post.cover_image || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=200&auto=format&fit=crop'}" class="w-full h-full object-cover">
+                <img src="${post.cover_image || '/assets/blog/blog-default.jpg'}" onerror="this.onerror=null; this.src='/assets/blog/blog-default.jpg';" class="w-full h-full object-cover">
               </div>
               <div class="max-w-md">
                 <div class="font-bold text-stone-900 dark:text-stone-100 line-clamp-1">${escapeHtml(post.title)}</div>

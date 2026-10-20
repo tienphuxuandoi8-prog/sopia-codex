@@ -13,10 +13,18 @@ const fs = require('fs');
 const multer = require('multer');
 const dbService = require('../../server/db');
 
-// Cấu hình Multer upload ảnh cho bài viết blog
-const uploadDir = path.join(__dirname, '..', '..', 'public', 'uploads', 'posts');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+// Cấu hình Multer upload ảnh cho bài viết blog (an toàn cho cả Local và Serverless Vercel)
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const uploadDir = isServerless 
+  ? path.join('/tmp', 'uploads', 'posts') 
+  : path.join(__dirname, '..', '..', 'public', 'uploads', 'posts');
+
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (e) {
+  console.warn('[Multer] Không thể tạo thư mục upload:', e.message);
 }
 
 const storage = multer.diskStorage({
