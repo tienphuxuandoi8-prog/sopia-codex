@@ -521,7 +521,7 @@ function switchAdminTab(tabName) {
     return;
   }
 
-  const supportedTabs = ['overview', 'books', 'chapters', 'quotes', 'ai', 'philosophers', 'audio'];
+  const supportedTabs = ['overview', 'books', 'chapters', 'quotes', 'ai', 'philosophers', 'audio', 'trash'];
   
   if (!supportedTabs.includes(tabName)) {
     showToast(`💡 Phân hệ "${tabName}" đang hoàn thiện trong các bản cập nhật tiếp theo!`);
@@ -557,7 +557,8 @@ function switchAdminTab(tabName) {
       quotes: 'Kho Danh Ngôn & Thiệp FB',
       ai: 'Hiền Triết AI Hub — Điều Hành & Đàm Đạo Socrates',
       philosophers: 'Bậc Thầy Tư Tưởng & Dòng Thời Gian Lịch Sử',
-      audio: 'Studio Âm Thanh & Nhạc Nền Thiền Định'
+      audio: 'Studio Âm Thanh & Nhạc Nền Thiền Định',
+      trash: 'Thùng Rác & Khôi Phục Dữ Liệu (Bảo Lưu 30 Ngày)'
     };
     breadcrumb.textContent = titles[tabName] || 'Quản Trị';
   }
@@ -577,6 +578,7 @@ function switchAdminTab(tabName) {
   if (tabName === 'ai') loadAiHub();
   if (tabName === 'philosophers') loadPhilosophersTab();
   if (tabName === 'audio') loadAudioStudioTab();
+  if (tabName === 'trash') loadTrashList();
 
   if (window.lucide) window.lucide.createIcons();
 }
@@ -884,10 +886,12 @@ async function handleUpdateBookSubmit(e) {
     if (res.ok) {
       closeModal('modal-edit-book');
       showToast(`✨ Đã cập nhật thành công tác phẩm "${title}"!`);
+      await preloadBooks();
       loadBooksList();
       loadOverviewDashboard();
     } else {
-      showToast('⚠️ Lỗi khi cập nhật tác phẩm');
+      const errData = await res.json().catch(() => ({}));
+      showToast(`⚠️ Lỗi khi cập nhật tác phẩm: ${errData.error?.message || errData.error || 'Vui lòng kiểm tra lại'}`);
     }
   } catch (err) {
     showToast('⚠️ Lỗi kết nối API');
@@ -900,19 +904,22 @@ async function handleUpdateBookSubmit(e) {
 async function handleDeleteBook(bookId) {
   const book = allBooksCache.find(b => b.id === bookId);
   const title = book ? `"${book.title}"` : 'tác phẩm này';
-  if (!confirm(`⚠️ CẢNH BÁO: Bạn có chắc chắn muốn xóa ${title} cùng toàn bộ các chương liên quan khỏi SQLite?`)) return;
+  if (!confirm(`⚠️ XÁC NHẬN CHUYỂN VÀO THÙNG RÁC:\nBạn có chắc chắn muốn chuyển tác phẩm ${title} vào Thùng Rác?\n\n• Dữ liệu được bảo lưu an toàn 30 ngày.\n• Có thể khôi phục lại bất cứ lúc nào trước khi hết hạn.\n• Tạm thời ẩn khỏi kệ sách công khai của độc giả.`)) return;
 
   try {
     const res = await fetch(`/api/books/${bookId}`, { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
     if (res.ok) {
-      showToast(`🗑️ Đã xóa tác phẩm thành công khỏi SQLite!`);
+      showToast(`🗑️ Đã chuyển ${title} vào Thùng Rác (bảo lưu 30 ngày)!`);
+      await preloadBooks();
       loadBooksList();
       loadOverviewDashboard();
+      updateTrashBadge();
     } else {
-      showToast('⚠️ Không thể xóa tác phẩm');
+      showToast(`⚠️ Lỗi khi chuyển vào thùng rác: ${data.error?.message || data.error || 'Thao tác không thành công'}`);
     }
   } catch (err) {
-    showToast('⚠️ Lỗi khi gửi yêu cầu xóa');
+    showToast('⚠️ Lỗi kết nối khi gửi yêu cầu xóa');
   }
 }
 
@@ -1261,19 +1268,21 @@ async function handleChapterEditorSubmit(e) {
  * Xóa chương
  */
 async function handleDeleteChapter(chapId) {
-  if (!confirm('Bạn có chắc chắn muốn xóa chương này khỏi cơ sở dữ liệu SQLite?')) return;
+  if (!confirm('⚠️ Bạn có chắc chắn muốn chuyển chương này vào Thùng Rác?\n\n• Dữ liệu được bảo lưu an toàn trong 30 ngày.\n• Có thể khôi phục bất cứ lúc nào từ Thùng Rác.')) return;
 
   try {
     const res = await fetch(`/api/chapters/${chapId}`, { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
     if (res.ok) {
-      showToast('🗑️ Đã xóa chương thành công!');
+      showToast('🗑️ Đã chuyển chương vào Thùng Rác (bảo lưu 30 ngày)!');
       loadChaptersForBook(currentSelectedBookId);
       loadOverviewDashboard();
+      updateTrashBadge();
     } else {
-      showToast('⚠️ Không thể xóa chương');
+      showToast(`⚠️ Không thể xóa chương: ${data.error?.message || data.error || 'Lỗi thao tác'}`);
     }
   } catch (err) {
-    showToast('⚠️ Lỗi kết nối API');
+    showToast('⚠️ Lỗi kết nối API khi xóa chương');
   }
 }
 
@@ -2029,12 +2038,14 @@ async function handleCreateBook(e) {
       closeModal('modal-new-book');
       document.getElementById('form-new-book').reset();
       showToast('🎉 Đã thêm tác phẩm mới vào SQLite thành công!');
+      await preloadBooks();
       loadOverviewDashboard();
       if (!document.getElementById('tab-books').classList.contains('hidden')) {
         loadBooksList();
       }
     } else {
-      showToast('⚠️ Lỗi khi lưu tác phẩm mới');
+      const errData = await res.json().catch(() => ({}));
+      showToast(`⚠️ Lỗi khi lưu tác phẩm mới: ${errData.error?.message || errData.error || 'Vui lòng kiểm tra lại'}`);
     }
   } catch (err) {
     showToast('⚠️ Lỗi kết nối API');
@@ -3377,4 +3388,283 @@ function initSearch() {
       });
     }
   });
+}
+
+
+/**
+ * =========================================================================
+ * 12. QUẢN LÝ THÙNG RÁC & BẢO LƯU 30 NGÀY (RECYCLE BIN & RESTORE)
+ * =========================================================================
+ */
+let currentTrashData = { books: [], chapters: [], total: 0 };
+let currentTrashFilter = 'all';
+
+function updateTrashBadge(count) {
+  const badge = document.getElementById('nav-trash-badge');
+  const countBadge = document.getElementById('trash-total-count-badge');
+  if (count !== undefined && count !== null) {
+    if (badge) {
+      badge.textContent = count;
+      if (count > 0) badge.classList.remove('hidden');
+      else badge.classList.add('hidden');
+    }
+    if (countBadge) countBadge.textContent = `${count} mục`;
+    return;
+  }
+  fetch('/api/trash')
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (data && typeof data.total === 'number') {
+        if (badge) {
+          badge.textContent = data.total;
+          if (data.total > 0) badge.classList.remove('hidden');
+          else badge.classList.add('hidden');
+        }
+        if (countBadge) countBadge.textContent = `${data.total} mục`;
+      }
+    })
+    .catch(() => {});
+}
+
+async function loadTrashList() {
+  const tableBody = document.getElementById('trash-table-body');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = `
+    <tr>
+      <td colspan="6" class="px-4 py-8 text-center text-stone-400">
+        <i data-lucide="loader" class="w-6 h-6 mx-auto mb-2 animate-spin text-amber-500"></i>
+        <div>Đang tải danh sách mục trong thùng rác...</div>
+      </td>
+    </tr>
+  `;
+  if (window.lucide) window.lucide.createIcons();
+
+  try {
+    const res = await fetch('/api/trash');
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="px-4 py-8 text-center text-rose-500">
+              <i data-lucide="shield-alert" class="w-8 h-8 mx-auto mb-2"></i>
+              <div class="font-bold">Phiên đăng nhập quản trị đã hết hạn hoặc không đủ quyền.</div>
+              <div class="text-[11px] text-stone-400 mt-1">Vui lòng đăng nhập lại tài khoản admin@sophiacodex.vn</div>
+            </td>
+          </tr>
+        `;
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+      throw new Error('Lỗi khi tải thùng rác');
+    }
+
+    const data = await res.json();
+    currentTrashData = data;
+
+    const booksCount = (data.books || []).length;
+    const chapsCount = (data.chapters || []).length;
+    const totalCount = booksCount + chapsCount;
+
+    const countAllEl = document.getElementById('trash-count-all');
+    const countBooksEl = document.getElementById('trash-count-books');
+    const countChapsEl = document.getElementById('trash-count-chapters');
+    const totalBadge = document.getElementById('trash-total-count-badge');
+    const navBadge = document.getElementById('nav-trash-badge');
+
+    if (countAllEl) countAllEl.textContent = totalCount;
+    if (countBooksEl) countBooksEl.textContent = booksCount;
+    if (countChapsEl) countChapsEl.textContent = chapsCount;
+    if (totalBadge) totalBadge.textContent = `${totalCount} mục`;
+    if (navBadge) {
+      navBadge.textContent = totalCount;
+      if (totalCount > 0) navBadge.classList.remove('hidden');
+      else navBadge.classList.add('hidden');
+    }
+
+    renderTrashTable();
+  } catch (err) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="px-4 py-8 text-center text-rose-500">
+          <div>⚠️ Không thể kết nối đến API Thùng Rác. Vui lòng thử lại sau.</div>
+        </td>
+      </tr>
+    `;
+  }
+}
+
+function filterTrashTab(type) {
+  currentTrashFilter = type;
+  const filters = ['all', 'book', 'chapter'];
+  filters.forEach(f => {
+    const btn = document.getElementById(`trash-filter-${f === 'book' ? 'books' : f === 'chapter' ? 'chapters' : 'all'}`);
+    if (btn) {
+      if (f === type) {
+        btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-stone-950";
+      } else {
+        btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100";
+      }
+    }
+  });
+  renderTrashTable();
+}
+
+function renderTrashTable() {
+  const tableBody = document.getElementById('trash-table-body');
+  if (!tableBody) return;
+
+  let items = [];
+  if (currentTrashFilter === 'all' || currentTrashFilter === 'book') {
+    items = items.concat(currentTrashData.books || []);
+  }
+  if (currentTrashFilter === 'all' || currentTrashFilter === 'chapter') {
+    items = items.concat(currentTrashData.chapters || []);
+  }
+
+  if (items.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="px-4 py-10 text-center text-stone-400">
+          <i data-lucide="check-circle-2" class="w-10 h-10 mx-auto mb-2 text-emerald-500 opacity-60"></i>
+          <div class="font-semibold text-sm">Thùng rác hiện đang trống</div>
+          <p class="text-[11px] text-stone-500 mt-1">Không có mục nào đang chờ khôi phục hoặc xóa quá hạn.</p>
+        </td>
+      </tr>
+    `;
+    if (window.lucide) window.lucide.createIcons();
+    return;
+  }
+
+  tableBody.innerHTML = items.map(item => {
+    const isBook = item.item_type === 'book';
+    const typeLabel = isBook ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/30">Tác phẩm</span>'
+                             : '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-500/10 text-sky-500 border border-sky-500/30">Chương mục</span>';
+    const title = isBook ? item.title : `${item.chapter_number}: ${item.title}`;
+    const belongsTo = isBook ? `<span class="text-stone-400">Tác phẩm độc lập (${item.chapters_count || 0} chương)</span>`
+                             : `<span class="font-medium text-stone-600 dark:text-stone-300">${item.book_title || item.book_id}</span>`;
+    const deletedDate = item.deleted_at ? new Date(item.deleted_at).toLocaleString('vi-VN') : 'Gần đây';
+    const daysLeft = item.days_remaining !== undefined ? item.days_remaining : 30;
+    
+    let daysBadge = '';
+    if (daysLeft > 10) {
+      daysBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/30">Còn ${daysLeft} ngày</span>`;
+    } else if (daysLeft > 3) {
+      daysBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/30">Còn ${daysLeft} ngày</span>`;
+    } else {
+      daysBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-500 border border-rose-500/30 animate-pulse">Sắp hết hạn (${daysLeft} ngày)</span>`;
+    }
+
+    const safeTitle = (title || '').replace(/'/g, "\\'");
+
+    return `
+      <tr class="hover:bg-stone-50/60 dark:hover:bg-emerald-950/20 transition-colors">
+        <td class="px-4 py-3">${typeLabel}</td>
+        <td class="px-4 py-3">
+          <div class="font-bold text-stone-900 dark:text-stone-100">${title}</div>
+          <div class="text-[10px] text-stone-400 font-mono mt-0.5">ID: ${item.id}</div>
+        </td>
+        <td class="px-4 py-3">${belongsTo}</td>
+        <td class="px-4 py-3 text-stone-500">${deletedDate}</td>
+        <td class="px-4 py-3">${daysBadge}</td>
+        <td class="px-4 py-3 text-right">
+          <div class="flex items-center justify-end gap-1.5">
+            <button onclick="restoreTrashItem('${item.item_type}', '${item.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-all" title="Khôi phục lại dữ liệu này">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span>Khôi Phục</span>
+            </button>
+            <button onclick="permanentDeleteTrashItem('${item.item_type}', '${item.id}', '${safeTitle}')" class="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 hover:text-rose-600 text-xs font-semibold transition-colors" title="Xóa vĩnh viễn không thể khôi phục">
+              <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+async function restoreTrashItem(type, id) {
+  try {
+    const res = await fetch('/api/trash/restore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, id })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast('✨ ' + (data.message || 'Đã khôi phục thành công!'));
+      await loadTrashList();
+      await preloadBooks();
+      loadOverviewDashboard();
+      if (!document.getElementById('tab-books').classList.contains('hidden')) {
+        loadBooksList();
+      }
+      if (!document.getElementById('tab-chapters').classList.contains('hidden')) {
+        loadChaptersForBook(currentSelectedBookId);
+      }
+    } else {
+      showToast(`⚠️ Lỗi khôi phục: ${data.error?.message || data.error || 'Vui lòng thử lại'}`);
+    }
+  } catch (err) {
+    showToast('⚠️ Lỗi kết nối khi gửi yêu cầu khôi phục');
+  }
+}
+
+async function permanentDeleteTrashItem(type, id, title) {
+  const itemDesc = type === 'book' ? `Tác phẩm "${title}" cùng toàn bộ các chương` : `Chương "${title}"`;
+  if (!confirm(`🚨 CẢNH BÁO QUAN TRỌNG:\nBạn có chắc chắn muốn XÓA VĨNH VIỄN ${itemDesc} khỏi ổ đĩa?\n\n• Hành động này KHÔNG THỂ HOÀN TÁC.\n• Dữ liệu sẽ biến mất hoàn toàn.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/trash/${type}/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (res.ok) {
+      showToast('🗑️ Đã xóa vĩnh viễn mục khỏi cơ sở dữ liệu!');
+      await loadTrashList();
+      loadOverviewDashboard();
+    } else {
+      showToast(`⚠️ Lỗi: ${data.error || 'Không thể xóa vĩnh viễn'}`);
+    }
+  } catch (err) {
+    showToast('⚠️ Lỗi kết nối API');
+  }
+}
+
+async function purgeExpiredTrashItems() {
+  try {
+    const res = await fetch('/api/trash/purge-expired', { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`🧹 Đã quét và dọn dẹp: ${data.purgedBooks || 0} sách, ${data.purgedChapters || 0} chương quá hạn 30 ngày.`);
+      loadTrashList();
+      loadOverviewDashboard();
+    } else {
+      showToast(`⚠️ Lỗi dọn dẹp: ${data.error || 'Vui lòng thử lại'}`);
+    }
+  } catch (err) {
+    showToast('⚠️ Lỗi kết nối API');
+  }
+}
+
+async function confirmEmptyTrash() {
+  if (!confirm('🚨 CẢNH BÁO:\nBạn có chắc chắn muốn DỌN SẠCH TOÀN BỘ THÙNG RÁC?\n\nTất cả tác phẩm và chương mục trong thùng rác sẽ bị xóa vĩnh viễn ngay lập tức!')) {
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/trash/empty', { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) {
+      showToast('🗑️ Đã dọn sạch toàn bộ thùng rác!');
+      loadTrashList();
+      loadOverviewDashboard();
+    } else {
+      showToast(`⚠️ Lỗi: ${data.error || 'Không thể dọn sạch thùng rác'}`);
+    }
+  } catch (err) {
+    showToast('⚠️ Lỗi kết nối API');
+  }
 }
