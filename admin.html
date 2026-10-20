@@ -206,6 +206,15 @@
             </div>
           </button>
 
+          <!-- Item: Viết Bài Blog & SEO -->
+          <button id="nav-btn-blog" onclick="switchAdminTab('blog')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
+            <div class="flex items-center gap-3">
+              <i data-lucide="newspaper" class="w-4 h-4 text-amber-400"></i>
+              <span>Quản Lý Blog & SEO</span>
+            </div>
+            <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30 font-semibold">SEO</span>
+          </button>
+
           <!-- Item: Triết gia & Trường phái -->
           <button id="nav-btn-philosophers" onclick="switchAdminTab('philosophers')" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-stone-300 hover:bg-emerald-900/40 hover:text-white transition-all">
             <div class="flex items-center gap-3">
@@ -849,6 +858,75 @@
             <!-- Rendered by js/admin.js -->
           </div>
 
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB BLOG: QUẢN LÝ BLOG & VIẾT BÀI CHUẨN GOOGLE / CHATGPT -->
+        <!-- ========================================================================= -->
+        <section id="tab-blog" class="hidden space-y-6">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-stone-200 dark:border-emerald-900">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="font-display font-bold text-2xl text-stone-900 dark:text-stone-100">Quản Lý Blog & Viết Bài</h2>
+                <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Auto SEO & ChatGPT</span>
+              </div>
+              <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Đăng bài viết mới, tự động tối ưu hóa từ khóa, dữ liệu cấu trúc Schema.org và llms.txt cho AI</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <a href="/blog" target="_blank" class="px-3.5 py-2 rounded-xl text-xs font-semibold border border-stone-300 dark:border-emerald-800 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-emerald-900/50 flex items-center gap-1.5 transition-colors">
+                <i data-lucide="external-link" class="w-4 h-4"></i> Xem Trang Blog
+              </a>
+              <button onclick="openCreateBlogModal()" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-stone-950 flex items-center gap-2 shadow-md transition-all">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Viết Bài Mới
+              </button>
+            </div>
+          </div>
+
+          <!-- Bộ lọc và tìm kiếm bài viết -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-emerald-950/40 p-4 rounded-2xl border border-stone-200 dark:border-emerald-800/60 shadow-sm">
+            <div class="relative w-full sm:w-80">
+              <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="admin-blog-search" oninput="debounceBlogSearch()" placeholder="Tìm kiếm bài viết..." class="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-stone-50 dark:bg-emerald-900/40 border border-stone-200 dark:border-emerald-800 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <select id="admin-blog-category-filter" onchange="loadAdminBlogPosts()" class="px-3 py-2 text-xs rounded-xl bg-stone-50 dark:bg-emerald-900/40 border border-stone-200 dark:border-emerald-800 text-stone-900 dark:text-stone-100">
+                <option value="ALL">Tất Cả Danh Mục</option>
+                <option value="Chủ nghĩa Khắc kỷ">Chủ nghĩa Khắc kỷ</option>
+                <option value="Triết học & Đời sống">Triết học & Đời sống</option>
+                <option value="Hiện sinh & Tự do">Hiện sinh & Tự do</option>
+                <option value="Đạo học Phương Đông">Đạo học Phương Đông</option>
+              </select>
+              <select id="admin-blog-status-filter" onchange="loadAdminBlogPosts()" class="px-3 py-2 text-xs rounded-xl bg-stone-50 dark:bg-emerald-900/40 border border-stone-200 dark:border-emerald-800 text-stone-900 dark:text-stone-100">
+                <option value="ALL">Tất Cả Trạng Thái</option>
+                <option value="PUBLISHED">Đã Xuất Bản</option>
+                <option value="DRAFT">Bản Nháp</option>
+                <option value="ARCHIVED">Lưu Trữ</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Bảng Danh Sách Bài Viết -->
+          <div class="bg-white dark:bg-emerald-950/40 rounded-2xl border border-stone-200 dark:border-emerald-800/60 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-stone-50/80 dark:bg-emerald-950/80 text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider border-b border-stone-200 dark:border-emerald-800">
+                    <th class="py-3 px-4">Bài Viết</th>
+                    <th class="py-3 px-4">Danh Mục</th>
+                    <th class="py-3 px-4">Trạng Thái</th>
+                    <th class="py-3 px-4">Lượt Xem</th>
+                    <th class="py-3 px-4">Ngày Đăng</th>
+                    <th class="py-3 px-4 text-right">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-blog-table-body" class="divide-y divide-stone-100 dark:divide-emerald-900/60 text-xs text-stone-700 dark:text-stone-300">
+                  <tr>
+                    <td colspan="6" class="py-8 text-center text-stone-400">Đang tải danh sách bài viết...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </section>
 
         <!-- ========================================================================= -->
@@ -1598,6 +1676,156 @@
   <!-- ========================================================================= -->
   <!-- MODALS (CỬA SỔ CHỨC NĂNG THÔNG MINH) -->
   <!-- ========================================================================= -->
+
+  <!-- MODAL: VIẾT BÀI / CHỈNH SỬA BLOG CHUẨN GOOGLE & CHATGPT -->
+  <div id="modal-blog-editor" class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div class="bg-[#FAF8F5] dark:bg-[#0E1A13] rounded-3xl border border-stone-300 dark:border-emerald-800 w-full max-w-4xl max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-stone-200 dark:border-emerald-900 flex items-center justify-between bg-stone-100/50 dark:bg-emerald-950/40 shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
+            <i data-lucide="edit-3" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 id="modal-blog-title-heading" class="font-bold text-base text-stone-900 dark:text-stone-100">Viết Bài Blog Mới</h3>
+            <p class="text-xs text-stone-500">Tự động cấu trúc chuẩn SEO Google & ChatGPT Friendly</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeModal('modal-blog-editor')" class="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 dark:hover:text-stone-200">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Form cuộn) -->
+      <form id="form-blog-post" onsubmit="handleSaveBlogPost(event)" class="flex-1 overflow-y-auto p-6 space-y-6 text-xs">
+        <input type="hidden" id="blog-id" value="">
+
+        <!-- Hàng 1: Tiêu đề & Danh mục -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="md:col-span-2 space-y-1">
+            <label class="font-bold text-stone-700 dark:text-stone-300">Tiêu đề bài viết (*)</label>
+            <input type="text" id="blog-title" required oninput="autoGenerateBlogSlug(this.value)" placeholder="Ví dụ: Nghệ Thuật Khắc Kỷ Trong Đời Sống Hiện Đại..." class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-emerald-900/40 border border-stone-300 dark:border-emerald-800 text-stone-900 dark:text-stone-100 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+          </div>
+          <div class="space-y-1">
+            <label class="font-bold text-stone-700 dark:text-stone-300">Danh mục</label>
+            <select id="blog-category" class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-emerald-900/40 border border-stone-300 dark:border-emerald-800 text-stone-900 dark:text-stone-100 font-medium text-sm">
+              <option value="Chủ nghĩa Khắc kỷ">Chủ nghĩa Khắc kỷ</option>
+              <option value="Triết học & Đời sống">Triết học & Đời sống</option>
+              <option value="Hiện sinh & Tự do">Hiện sinh & Tự do</option>
+              <option value="Đạo học Phương Đông">Đạo học Phương Đông</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Hàng 2: Slug URL & Ảnh Cover -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1">
+            <label class="font-bold text-stone-700 dark:text-stone-300 flex items-center justify-between">
+              <span>Đường dẫn bài viết (URL Slug)</span>
+              <span class="text-[10px] text-stone-400">Tự động tạo từ tiêu đề</span>
+            </label>
+            <div class="flex items-center">
+              <span class="px-2.5 py-2.5 bg-stone-200 dark:bg-emerald-900 border border-r-0 border-stone-300 dark:border-emerald-800 rounded-l-xl text-stone-500 font-mono text-[11px]">/blog/</span>
+              <input type="text" id="blog-slug" required placeholder="duong-dan-bai-viet" class="w-full px-3 py-2.5 rounded-r-xl bg-white dark:bg-emerald-900/40 border border-stone-300 dark:border-emerald-800 text-stone-900 dark:text-stone-100 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <label class="font-bold text-stone-700 dark:text-stone-300 flex items-center justify-between">
+              <span>Ảnh đại diện (Cover Image)</span>
+              <label class="text-[10px] text-amber-600 dark:text-amber-400 cursor-pointer hover:underline flex items-center gap-1">
+                <i data-lucide="upload" class="w-3 h-3"></i> Tải ảnh lên
+                <input type="file" accept="image/*" class="hidden" onchange="uploadBlogImageFile(event, 'blog-cover')">
+              </label>
+            </label>
+            <input type="text" id="blog-cover" placeholder="https://... hoặc /uploads/posts/..." class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-emerald-900/40 border border-stone-300 dark:border-emerald-800 text-stone-900 dark:text-stone-100 font-mono text-xs">
+          </div>
+        </div>
+
+        <!-- Tóm tắt bài viết (Meta Description & Key Takeaways) -->
+        <div class="space-y-1">
+          <label class="font-bold text-stone-700 dark:text-stone-300 flex items-center justify-between">
+            <span>Tóm tắt bài viết / Điểm cốt lõi (Key Takeaways)</span>
+            <span class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">Cực kỳ quan trọng để ChatGPT & Google trích dẫn</span>
+          </label>
+          <textarea id="blog-summary" rows="2" placeholder="Tóm tắt ngắn gọn 2-3 câu thể hiện nội dung trọng tâm của bài viết..." class="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-emerald-900/40 border border-stone-300 dark:border-emerald-800 text-stone-900 dark:text-stone-100 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+        </div>
+
+        <!-- Soạn Thảo Nội Dung Chính (Markdown + Quick Toolbar) -->
+        <div class="space-y-1.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <label class="font-bold text-stone-700 dark:text-stone-300">Nội dung bài viết (*)</label>
+            <div class="flex items-center gap-1.5 bg-stone-200/80 dark:bg-emerald-900/70 p-1 rounded-lg">
+              <button type="button" onclick="insertBlogMarkdown('**', '**', 'Chữ đậm')" class="px-2 py-0.5 rounded font-bold hover:bg-white dark:hover:bg-emerald-800" title="In đậm">B</button>
+              <button type="button" onclick="insertBlogMarkdown('*', '*', 'Chữ nghiêng')" class="px-2 py-0.5 rounded italic font-serif hover:bg-white dark:hover:bg-emerald-800" title="In nghiêng">I</button>
+              <button type="button" onclick="insertBlogMarkdown('## ', '', 'Tiêu đề mục (H2)')" class="px-2 py-0.5 rounded font-bold hover:bg-white dark:hover:bg-emerald-800" title="Tiêu đề H2">H2</button>
+              <button type="button" onclick="insertBlogMarkdown('### ', '', 'Tiêu đề nhỏ (H3)')" class="px-2 py-0.5 rounded font-bold hover:bg-white dark:hover:bg-emerald-800" title="Tiêu đề H3">H3</button>
+              <button type="button" onclick="insertBlogMarkdown('> ', '', 'Trích dẫn danh ngôn...')" class="px-2 py-0.5 rounded hover:bg-white dark:hover:bg-emerald-800" title="Trích dẫn">❝</button>
+              <button type="button" onclick="insertBlogMarkdown('- ', '', 'Mục danh sách')" class="px-2 py-0.5 rounded hover:bg-white dark:hover:bg-emerald-800" title="Danh sách">•</button>
+              <label class="px-2 py-0.5 rounded hover:bg-white dark:hover:bg-emerald-800 cursor-pointer flex items-center gap-1 text-[11px]" title="Chèn ảnh vào nội dung">
+                <i data-lucide="image" class="w-3.5 h-3.5"></i> Chèn ảnh
+                <input type="file" accept="image/*" class="hidden" onchange="uploadContentImageFile(event)">
+              </label>
+            </div>
+          </div>
+          <textarea id="blog-content" required rows="12" placeholder="Soạn thảo nội dung bài viết bằng Markdown hoặc gõ văn bản thông thường. Bạn có thể kéo thả ảnh hoặc dán ảnh (Ctrl+V) trực tiếp vào đây..." class="w-full px-4 py-3 rounded-xl bg-white dark:bg-emerald-900/40 border border-stone-300 dark:border-emerald-800 text-stone-900 dark:text-stone-100 font-mono text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+          <p class="text-[11px] text-stone-400">Mẹo: Hỗ trợ kéo thả ảnh hoặc nhấn <kbd class="px-1.5 py-0.5 bg-stone-200 dark:bg-emerald-900 rounded font-mono">Ctrl + V</kbd> để dán ảnh trực tiếp từ bộ nhớ tạm clipboard.</p>
+        </div>
+
+        <!-- Hộp Câu Hỏi Thường Gặp FAQ (Schema FAQPage cho ChatGPT & Google Rich Snippets) -->
+        <div class="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="font-bold text-stone-800 dark:text-amber-300 flex items-center gap-1.5">
+                <i data-lucide="help-circle" class="w-4 h-4"></i> Hỏi & Đáp nhanh (FAQ Schema)
+              </div>
+              <p class="text-[11px] text-stone-500 dark:text-stone-400">Giúp bài viết đạt vị trí "Featured Snippet" trên Google và được ChatGPT trích dẫn trực tiếp câu trả lời</p>
+            </div>
+            <button type="button" onclick="addFaqRow()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300 font-semibold text-[11px] flex items-center gap-1">
+              <i data-lucide="plus" class="w-3 h-3"></i> Thêm câu hỏi
+            </button>
+          </div>
+          <div id="blog-faq-container" class="space-y-2">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Cấu hình Trạng thái & Tác giả -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+          <div class="space-y-1">
+            <label class="font-bold text-stone-700 dark:text-stone-300">Tác giả</label>
+            <input type="text" id="blog-author" value="Sophia Codex" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-900/40 border border-stone-300 dark:border-emerald-800 text-stone-900 dark:text-stone-100 text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="font-bold text-stone-700 dark:text-stone-300">Thẻ tags (phân tách bởi dấu phẩy)</label>
+            <input type="text" id="blog-tags" placeholder="stoicism, triethoc, mindfulness" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-900/40 border border-stone-300 dark:border-emerald-800 text-stone-900 dark:text-stone-100 text-xs">
+          </div>
+          <div class="space-y-1">
+            <label class="font-bold text-stone-700 dark:text-stone-300">Trạng thái xuất bản</label>
+            <select id="blog-status" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-900/40 border border-stone-300 dark:border-emerald-800 text-stone-900 dark:text-stone-100 text-xs font-semibold">
+              <option value="PUBLISHED">Xuất bản ngay (Hiển thị ra Web)</option>
+              <option value="DRAFT">Lưu bản nháp</option>
+              <option value="ARCHIVED">Lưu trữ ẩn</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="pt-4 border-t border-stone-200 dark:border-emerald-900 flex items-center justify-between">
+          <button type="button" onclick="closeModal('modal-blog-editor')" class="px-4 py-2 rounded-xl bg-stone-200 dark:bg-emerald-900 text-stone-700 dark:text-stone-300 font-semibold">
+            Hủy Bỏ
+          </button>
+          <div class="flex items-center gap-2">
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold flex items-center gap-2 shadow-lg transition-all">
+              <i data-lucide="check" class="w-4 h-4"></i> Hoàn Tất & Lưu Bài Viết
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- MODAL 1: SỨC KHỎE CSDL SQLITE & SAO LƯU -->
   <div id="modal-db-health" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">

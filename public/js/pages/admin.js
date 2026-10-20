@@ -521,7 +521,7 @@ function switchAdminTab(tabName) {
     return;
   }
 
-  const supportedTabs = ['overview', 'books', 'chapters', 'quotes', 'blog', 'ai', 'philosophers', 'audio'];
+  const supportedTabs = ['overview', 'books', 'chapters', 'quotes', 'blog', 'ai', 'philosophers', 'audio', 'trash'];
   
   if (!supportedTabs.includes(tabName)) {
     showToast(`💡 Phân hệ "${tabName}" đang hoàn thiện trong các bản cập nhật tiếp theo!`);
@@ -558,7 +558,8 @@ function switchAdminTab(tabName) {
       blog: 'Quản Lý Blog & Viết Bài Chuẩn SEO / ChatGPT',
       ai: 'Hiền Triết AI Hub — Điều Hành & Đàm Đạo Socrates',
       philosophers: 'Bậc Thầy Tư Tưởng & Dòng Thời Gian Lịch Sử',
-      audio: 'Studio Âm Thanh & Nhạc Nền Thiền Định'
+      audio: 'Studio Âm Thanh & Nhạc Nền Thiền Định',
+      trash: 'Thùng Rác & Khôi Phục Dữ Liệu'
     };
     breadcrumb.textContent = titles[tabName] || 'Quản Trị';
   }
@@ -579,6 +580,7 @@ function switchAdminTab(tabName) {
   if (tabName === 'ai') loadAiHub();
   if (tabName === 'philosophers') loadPhilosophersTab();
   if (tabName === 'audio') loadAudioStudioTab();
+  if (tabName === 'trash') loadTrashList();
 
   if (window.lucide) window.lucide.createIcons();
 }

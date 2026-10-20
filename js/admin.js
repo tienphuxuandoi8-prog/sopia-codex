@@ -521,7 +521,7 @@ function switchAdminTab(tabName) {
     return;
   }
 
-  const supportedTabs = ['overview', 'books', 'chapters', 'quotes', 'ai', 'philosophers', 'audio', 'trash'];
+  const supportedTabs = ['overview', 'books', 'chapters', 'quotes', 'blog', 'ai', 'philosophers', 'audio', 'trash'];
   
   if (!supportedTabs.includes(tabName)) {
     showToast(`💡 Phân hệ "${tabName}" đang hoàn thiện trong các bản cập nhật tiếp theo!`);
@@ -555,10 +555,11 @@ function switchAdminTab(tabName) {
       books: 'Quản Lý Tủ Sách Toàn Văn',
       chapters: 'Soạn Thảo & Quản Lý Chương Mục Toàn Văn',
       quotes: 'Kho Danh Ngôn & Thiệp FB',
+      blog: 'Quản Lý Blog & Viết Bài Chuẩn SEO / ChatGPT',
       ai: 'Hiền Triết AI Hub — Điều Hành & Đàm Đạo Socrates',
       philosophers: 'Bậc Thầy Tư Tưởng & Dòng Thời Gian Lịch Sử',
       audio: 'Studio Âm Thanh & Nhạc Nền Thiền Định',
-      trash: 'Thùng Rác & Khôi Phục Dữ Liệu (Bảo Lưu 30 Ngày)'
+      trash: 'Thùng Rác & Khôi Phục Dữ Liệu'
     };
     breadcrumb.textContent = titles[tabName] || 'Quản Trị';
   }
@@ -575,6 +576,7 @@ function switchAdminTab(tabName) {
   if (tabName === 'books') loadBooksList();
   if (tabName === 'chapters') loadChaptersStudio();
   if (tabName === 'quotes') loadQuotesList();
+  if (tabName === 'blog') loadAdminBlogPosts();
   if (tabName === 'ai') loadAiHub();
   if (tabName === 'philosophers') loadPhilosophersTab();
   if (tabName === 'audio') loadAudioStudioTab();
@@ -886,12 +888,10 @@ async function handleUpdateBookSubmit(e) {
     if (res.ok) {
       closeModal('modal-edit-book');
       showToast(`✨ Đã cập nhật thành công tác phẩm "${title}"!`);
-      await preloadBooks();
       loadBooksList();
       loadOverviewDashboard();
     } else {
-      const errData = await res.json().catch(() => ({}));
-      showToast(`⚠️ Lỗi khi cập nhật tác phẩm: ${errData.error?.message || errData.error || 'Vui lòng kiểm tra lại'}`);
+      showToast('⚠️ Lỗi khi cập nhật tác phẩm');
     }
   } catch (err) {
     showToast('⚠️ Lỗi kết nối API');
@@ -904,22 +904,19 @@ async function handleUpdateBookSubmit(e) {
 async function handleDeleteBook(bookId) {
   const book = allBooksCache.find(b => b.id === bookId);
   const title = book ? `"${book.title}"` : 'tác phẩm này';
-  if (!confirm(`⚠️ XÁC NHẬN CHUYỂN VÀO THÙNG RÁC:\nBạn có chắc chắn muốn chuyển tác phẩm ${title} vào Thùng Rác?\n\n• Dữ liệu được bảo lưu an toàn 30 ngày.\n• Có thể khôi phục lại bất cứ lúc nào trước khi hết hạn.\n• Tạm thời ẩn khỏi kệ sách công khai của độc giả.`)) return;
+  if (!confirm(`⚠️ CẢNH BÁO: Bạn có chắc chắn muốn xóa ${title} cùng toàn bộ các chương liên quan khỏi SQLite?`)) return;
 
   try {
     const res = await fetch(`/api/books/${bookId}`, { method: 'DELETE' });
-    const data = await res.json().catch(() => ({}));
     if (res.ok) {
-      showToast(`🗑️ Đã chuyển ${title} vào Thùng Rác (bảo lưu 30 ngày)!`);
-      await preloadBooks();
+      showToast(`🗑️ Đã xóa tác phẩm thành công khỏi SQLite!`);
       loadBooksList();
       loadOverviewDashboard();
-      updateTrashBadge();
     } else {
-      showToast(`⚠️ Lỗi khi chuyển vào thùng rác: ${data.error?.message || data.error || 'Thao tác không thành công'}`);
+      showToast('⚠️ Không thể xóa tác phẩm');
     }
   } catch (err) {
-    showToast('⚠️ Lỗi kết nối khi gửi yêu cầu xóa');
+    showToast('⚠️ Lỗi khi gửi yêu cầu xóa');
   }
 }
 
@@ -1268,21 +1265,19 @@ async function handleChapterEditorSubmit(e) {
  * Xóa chương
  */
 async function handleDeleteChapter(chapId) {
-  if (!confirm('⚠️ Bạn có chắc chắn muốn chuyển chương này vào Thùng Rác?\n\n• Dữ liệu được bảo lưu an toàn trong 30 ngày.\n• Có thể khôi phục bất cứ lúc nào từ Thùng Rác.')) return;
+  if (!confirm('Bạn có chắc chắn muốn xóa chương này khỏi cơ sở dữ liệu SQLite?')) return;
 
   try {
     const res = await fetch(`/api/chapters/${chapId}`, { method: 'DELETE' });
-    const data = await res.json().catch(() => ({}));
     if (res.ok) {
-      showToast('🗑️ Đã chuyển chương vào Thùng Rác (bảo lưu 30 ngày)!');
+      showToast('🗑️ Đã xóa chương thành công!');
       loadChaptersForBook(currentSelectedBookId);
       loadOverviewDashboard();
-      updateTrashBadge();
     } else {
-      showToast(`⚠️ Không thể xóa chương: ${data.error?.message || data.error || 'Lỗi thao tác'}`);
+      showToast('⚠️ Không thể xóa chương');
     }
   } catch (err) {
-    showToast('⚠️ Lỗi kết nối API khi xóa chương');
+    showToast('⚠️ Lỗi kết nối API');
   }
 }
 
@@ -2038,14 +2033,12 @@ async function handleCreateBook(e) {
       closeModal('modal-new-book');
       document.getElementById('form-new-book').reset();
       showToast('🎉 Đã thêm tác phẩm mới vào SQLite thành công!');
-      await preloadBooks();
       loadOverviewDashboard();
       if (!document.getElementById('tab-books').classList.contains('hidden')) {
         loadBooksList();
       }
     } else {
-      const errData = await res.json().catch(() => ({}));
-      showToast(`⚠️ Lỗi khi lưu tác phẩm mới: ${errData.error?.message || errData.error || 'Vui lòng kiểm tra lại'}`);
+      showToast('⚠️ Lỗi khi lưu tác phẩm mới');
     }
   } catch (err) {
     showToast('⚠️ Lỗi kết nối API');
@@ -3317,6 +3310,404 @@ function initShortcuts() {
   });
 }
 
+/**
+ * =========================================================================
+ * 12. PHÂN HỆ QUẢN LÝ BLOG & SOẠN THẢO BÀI VIẾT TỰ ĐỘNG SEO / CHATGPT
+ * =========================================================================
+ */
+
+let blogSearchTimeout = null;
+
+function debounceBlogSearch() {
+  clearTimeout(blogSearchTimeout);
+  blogSearchTimeout = setTimeout(() => {
+    loadAdminBlogPosts();
+  }, 300);
+}
+
+async function loadAdminBlogPosts() {
+  const tableBody = document.getElementById('admin-blog-table-body');
+  if (!tableBody) return;
+
+  const search = document.getElementById('admin-blog-search')?.value || '';
+  const category = document.getElementById('admin-blog-category-filter')?.value || 'ALL';
+  const status = document.getElementById('admin-blog-status-filter')?.value || 'ALL';
+
+  tableBody.innerHTML = `
+    <tr>
+      <td colspan="6" class="py-8 text-center text-stone-400">
+        <i data-lucide="loader" class="w-5 h-5 animate-spin mx-auto mb-2 text-amber-500"></i>
+        Đang tải danh sách bài viết...
+      </td>
+    </tr>
+  `;
+  if (window.lucide) window.lucide.createIcons();
+
+  try {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (category !== 'ALL') params.append('category', category);
+    if (status !== 'ALL') params.append('status', status);
+
+    const res = await fetch(`/api/admin/posts?${params.toString()}`);
+    if (!res.ok) throw new Error('Không thể tải danh sách bài viết');
+    const posts = await res.json();
+
+    if (!Array.isArray(posts) || posts.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" class="py-8 text-center text-stone-400 font-serif">
+            Không tìm thấy bài viết nào. Hãy bấm <strong>"Viết Bài Mới"</strong> để đăng tải bài đầu tiên!
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tableBody.innerHTML = posts.map(post => {
+      const dateStr = new Date(post.created_at).toLocaleDateString('vi-VN');
+      const statusBadge = post.status === 'PUBLISHED'
+        ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Xuất bản</span>'
+        : post.status === 'DRAFT'
+          ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Bản nháp</span>'
+          : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-500/20 text-stone-400 border border-stone-500/30">Lưu trữ</span>';
+
+      return `
+        <tr class="hover:bg-stone-50 dark:hover:bg-emerald-950/20 transition-colors">
+          <td class="py-3 px-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-stone-200 dark:bg-emerald-900 overflow-hidden shrink-0">
+                <img src="${post.cover_image || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=200&auto=format&fit=crop'}" class="w-full h-full object-cover">
+              </div>
+              <div class="max-w-md">
+                <div class="font-bold text-stone-900 dark:text-stone-100 line-clamp-1">${escapeHtml(post.title)}</div>
+                <div class="text-[11px] font-mono text-stone-400">/blog/${escapeHtml(post.slug)}</div>
+              </div>
+            </div>
+          </td>
+          <td class="py-3 px-4 font-medium text-stone-600 dark:text-stone-300">${escapeHtml(post.category)}</td>
+          <td class="py-3 px-4">${statusBadge}</td>
+          <td class="py-3 px-4 font-mono font-bold">${post.views || 0}</td>
+          <td class="py-3 px-4 text-stone-500">${dateStr}</td>
+          <td class="py-3 px-4 text-right">
+            <div class="flex items-center justify-end gap-1.5">
+              <a href="/blog/${escapeHtml(post.slug)}" target="_blank" class="p-1.5 rounded-lg text-stone-400 hover:text-amber-500 hover:bg-stone-100 dark:hover:bg-emerald-900 transition-colors" title="Xem trên web">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </a>
+              <button onclick="openEditBlogModal('${escapeHtml(post.id)}')" class="p-1.5 rounded-lg text-stone-400 hover:text-amber-500 hover:bg-stone-100 dark:hover:bg-emerald-900 transition-colors" title="Chỉnh sửa">
+                <i data-lucide="edit" class="w-4 h-4"></i>
+              </button>
+              <button onclick="handleDeleteBlogPost('${escapeHtml(post.id)}')" class="p-1.5 rounded-lg text-stone-400 hover:text-red-500 hover:bg-stone-100 dark:hover:bg-emerald-900 transition-colors" title="Xóa">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    if (window.lucide) window.lucide.createIcons();
+  } catch (err) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="6" class="py-8 text-center text-red-500 font-semibold">
+          Lỗi: ${err.message}
+        </td>
+      </tr>
+    `;
+  }
+}
+
+function openCreateBlogModal() {
+  document.getElementById('form-blog-post')?.reset();
+  document.getElementById('blog-id').value = '';
+  document.getElementById('modal-blog-title-heading').textContent = 'Viết Bài Blog Mới';
+  document.getElementById('blog-faq-container').innerHTML = '';
+  // Gợi ý 1 FAQ mẫu
+  addFaqRow('Bài viết này mang lại giá trị thực tiễn gì?', 'Cung cấp phương pháp chiêm nghiệm và bài học ứng dụng cụ thể vào cuộc sống hàng ngày.');
+  openModal('modal-blog-editor');
+  setupEditorPasteAndDrop();
+}
+
+async function openEditBlogModal(id) {
+  try {
+    const res = await fetch(`/api/posts`);
+    const all = await res.json();
+    const post = all.find(p => p.id === id);
+    if (!post) {
+      showToast('Không tìm thấy bài viết');
+      return;
+    }
+
+    document.getElementById('blog-id').value = post.id;
+    document.getElementById('modal-blog-title-heading').textContent = 'Chỉnh Sửa Bài Viết';
+    document.getElementById('blog-title').value = post.title;
+    document.getElementById('blog-slug').value = post.slug;
+    document.getElementById('blog-category').value = post.category || 'Triết học & Đời sống';
+    document.getElementById('blog-cover').value = post.cover_image || '';
+    document.getElementById('blog-summary').value = post.summary || '';
+    document.getElementById('blog-content').value = post.content || '';
+    document.getElementById('blog-author').value = post.author || 'Sophia Codex';
+    document.getElementById('blog-tags').value = post.tags || '';
+    document.getElementById('blog-status').value = post.status || 'PUBLISHED';
+
+    const faqContainer = document.getElementById('blog-faq-container');
+    faqContainer.innerHTML = '';
+    try {
+      const faqs = JSON.parse(post.faq_json || '[]');
+      if (Array.isArray(faqs) && faqs.length > 0) {
+        faqs.forEach(f => addFaqRow(f.q, f.a));
+      } else {
+        addFaqRow();
+      }
+    } catch(e) {
+      addFaqRow();
+    }
+
+    openModal('modal-blog-editor');
+    setupEditorPasteAndDrop();
+  } catch (err) {
+    showToast('Lỗi khi nạp dữ liệu bài viết: ' + err.message);
+  }
+}
+
+function autoGenerateBlogSlug(title) {
+  const slugInput = document.getElementById('blog-slug');
+  if (!slugInput) return;
+  // Chỉ tự sinh nếu slug đang rỗng hoặc chưa bị sửa thủ công
+  const slug = title
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+  slugInput.value = slug;
+}
+
+function insertBlogMarkdown(prefix, suffix, placeholder) {
+  const textarea = document.getElementById('blog-content');
+  if (!textarea) return;
+
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selected = textarea.value.substring(start, end) || placeholder;
+
+  const replacement = prefix + selected + suffix;
+  textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+  textarea.focus();
+  textarea.selectionStart = start + prefix.length;
+  textarea.selectionEnd = start + prefix.length + selected.length;
+}
+
+function addFaqRow(question = '', answer = '') {
+  const container = document.getElementById('blog-faq-container');
+  if (!container) return;
+
+  const row = document.createElement('div');
+  row.className = 'p-3 rounded-xl bg-white dark:bg-emerald-950/70 border border-stone-200 dark:border-emerald-800 space-y-2 relative';
+  row.innerHTML = `
+    <div class="flex items-center justify-between gap-2">
+      <input type="text" placeholder="Câu hỏi thường gặp..." value="${escapeHtml(question)}" class="faq-q w-full px-3 py-1.5 rounded-lg bg-stone-50 dark:bg-emerald-900/40 border border-stone-200 dark:border-emerald-800 text-stone-900 dark:text-stone-100 font-semibold text-xs">
+      <button type="button" onclick="this.closest('.p-3').remove()" class="p-1 rounded text-stone-400 hover:text-red-500">
+        <i data-lucide="trash-2" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <textarea rows="2" placeholder="Câu trả lời ngắn gọn, chuẩn xác..." class="faq-a w-full px-3 py-1.5 rounded-lg bg-stone-50 dark:bg-emerald-900/40 border border-stone-200 dark:border-emerald-800 text-stone-900 dark:text-stone-100 text-xs">${escapeHtml(answer)}</textarea>
+  `;
+  container.appendChild(row);
+  if (window.lucide) window.lucide.createIcons();
+}
+
+async function handleSaveBlogPost(e) {
+  e.preventDefault();
+  const id = document.getElementById('blog-id')?.value;
+  const title = document.getElementById('blog-title')?.value.trim();
+  const slug = document.getElementById('blog-slug')?.value.trim();
+  const category = document.getElementById('blog-category')?.value;
+  const coverImage = document.getElementById('blog-cover')?.value.trim();
+  const summary = document.getElementById('blog-summary')?.value.trim();
+  const content = document.getElementById('blog-content')?.value.trim();
+  const author = document.getElementById('blog-author')?.value.trim();
+  const tags = document.getElementById('blog-tags')?.value.trim();
+  const status = document.getElementById('blog-status')?.value;
+
+  // Lấy danh sách FAQ
+  const faqRows = document.querySelectorAll('#blog-faq-container > div');
+  const faqs = [];
+  faqRows.forEach(row => {
+    const q = row.querySelector('.faq-q')?.value.trim();
+    const a = row.querySelector('.faq-a')?.value.trim();
+    if (q && a) faqs.push({ q, a });
+  });
+
+  const payload = {
+    title,
+    slug,
+    category,
+    cover_image: coverImage,
+    summary,
+    content,
+    author,
+    tags,
+    status,
+    faq_json: faqs
+  };
+
+  try {
+    const url = id ? `/api/posts/${id}` : '/api/posts';
+    const method = id ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.error || 'Lỗi khi lưu bài viết');
+    }
+
+    showToast(id ? '✅ Đã cập nhật bài viết thành công!' : '✅ Đã tạo và xuất bản bài viết thành công!');
+    closeModal('modal-blog-editor');
+    loadAdminBlogPosts();
+  } catch (err) {
+    alert('❌ Không thể lưu bài viết: ' + err.message);
+  }
+}
+
+async function handleDeleteBlogPost(id) {
+  if (!confirm('Bạn có chắc chắn muốn xóa bài viết này?')) return;
+  try {
+    const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Không thể xóa bài viết');
+    showToast('🗑️ Đã xóa bài viết thành công');
+    loadAdminBlogPosts();
+  } catch (err) {
+    alert('Lỗi: ' + err.message);
+  }
+}
+
+// Upload ảnh cover
+async function uploadBlogImageFile(event, targetInputId) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    showToast('⏳ Đang tải ảnh lên...');
+    const res = await fetch('/api/posts/upload-image', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Lỗi upload ảnh');
+
+    document.getElementById(targetInputId).value = data.url;
+    showToast('✅ Tải ảnh bìa thành công!');
+  } catch (err) {
+    alert('Lỗi tải ảnh: ' + err.message);
+  }
+}
+
+// Upload ảnh chèn vào nội dung Markdown
+async function uploadContentImageFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    showToast('⏳ Đang tải ảnh vào nội dung...');
+    const res = await fetch('/api/posts/upload-image', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Lỗi upload ảnh');
+
+    const markdownImg = `\n![${file.name.replace(/\.[^/.]+$/, "")}](${data.url})\n`;
+    insertBlogMarkdown(markdownImg, '', '');
+    showToast('✅ Đã chèn ảnh vào bài viết!');
+  } catch (err) {
+    alert('Lỗi tải ảnh: ' + err.message);
+  }
+}
+
+// Hỗ trợ kéo thả ảnh và Ctrl+V dán ảnh trực tiếp vào textarea
+function setupEditorPasteAndDrop() {
+  const textarea = document.getElementById('blog-content');
+  if (!textarea || textarea.dataset.pasteAttached) return;
+
+  textarea.dataset.pasteAttached = 'true';
+
+  // Sự kiện Ctrl+V dán ảnh từ clipboard
+  textarea.addEventListener('paste', async (e) => {
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    for (const item of items) {
+      if (item.type.indexOf('image') !== -1) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        const formData = new FormData();
+        formData.append('image', file);
+
+        showToast('⏳ Đang tải ảnh dán từ clipboard...');
+        try {
+          const res = await fetch('/api/posts/upload-image', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Lỗi dán ảnh');
+
+          const markdownImg = `\n![Hình ảnh](${data.url})\n`;
+          insertBlogMarkdown(markdownImg, '', '');
+          showToast('✅ Đã dán ảnh thành công!');
+        } catch (err) {
+          alert('Lỗi dán ảnh: ' + err.message);
+        }
+      }
+    }
+  });
+
+  // Sự kiện kéo thả file ảnh
+  textarea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  });
+
+  textarea.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (!file.type.startsWith('image/')) return;
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      showToast('⏳ Đang tải ảnh kéo thả...');
+      try {
+        const res = await fetch('/api/posts/upload-image', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Lỗi tải ảnh');
+
+        const markdownImg = `\n![${file.name.replace(/\.[^/.]+$/, "")}](${data.url})\n`;
+        insertBlogMarkdown(markdownImg, '', '');
+        showToast('✅ Đã chèn ảnh kéo thả thành công!');
+      } catch (err) {
+        alert('Lỗi tải ảnh: ' + err.message);
+      }
+    }
+  });
+}
+
+
 function initModalBackdropDismiss() {
   document.querySelectorAll('[id^="modal-"]').forEach(modal => {
     modal.addEventListener('click', (e) => {
@@ -3390,281 +3781,400 @@ function initSearch() {
   });
 }
 
-
 /**
  * =========================================================================
- * 12. QUẢN LÝ THÙNG RÁC & BẢO LƯU 30 NGÀY (RECYCLE BIN & RESTORE)
+ * 12. PHÂN HỆ QUẢN LÝ BLOG & SOẠN THẢO BÀI VIẾT TỰ ĐỘNG SEO / CHATGPT
  * =========================================================================
  */
-let currentTrashData = { books: [], chapters: [], total: 0 };
-let currentTrashFilter = 'all';
 
-function updateTrashBadge(count) {
-  const badge = document.getElementById('nav-trash-badge');
-  const countBadge = document.getElementById('trash-total-count-badge');
-  if (count !== undefined && count !== null) {
-    if (badge) {
-      badge.textContent = count;
-      if (count > 0) badge.classList.remove('hidden');
-      else badge.classList.add('hidden');
-    }
-    if (countBadge) countBadge.textContent = `${count} mục`;
-    return;
-  }
-  fetch('/api/trash')
-    .then(r => r.ok ? r.json() : null)
-    .then(data => {
-      if (data && typeof data.total === 'number') {
-        if (badge) {
-          badge.textContent = data.total;
-          if (data.total > 0) badge.classList.remove('hidden');
-          else badge.classList.add('hidden');
-        }
-        if (countBadge) countBadge.textContent = `${data.total} mục`;
-      }
-    })
-    .catch(() => {});
+let blogSearchTimeout = null;
+
+function debounceBlogSearch() {
+  clearTimeout(blogSearchTimeout);
+  blogSearchTimeout = setTimeout(() => {
+    loadAdminBlogPosts();
+  }, 300);
 }
 
-async function loadTrashList() {
-  const tableBody = document.getElementById('trash-table-body');
+async function loadAdminBlogPosts() {
+  const tableBody = document.getElementById('admin-blog-table-body');
   if (!tableBody) return;
+
+  const search = document.getElementById('admin-blog-search')?.value || '';
+  const category = document.getElementById('admin-blog-category-filter')?.value || 'ALL';
+  const status = document.getElementById('admin-blog-status-filter')?.value || 'ALL';
 
   tableBody.innerHTML = `
     <tr>
-      <td colspan="6" class="px-4 py-8 text-center text-stone-400">
-        <i data-lucide="loader" class="w-6 h-6 mx-auto mb-2 animate-spin text-amber-500"></i>
-        <div>Đang tải danh sách mục trong thùng rác...</div>
+      <td colspan="6" class="py-8 text-center text-stone-400">
+        <i data-lucide="loader" class="w-5 h-5 animate-spin mx-auto mb-2 text-amber-500"></i>
+        Đang tải danh sách bài viết...
       </td>
     </tr>
   `;
   if (window.lucide) window.lucide.createIcons();
 
   try {
-    const res = await fetch('/api/trash');
-    if (!res.ok) {
-      if (res.status === 401 || res.status === 403) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="6" class="px-4 py-8 text-center text-rose-500">
-              <i data-lucide="shield-alert" class="w-8 h-8 mx-auto mb-2"></i>
-              <div class="font-bold">Phiên đăng nhập quản trị đã hết hạn hoặc không đủ quyền.</div>
-              <div class="text-[11px] text-stone-400 mt-1">Vui lòng đăng nhập lại tài khoản admin@sophiacodex.vn</div>
-            </td>
-          </tr>
-        `;
-        if (window.lucide) window.lucide.createIcons();
-        return;
-      }
-      throw new Error('Lỗi khi tải thùng rác');
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (category !== 'ALL') params.append('category', category);
+    if (status !== 'ALL') params.append('status', status);
+
+    const res = await fetch(`/api/admin/posts?${params.toString()}`);
+    if (!res.ok) throw new Error('Không thể tải danh sách bài viết');
+    const posts = await res.json();
+
+    if (!Array.isArray(posts) || posts.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" class="py-8 text-center text-stone-400 font-serif">
+            Không tìm thấy bài viết nào. Hãy bấm <strong>"Viết Bài Mới"</strong> để đăng tải bài đầu tiên!
+          </td>
+        </tr>
+      `;
+      return;
     }
 
-    const data = await res.json();
-    currentTrashData = data;
+    tableBody.innerHTML = posts.map(post => {
+      const dateStr = new Date(post.created_at).toLocaleDateString('vi-VN');
+      const statusBadge = post.status === 'PUBLISHED'
+        ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Xuất bản</span>'
+        : post.status === 'DRAFT'
+          ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Bản nháp</span>'
+          : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-stone-500/20 text-stone-400 border border-stone-500/30">Lưu trữ</span>';
 
-    const booksCount = (data.books || []).length;
-    const chapsCount = (data.chapters || []).length;
-    const totalCount = booksCount + chapsCount;
+      return `
+        <tr class="hover:bg-stone-50 dark:hover:bg-emerald-950/20 transition-colors">
+          <td class="py-3 px-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-stone-200 dark:bg-emerald-900 overflow-hidden shrink-0">
+                <img src="${post.cover_image || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=200&auto=format&fit=crop'}" class="w-full h-full object-cover">
+              </div>
+              <div class="max-w-md">
+                <div class="font-bold text-stone-900 dark:text-stone-100 line-clamp-1">${escapeHtml(post.title)}</div>
+                <div class="text-[11px] font-mono text-stone-400">/blog/${escapeHtml(post.slug)}</div>
+              </div>
+            </div>
+          </td>
+          <td class="py-3 px-4 font-medium text-stone-600 dark:text-stone-300">${escapeHtml(post.category)}</td>
+          <td class="py-3 px-4">${statusBadge}</td>
+          <td class="py-3 px-4 font-mono font-bold">${post.views || 0}</td>
+          <td class="py-3 px-4 text-stone-500">${dateStr}</td>
+          <td class="py-3 px-4 text-right">
+            <div class="flex items-center justify-end gap-1.5">
+              <a href="/blog/${escapeHtml(post.slug)}" target="_blank" class="p-1.5 rounded-lg text-stone-400 hover:text-amber-500 hover:bg-stone-100 dark:hover:bg-emerald-900 transition-colors" title="Xem trên web">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </a>
+              <button onclick="openEditBlogModal('${escapeHtml(post.id)}')" class="p-1.5 rounded-lg text-stone-400 hover:text-amber-500 hover:bg-stone-100 dark:hover:bg-emerald-900 transition-colors" title="Chỉnh sửa">
+                <i data-lucide="edit" class="w-4 h-4"></i>
+              </button>
+              <button onclick="handleDeleteBlogPost('${escapeHtml(post.id)}')" class="p-1.5 rounded-lg text-stone-400 hover:text-red-500 hover:bg-stone-100 dark:hover:bg-emerald-900 transition-colors" title="Xóa">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
 
-    const countAllEl = document.getElementById('trash-count-all');
-    const countBooksEl = document.getElementById('trash-count-books');
-    const countChapsEl = document.getElementById('trash-count-chapters');
-    const totalBadge = document.getElementById('trash-total-count-badge');
-    const navBadge = document.getElementById('nav-trash-badge');
-
-    if (countAllEl) countAllEl.textContent = totalCount;
-    if (countBooksEl) countBooksEl.textContent = booksCount;
-    if (countChapsEl) countChapsEl.textContent = chapsCount;
-    if (totalBadge) totalBadge.textContent = `${totalCount} mục`;
-    if (navBadge) {
-      navBadge.textContent = totalCount;
-      if (totalCount > 0) navBadge.classList.remove('hidden');
-      else navBadge.classList.add('hidden');
-    }
-
-    renderTrashTable();
+    if (window.lucide) window.lucide.createIcons();
   } catch (err) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="6" class="px-4 py-8 text-center text-rose-500">
-          <div>⚠️ Không thể kết nối đến API Thùng Rác. Vui lòng thử lại sau.</div>
+        <td colspan="6" class="py-8 text-center text-red-500 font-semibold">
+          Lỗi: ${err.message}
         </td>
       </tr>
     `;
   }
 }
 
-function filterTrashTab(type) {
-  currentTrashFilter = type;
-  const filters = ['all', 'book', 'chapter'];
-  filters.forEach(f => {
-    const btn = document.getElementById(`trash-filter-${f === 'book' ? 'books' : f === 'chapter' ? 'chapters' : 'all'}`);
-    if (btn) {
-      if (f === type) {
-        btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-stone-950";
+function openCreateBlogModal() {
+  document.getElementById('form-blog-post')?.reset();
+  document.getElementById('blog-id').value = '';
+  document.getElementById('modal-blog-title-heading').textContent = 'Viết Bài Blog Mới';
+  document.getElementById('blog-faq-container').innerHTML = '';
+  // Gợi ý 1 FAQ mẫu
+  addFaqRow('Bài viết này mang lại giá trị thực tiễn gì?', 'Cung cấp phương pháp chiêm nghiệm và bài học ứng dụng cụ thể vào cuộc sống hàng ngày.');
+  openModal('modal-blog-editor');
+  setupEditorPasteAndDrop();
+}
+
+async function openEditBlogModal(id) {
+  try {
+    const res = await fetch(`/api/posts`);
+    const all = await res.json();
+    const post = all.find(p => p.id === id);
+    if (!post) {
+      showToast('Không tìm thấy bài viết');
+      return;
+    }
+
+    document.getElementById('blog-id').value = post.id;
+    document.getElementById('modal-blog-title-heading').textContent = 'Chỉnh Sửa Bài Viết';
+    document.getElementById('blog-title').value = post.title;
+    document.getElementById('blog-slug').value = post.slug;
+    document.getElementById('blog-category').value = post.category || 'Triết học & Đời sống';
+    document.getElementById('blog-cover').value = post.cover_image || '';
+    document.getElementById('blog-summary').value = post.summary || '';
+    document.getElementById('blog-content').value = post.content || '';
+    document.getElementById('blog-author').value = post.author || 'Sophia Codex';
+    document.getElementById('blog-tags').value = post.tags || '';
+    document.getElementById('blog-status').value = post.status || 'PUBLISHED';
+
+    const faqContainer = document.getElementById('blog-faq-container');
+    faqContainer.innerHTML = '';
+    try {
+      const faqs = JSON.parse(post.faq_json || '[]');
+      if (Array.isArray(faqs) && faqs.length > 0) {
+        faqs.forEach(f => addFaqRow(f.q, f.a));
       } else {
-        btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100";
+        addFaqRow();
       }
+    } catch(e) {
+      addFaqRow();
     }
-  });
-  renderTrashTable();
+
+    openModal('modal-blog-editor');
+    setupEditorPasteAndDrop();
+  } catch (err) {
+    showToast('Lỗi khi nạp dữ liệu bài viết: ' + err.message);
+  }
 }
 
-function renderTrashTable() {
-  const tableBody = document.getElementById('trash-table-body');
-  if (!tableBody) return;
+function autoGenerateBlogSlug(title) {
+  const slugInput = document.getElementById('blog-slug');
+  if (!slugInput) return;
+  // Chỉ tự sinh nếu slug đang rỗng hoặc chưa bị sửa thủ công
+  const slug = title
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+  slugInput.value = slug;
+}
 
-  let items = [];
-  if (currentTrashFilter === 'all' || currentTrashFilter === 'book') {
-    items = items.concat(currentTrashData.books || []);
-  }
-  if (currentTrashFilter === 'all' || currentTrashFilter === 'chapter') {
-    items = items.concat(currentTrashData.chapters || []);
-  }
+function insertBlogMarkdown(prefix, suffix, placeholder) {
+  const textarea = document.getElementById('blog-content');
+  if (!textarea) return;
 
-  if (items.length === 0) {
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="6" class="px-4 py-10 text-center text-stone-400">
-          <i data-lucide="check-circle-2" class="w-10 h-10 mx-auto mb-2 text-emerald-500 opacity-60"></i>
-          <div class="font-semibold text-sm">Thùng rác hiện đang trống</div>
-          <p class="text-[11px] text-stone-500 mt-1">Không có mục nào đang chờ khôi phục hoặc xóa quá hạn.</p>
-        </td>
-      </tr>
-    `;
-    if (window.lucide) window.lucide.createIcons();
-    return;
-  }
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selected = textarea.value.substring(start, end) || placeholder;
 
-  tableBody.innerHTML = items.map(item => {
-    const isBook = item.item_type === 'book';
-    const typeLabel = isBook ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/30">Tác phẩm</span>'
-                             : '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-500/10 text-sky-500 border border-sky-500/30">Chương mục</span>';
-    const title = isBook ? item.title : `${item.chapter_number}: ${item.title}`;
-    const belongsTo = isBook ? `<span class="text-stone-400">Tác phẩm độc lập (${item.chapters_count || 0} chương)</span>`
-                             : `<span class="font-medium text-stone-600 dark:text-stone-300">${item.book_title || item.book_id}</span>`;
-    const deletedDate = item.deleted_at ? new Date(item.deleted_at).toLocaleString('vi-VN') : 'Gần đây';
-    const daysLeft = item.days_remaining !== undefined ? item.days_remaining : 30;
-    
-    let daysBadge = '';
-    if (daysLeft > 10) {
-      daysBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/30">Còn ${daysLeft} ngày</span>`;
-    } else if (daysLeft > 3) {
-      daysBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/30">Còn ${daysLeft} ngày</span>`;
-    } else {
-      daysBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-500 border border-rose-500/30 animate-pulse">Sắp hết hạn (${daysLeft} ngày)</span>`;
-    }
+  const replacement = prefix + selected + suffix;
+  textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+  textarea.focus();
+  textarea.selectionStart = start + prefix.length;
+  textarea.selectionEnd = start + prefix.length + selected.length;
+}
 
-    const safeTitle = (title || '').replace(/'/g, "\\'");
+function addFaqRow(question = '', answer = '') {
+  const container = document.getElementById('blog-faq-container');
+  if (!container) return;
 
-    return `
-      <tr class="hover:bg-stone-50/60 dark:hover:bg-emerald-950/20 transition-colors">
-        <td class="px-4 py-3">${typeLabel}</td>
-        <td class="px-4 py-3">
-          <div class="font-bold text-stone-900 dark:text-stone-100">${title}</div>
-          <div class="text-[10px] text-stone-400 font-mono mt-0.5">ID: ${item.id}</div>
-        </td>
-        <td class="px-4 py-3">${belongsTo}</td>
-        <td class="px-4 py-3 text-stone-500">${deletedDate}</td>
-        <td class="px-4 py-3">${daysBadge}</td>
-        <td class="px-4 py-3 text-right">
-          <div class="flex items-center justify-end gap-1.5">
-            <button onclick="restoreTrashItem('${item.item_type}', '${item.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-all" title="Khôi phục lại dữ liệu này">
-              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-              <span>Khôi Phục</span>
-            </button>
-            <button onclick="permanentDeleteTrashItem('${item.item_type}', '${item.id}', '${safeTitle}')" class="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 hover:text-rose-600 text-xs font-semibold transition-colors" title="Xóa vĩnh viễn không thể khôi phục">
-              <i data-lucide="trash" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
-
+  const row = document.createElement('div');
+  row.className = 'p-3 rounded-xl bg-white dark:bg-emerald-950/70 border border-stone-200 dark:border-emerald-800 space-y-2 relative';
+  row.innerHTML = `
+    <div class="flex items-center justify-between gap-2">
+      <input type="text" placeholder="Câu hỏi thường gặp..." value="${escapeHtml(question)}" class="faq-q w-full px-3 py-1.5 rounded-lg bg-stone-50 dark:bg-emerald-900/40 border border-stone-200 dark:border-emerald-800 text-stone-900 dark:text-stone-100 font-semibold text-xs">
+      <button type="button" onclick="this.closest('.p-3').remove()" class="p-1 rounded text-stone-400 hover:text-red-500">
+        <i data-lucide="trash-2" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <textarea rows="2" placeholder="Câu trả lời ngắn gọn, chuẩn xác..." class="faq-a w-full px-3 py-1.5 rounded-lg bg-stone-50 dark:bg-emerald-900/40 border border-stone-200 dark:border-emerald-800 text-stone-900 dark:text-stone-100 text-xs">${escapeHtml(answer)}</textarea>
+  `;
+  container.appendChild(row);
   if (window.lucide) window.lucide.createIcons();
 }
 
-async function restoreTrashItem(type, id) {
+async function handleSaveBlogPost(e) {
+  e.preventDefault();
+  const id = document.getElementById('blog-id')?.value;
+  const title = document.getElementById('blog-title')?.value.trim();
+  const slug = document.getElementById('blog-slug')?.value.trim();
+  const category = document.getElementById('blog-category')?.value;
+  const coverImage = document.getElementById('blog-cover')?.value.trim();
+  const summary = document.getElementById('blog-summary')?.value.trim();
+  const content = document.getElementById('blog-content')?.value.trim();
+  const author = document.getElementById('blog-author')?.value.trim();
+  const tags = document.getElementById('blog-tags')?.value.trim();
+  const status = document.getElementById('blog-status')?.value;
+
+  // Lấy danh sách FAQ
+  const faqRows = document.querySelectorAll('#blog-faq-container > div');
+  const faqs = [];
+  faqRows.forEach(row => {
+    const q = row.querySelector('.faq-q')?.value.trim();
+    const a = row.querySelector('.faq-a')?.value.trim();
+    if (q && a) faqs.push({ q, a });
+  });
+
+  const payload = {
+    title,
+    slug,
+    category,
+    cover_image: coverImage,
+    summary,
+    content,
+    author,
+    tags,
+    status,
+    faq_json: faqs
+  };
+
   try {
-    const res = await fetch('/api/trash/restore', {
-      method: 'POST',
+    const url = id ? `/api/posts/${id}` : '/api/posts';
+    const method = id ? 'PUT' : 'POST';
+
+    const res = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, id })
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.error || 'Lỗi khi lưu bài viết');
+    }
+
+    showToast(id ? '✅ Đã cập nhật bài viết thành công!' : '✅ Đã tạo và xuất bản bài viết thành công!');
+    closeModal('modal-blog-editor');
+    loadAdminBlogPosts();
+  } catch (err) {
+    alert('❌ Không thể lưu bài viết: ' + err.message);
+  }
+}
+
+async function handleDeleteBlogPost(id) {
+  if (!confirm('Bạn có chắc chắn muốn xóa bài viết này?')) return;
+  try {
+    const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Không thể xóa bài viết');
+    showToast('🗑️ Đã xóa bài viết thành công');
+    loadAdminBlogPosts();
+  } catch (err) {
+    alert('Lỗi: ' + err.message);
+  }
+}
+
+// Upload ảnh cover
+async function uploadBlogImageFile(event, targetInputId) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    showToast('⏳ Đang tải ảnh lên...');
+    const res = await fetch('/api/posts/upload-image', {
+      method: 'POST',
+      body: formData
     });
     const data = await res.json();
-    if (res.ok) {
-      showToast('✨ ' + (data.message || 'Đã khôi phục thành công!'));
-      await loadTrashList();
-      await preloadBooks();
-      loadOverviewDashboard();
-      if (!document.getElementById('tab-books').classList.contains('hidden')) {
-        loadBooksList();
+    if (!res.ok) throw new Error(data.error || 'Lỗi upload ảnh');
+
+    document.getElementById(targetInputId).value = data.url;
+    showToast('✅ Tải ảnh bìa thành công!');
+  } catch (err) {
+    alert('Lỗi tải ảnh: ' + err.message);
+  }
+}
+
+// Upload ảnh chèn vào nội dung Markdown
+async function uploadContentImageFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    showToast('⏳ Đang tải ảnh vào nội dung...');
+    const res = await fetch('/api/posts/upload-image', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Lỗi upload ảnh');
+
+    const markdownImg = `\n![${file.name.replace(/\.[^/.]+$/, "")}](${data.url})\n`;
+    insertBlogMarkdown(markdownImg, '', '');
+    showToast('✅ Đã chèn ảnh vào bài viết!');
+  } catch (err) {
+    alert('Lỗi tải ảnh: ' + err.message);
+  }
+}
+
+// Hỗ trợ kéo thả ảnh và Ctrl+V dán ảnh trực tiếp vào textarea
+function setupEditorPasteAndDrop() {
+  const textarea = document.getElementById('blog-content');
+  if (!textarea || textarea.dataset.pasteAttached) return;
+
+  textarea.dataset.pasteAttached = 'true';
+
+  // Sự kiện Ctrl+V dán ảnh từ clipboard
+  textarea.addEventListener('paste', async (e) => {
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    for (const item of items) {
+      if (item.type.indexOf('image') !== -1) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        const formData = new FormData();
+        formData.append('image', file);
+
+        showToast('⏳ Đang tải ảnh dán từ clipboard...');
+        try {
+          const res = await fetch('/api/posts/upload-image', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Lỗi dán ảnh');
+
+          const markdownImg = `\n![Hình ảnh](${data.url})\n`;
+          insertBlogMarkdown(markdownImg, '', '');
+          showToast('✅ Đã dán ảnh thành công!');
+        } catch (err) {
+          alert('Lỗi dán ảnh: ' + err.message);
+        }
       }
-      if (!document.getElementById('tab-chapters').classList.contains('hidden')) {
-        loadChaptersForBook(currentSelectedBookId);
+    }
+  });
+
+  // Sự kiện kéo thả file ảnh
+  textarea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  });
+
+  textarea.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (!file.type.startsWith('image/')) return;
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      showToast('⏳ Đang tải ảnh kéo thả...');
+      try {
+        const res = await fetch('/api/posts/upload-image', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Lỗi tải ảnh');
+
+        const markdownImg = `\n![${file.name.replace(/\.[^/.]+$/, "")}](${data.url})\n`;
+        insertBlogMarkdown(markdownImg, '', '');
+        showToast('✅ Đã chèn ảnh kéo thả thành công!');
+      } catch (err) {
+        alert('Lỗi tải ảnh: ' + err.message);
       }
-    } else {
-      showToast(`⚠️ Lỗi khôi phục: ${data.error?.message || data.error || 'Vui lòng thử lại'}`);
     }
-  } catch (err) {
-    showToast('⚠️ Lỗi kết nối khi gửi yêu cầu khôi phục');
-  }
+  });
 }
 
-async function permanentDeleteTrashItem(type, id, title) {
-  const itemDesc = type === 'book' ? `Tác phẩm "${title}" cùng toàn bộ các chương` : `Chương "${title}"`;
-  if (!confirm(`🚨 CẢNH BÁO QUAN TRỌNG:\nBạn có chắc chắn muốn XÓA VĨNH VIỄN ${itemDesc} khỏi ổ đĩa?\n\n• Hành động này KHÔNG THỂ HOÀN TÁC.\n• Dữ liệu sẽ biến mất hoàn toàn.`)) {
-    return;
-  }
-
-  try {
-    const res = await fetch(`/api/trash/${type}/${id}`, { method: 'DELETE' });
-    const data = await res.json();
-    if (res.ok) {
-      showToast('🗑️ Đã xóa vĩnh viễn mục khỏi cơ sở dữ liệu!');
-      await loadTrashList();
-      loadOverviewDashboard();
-    } else {
-      showToast(`⚠️ Lỗi: ${data.error || 'Không thể xóa vĩnh viễn'}`);
-    }
-  } catch (err) {
-    showToast('⚠️ Lỗi kết nối API');
-  }
-}
-
-async function purgeExpiredTrashItems() {
-  try {
-    const res = await fetch('/api/trash/purge-expired', { method: 'POST' });
-    const data = await res.json();
-    if (res.ok) {
-      showToast(`🧹 Đã quét và dọn dẹp: ${data.purgedBooks || 0} sách, ${data.purgedChapters || 0} chương quá hạn 30 ngày.`);
-      loadTrashList();
-      loadOverviewDashboard();
-    } else {
-      showToast(`⚠️ Lỗi dọn dẹp: ${data.error || 'Vui lòng thử lại'}`);
-    }
-  } catch (err) {
-    showToast('⚠️ Lỗi kết nối API');
-  }
-}
-
-async function confirmEmptyTrash() {
-  if (!confirm('🚨 CẢNH BÁO:\nBạn có chắc chắn muốn DỌN SẠCH TOÀN BỘ THÙNG RÁC?\n\nTất cả tác phẩm và chương mục trong thùng rác sẽ bị xóa vĩnh viễn ngay lập tức!')) {
-    return;
-  }
-
-  try {
-    const res = await fetch('/api/trash/empty', { method: 'POST' });
-    const data = await res.json();
-    if (res.ok) {
-      showToast('🗑️ Đã dọn sạch toàn bộ thùng rác!');
-      loadTrashList();
-      loadOverviewDashboard();
-    } else {
-      showToast(`⚠️ Lỗi: ${data.error || 'Không thể dọn sạch thùng rác'}`);
-    }
-  } catch (err) {
-    showToast('⚠️ Lỗi kết nối API');
-  }
-}
