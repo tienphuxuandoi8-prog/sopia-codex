@@ -145,13 +145,32 @@ const sqliteApiRouter = require('./modules/sqlite-api');
 app.use('/api', sqliteApiRouter);
 
 // --- 7. Trang Quản trị (Admin Studio) ---
-// Admin HTML nằm trong views/ (bảo vệ bằng guard và session)
-app.get('/admin', (req, res) => {
+// Admin HTML nằm trong views/ — bảo vệ bằng server-side session check + client-side guard
+function requireAdminSession(req, res, next) {
+  const user = req.user;
+  const isAdmin = user && (
+    user.isSuperAdmin === true ||
+    (Array.isArray(user.permissions) && (
+      user.permissions.includes('*') ||
+      user.permissions.includes('admin') ||
+      user.permissions.some(p => typeof p === 'string' && p.startsWith('admin.'))
+    )) ||
+    (Array.isArray(user.roles) && user.roles.includes('admin'))
+  );
+
+  if (!isAdmin) {
+    // Redirect về login với thông báo
+    return res.redirect('/login.html?next=admin.html&reason=auth_required');
+  }
+  next();
+}
+
+app.get('/admin', requireAdminSession, (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'views', 'admin.html'));
 });
 
 // Trang Admin Studio direct file route
-app.get('/admin.html', (req, res) => {
+app.get('/admin.html', requireAdminSession, (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'views', 'admin.html'));
 });
 

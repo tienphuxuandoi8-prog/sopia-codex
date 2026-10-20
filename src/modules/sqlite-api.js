@@ -2,11 +2,48 @@
  * SOPHIA CODEX - SQLITE API CONTROLLER
  * Cung cấp đầy đủ các endpoint REST API cho Bảng Quản Trị (Admin Studio) và Độc Giả,
  * kết nối trực tiếp với động cơ CSDL SQLite (node:sqlite) siêu tốc và ổn định.
+ *
+ * SECURITY: Tất cả route ghi (POST/PUT/DELETE) yêu cầu xác thực Admin từ server-side.
  */
 
 const express = require('express');
 const router = express.Router();
 const dbService = require('../../server/db');
+
+/**
+ * Server-side Admin Auth Middleware cho SQLite API
+ * Kiểm tra session hợp lệ và quyền admin từ req.user (được gán bởi sessionMiddleware)
+ * Không phụ thuộc vào localStorage phía client.
+ */
+function requireAdminAuth(req, res, next) {
+  const user = req.user;
+
+  // Kiểm tra người dùng đã đăng nhập chưa (req.user được gán bởi session middleware)
+  if (!user) {
+    return res.status(401).json({
+      error: { code: 'UNAUTHORIZED', message: 'Yêu cầu đăng nhập để thực hiện thao tác này.' }
+    });
+  }
+
+  // Kiểm tra quyền admin: isSuperAdmin hoặc có permission 'admin' hoặc '*'
+  const isAdmin = (
+    user.isSuperAdmin === true ||
+    (Array.isArray(user.permissions) && (
+      user.permissions.includes('*') ||
+      user.permissions.includes('admin') ||
+      user.permissions.some(p => typeof p === 'string' && p.startsWith('admin.'))
+    )) ||
+    (Array.isArray(user.roles) && user.roles.includes('admin'))
+  );
+
+  if (!isAdmin) {
+    return res.status(403).json({
+      error: { code: 'FORBIDDEN', message: 'Bạn không có quyền Quản Trị để thực hiện thao tác này.' }
+    });
+  }
+
+  next();
+}
 
 // --- OVERVIEW DASHBOARD ---
 router.get('/overview', (req, res) => {
@@ -39,7 +76,7 @@ router.get('/books/:id', (req, res) => {
   }
 });
 
-router.post('/books', (req, res) => {
+router.post('/books', requireAdminAuth, (req, res) => {
   try {
     const body = req.body;
     if (!body.title || !body.author) {
@@ -55,7 +92,7 @@ router.post('/books', (req, res) => {
   }
 });
 
-router.put('/books/:id', (req, res) => {
+router.put('/books/:id', requireAdminAuth, (req, res) => {
   try {
     const updated = dbService.updateBook(req.params.id, req.body);
     res.json(updated);
@@ -64,7 +101,7 @@ router.put('/books/:id', (req, res) => {
   }
 });
 
-router.delete('/books/:id', (req, res) => {
+router.delete('/books/:id', requireAdminAuth, (req, res) => {
   try {
     const result = dbService.deleteBook(req.params.id);
     res.json(result);
@@ -82,7 +119,7 @@ router.get('/books/:id/chapters', (req, res) => {
   }
 });
 
-router.post('/books/:id/smart-ingest', (req, res) => {
+router.post('/books/:id/smart-ingest', requireAdminAuth, (req, res) => {
   try {
     if (!req.body.rawText) {
       return res.status(400).json({ error: 'Nội dung văn bản (rawText) là bắt buộc' });
@@ -105,7 +142,7 @@ router.get('/chapters/:id', (req, res) => {
   }
 });
 
-router.post('/chapters', (req, res) => {
+router.post('/chapters', requireAdminAuth, (req, res) => {
   try {
     const chapId = dbService.createChapter(req.body);
     res.status(201).json({ success: true, id: chapId });
@@ -114,7 +151,7 @@ router.post('/chapters', (req, res) => {
   }
 });
 
-router.put('/chapters/:id', (req, res) => {
+router.put('/chapters/:id', requireAdminAuth, (req, res) => {
   try {
     const updated = dbService.updateChapter(req.params.id, req.body);
     res.json(updated);
@@ -123,7 +160,7 @@ router.put('/chapters/:id', (req, res) => {
   }
 });
 
-router.delete('/chapters/:id', (req, res) => {
+router.delete('/chapters/:id', requireAdminAuth, (req, res) => {
   try {
     const result = dbService.deleteChapter(req.params.id);
     res.json(result);
@@ -152,7 +189,7 @@ router.get('/quotes/:id', (req, res) => {
   }
 });
 
-router.post('/quotes', (req, res) => {
+router.post('/quotes', requireAdminAuth, (req, res) => {
   try {
     const id = dbService.createQuote(req.body);
     res.status(201).json({ success: true, id });
@@ -161,7 +198,7 @@ router.post('/quotes', (req, res) => {
   }
 });
 
-router.put('/quotes/:id', (req, res) => {
+router.put('/quotes/:id', requireAdminAuth, (req, res) => {
   try {
     const updated = dbService.updateQuote(req.params.id, req.body);
     res.json(updated);
@@ -170,7 +207,7 @@ router.put('/quotes/:id', (req, res) => {
   }
 });
 
-router.delete('/quotes/:id', (req, res) => {
+router.delete('/quotes/:id', requireAdminAuth, (req, res) => {
   try {
     const result = dbService.deleteQuote(req.params.id);
     res.json(result);
@@ -179,7 +216,7 @@ router.delete('/quotes/:id', (req, res) => {
   }
 });
 
-router.put('/quotes/:id/daily', (req, res) => {
+router.put('/quotes/:id/daily', requireAdminAuth, (req, res) => {
   try {
     const result = dbService.setDailyQuote(req.params.id);
     res.json(result);
@@ -226,7 +263,7 @@ router.get('/philosophers/:id', (req, res) => {
   }
 });
 
-router.post('/philosophers', (req, res) => {
+router.post('/philosophers', requireAdminAuth, (req, res) => {
   try {
     const id = dbService.createPhilosopher(req.body);
     res.status(201).json({ success: true, id });
@@ -235,7 +272,7 @@ router.post('/philosophers', (req, res) => {
   }
 });
 
-router.put('/philosophers/:id', (req, res) => {
+router.put('/philosophers/:id', requireAdminAuth, (req, res) => {
   try {
     const updated = dbService.updatePhilosopher(req.params.id, req.body);
     res.json(updated);
@@ -244,7 +281,7 @@ router.put('/philosophers/:id', (req, res) => {
   }
 });
 
-router.delete('/philosophers/:id', (req, res) => {
+router.delete('/philosophers/:id', requireAdminAuth, (req, res) => {
   try {
     const result = dbService.deletePhilosopher(req.params.id);
     res.json(result);
@@ -263,8 +300,8 @@ router.get('/categories', (req, res) => {
   }
 });
 
-// --- AI SOCRATES HUB ---
-router.get('/ai/stats', (req, res) => {
+// --- AI SOCRATES HUB (Admin xem stats/conversations; user tự xóa của mình) ---
+router.get('/ai/stats', requireAdminAuth, (req, res) => {
   try {
     const stats = dbService.getAiHubStats();
     res.json(stats);
@@ -273,7 +310,7 @@ router.get('/ai/stats', (req, res) => {
   }
 });
 
-router.get('/ai/conversations', (req, res) => {
+router.get('/ai/conversations', requireAdminAuth, (req, res) => {
   try {
     const convs = dbService.getAllAiConversations(req.query.book_id || null);
     res.json(convs);
@@ -291,7 +328,7 @@ router.post('/ai/conversations', (req, res) => {
   }
 });
 
-router.delete('/ai/conversations/:id', (req, res) => {
+router.delete('/ai/conversations/:id', requireAdminAuth, (req, res) => {
   try {
     const result = dbService.deleteAiConversation(req.params.id);
     res.json(result);
@@ -300,7 +337,7 @@ router.delete('/ai/conversations/:id', (req, res) => {
   }
 });
 
-router.delete('/ai/conversations', (req, res) => {
+router.delete('/ai/conversations', requireAdminAuth, (req, res) => {
   try {
     const result = dbService.clearAiConversations(req.query.book_id || null);
     res.json(result);
@@ -319,8 +356,8 @@ router.post('/reading-logs', (req, res) => {
   }
 });
 
-// --- DATABASE HEALTH & BACKUP ---
-router.get('/db/health', (req, res) => {
+// --- DATABASE HEALTH & BACKUP (Admin only) ---
+router.get('/db/health', requireAdminAuth, (req, res) => {
   try {
     const health = dbService.getDbHealth();
     res.json(health);
@@ -329,7 +366,7 @@ router.get('/db/health', (req, res) => {
   }
 });
 
-router.post('/db/backup', (req, res) => {
+router.post('/db/backup', requireAdminAuth, (req, res) => {
   try {
     const result = dbService.backupDatabase();
     res.json(result);
@@ -338,7 +375,7 @@ router.post('/db/backup', (req, res) => {
   }
 });
 
-router.post('/db/reseed', (req, res) => {
+router.post('/db/reseed', requireAdminAuth, (req, res) => {
   try {
     const result = dbService.reseedDatabase();
     res.json(result);

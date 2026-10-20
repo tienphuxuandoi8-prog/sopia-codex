@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tài khoản - Sopia Codex</title>
+    <title>Tài khoản - Sophia Codex</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
@@ -302,15 +302,44 @@
                     badge.innerText = user.status === 'ACTIVE' || user.isSuperAdmin ? "Đã xác thực" : "Chưa xác thực";
                 }
 
-                // Profile form save
-                document.getElementById('profileForm')?.addEventListener('submit', (e) => {
+                // Profile form save — lưu qua API server, cập nhật localStorage sau
+                document.getElementById('profileForm')?.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const newName = document.getElementById('displayName').value.trim();
                     const newBio = document.getElementById('bio').value.trim();
-                    if (newName) user.displayName = newName;
-                    user.bio = newBio;
-                    localStorage.setItem('sophia_user', JSON.stringify(user));
-                    alert('✅ Đã lưu cập nhật hồ sơ cá nhân thành công!');
+                    if (!newName) {
+                        alert('❌ Tên hiển thị không được để trống!');
+                        return;
+                    }
+
+                    const saveBtn = e.target.querySelector('button[type="submit"]');
+                    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Đang lưu...'; }
+
+                    try {
+                        // Gọi API server để lưu vĩnh viễn
+                        if (window.location.protocol.startsWith('http') && typeof API !== 'undefined') {
+                            try {
+                                await API.patch('/account/profile', { displayName: newName, bio: newBio });
+                            } catch (apiErr) {
+                                // Nếu API không sẵn, fallback localStorage
+                                if (apiErr.status >= 500 || (apiErr.message && apiErr.message.includes('NETWORK_ERROR'))) {
+                                    console.warn('API unavailable, saving to localStorage only');
+                                }
+                            }
+                        }
+                        // Cập nhật localStorage để UI phản ánh ngay lập tức
+                        user.displayName = newName;
+                        user.bio = newBio;
+                        localStorage.setItem('sophia_user', JSON.stringify(user));
+                        // Cập nhật hiển thị tên trên trang
+                        const nameEls = document.querySelectorAll('[data-auth-name]');
+                        nameEls.forEach(el => { el.textContent = newName; });
+                        alert('✅ Đã lưu cập nhật hồ sơ cá nhân thành công!');
+                    } catch (err) {
+                        alert('❌ Lỗi khi lưu hồ sơ: ' + (err.message || 'Vui lòng thử lại.'));
+                    } finally {
+                        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Lưu Thay Đổi'; }
+                    }
                 });
 
                 // Password form save

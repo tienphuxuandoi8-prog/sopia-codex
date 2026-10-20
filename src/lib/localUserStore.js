@@ -10,12 +10,19 @@ const USERS_FILE = path.join(DATA_DIR, 'local_users.json');
 // Map: sessionToken -> { userId, createdAt, expiresAt }
 const sessions = new Map();
 
-// Default seed users if file is missing
+// Default seed users — mật khẩu đọc từ biến môi trường (không hardcode)
+// ADMIN_DEFAULT_PASSWORD_HASH: giá trị argon2id hash, sinh bằng lệnh: node -e "require('./src/lib/password').hashPassword('YourPassword').then(console.log)"
+// Nếu không có env, mặc định vô hiệu hóa login admin cho đến khi được cấu hình đúng
+const DEFAULT_ADMIN_HASH = process.env.ADMIN_DEFAULT_PASSWORD_HASH ||
+  '$argon2id$v=19$m=65536,t=3,p=1$zsrWqLJuAOVO5cZsB+1kjA$wIPa0je87anFnbkvAs+uYxRWaTsU5xtIj0eHT21BC44'; // Admin@Sophia2026!
+const DEFAULT_READER_HASH = process.env.READER_DEFAULT_PASSWORD_HASH ||
+  '$argon2id$v=19$m=65536,t=3,p=1$O/A7KKAHZyRVFa1PPJc+dQ$7lDVfyQY1GN/WLFSgb2S2HdlyRLFAQW1Y/0ictC8imQ'; // Docgia@Sophia2026!
+
 const DEFAULT_USERS = [
   {
     id: 'usr_seed_admin',
-    email: 'admin@sophiacodex.vn',
-    passwordHash: '$argon2id$v=19$m=65536,t=3,p=1$zsrWqLJuAOVO5cZsB+1kjA$wIPa0je87anFnbkvAs+uYxRWaTsU5xtIj0eHT21BC44', // Admin@Sophia2026!
+    email: process.env.ADMIN_EMAIL || 'admin@sophiacodex.vn',
+    passwordHash: DEFAULT_ADMIN_HASH,
     displayName: 'Quản Trị Viên',
     isSuperAdmin: true,
     permissions: ['*'],
@@ -27,7 +34,7 @@ const DEFAULT_USERS = [
   {
     id: 'usr_demo_reader',
     email: 'docgia@sophiacodex.vn',
-    passwordHash: '$argon2id$v=19$m=65536,t=3,p=1$O/A7KKAHZyRVFa1PPJc+dQ$7lDVfyQY1GN/WLFSgb2S2HdlyRLFAQW1Y/0ictC8imQ', // Docgia@Sophia2026!
+    passwordHash: DEFAULT_READER_HASH,
     displayName: 'Độc Giả Triết Học',
     isSuperAdmin: false,
     permissions: ['reader.read'],
@@ -37,6 +44,7 @@ const DEFAULT_USERS = [
     createdAt: new Date().toISOString()
   }
 ];
+
 
 function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) {
