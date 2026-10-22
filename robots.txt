@@ -1,0 +1,79 @@
+# ==========================================
+# SOPHIA CODEX - ROBOTS.TXT
+# Chuẩn hóa Technical SEO, AEO & GEO
+# ==========================================
+
+# 1. Cấu hình chung cho mọi Web Crawler & Search Engine
+User-agent: *
+Allow: /
+Allow: /library.html
+Allow: /pricing.html
+Allow: /privacy.html
+Allow: /terms.html
+Allow: /views/blog-list.html
+Allow: /views/blog-detail.html
+Allow: /assets/
+Allow: /css/
+Allow: /js/
+
+# Chặn thu thập dữ liệu khu vực bảo mật, tài khoản và quản trị
+Disallow: /admin.html
+Disallow: /views/admin.html
+Disallow: /account.html
+Disallow: /api/admin/
+Disallow: /api/auth/
+Disallow: /api/payments/
+Disallow: /data/
+Disallow: /server/
+Disallow: /prisma/
+Disallow: /login.html
+Disallow: /register.html
+Disallow: /forgot-password.html
+Disallow: /reset-password.html
+Disallow: /verify-email.html
+
+# 2. Cấu hình tối ưu hóa cho AI Search & GEO (Generative Engine Optimization)
+# Cho phép GPTBot (OpenAI / ChatGPT Search) cào nội dung triết học để trích dẫn
+User-agent: GPTBot
+Allow: /
+Disallow: /admin.html
+Disallow: /account.html
+Disallow: /api/admin/
+
+# Cho phép PerplexityBot (Perplexity AI) trích dẫn nguồn học thuật
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin.html
+Disallow: /account.html
+Disallow: /api/admin/
+
+# Cho phép Google-Extended (Google Gemini & AI Overviews)
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin.html
+Disallow: /account.html
+Disallow: /api/admin/
+
+# Cho phép ClaudeBot (Anthropic)
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin.html
+Disallow: /account.html
+Disallow: /api/admin/
+
+# Cho phép Applebot-Extended (Apple Intelligence)
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin.html
+Disallow: /account.html
+Disallow: /api/admin/
+
+# Cho phép Cohere AI Crawler
+User-agent: cohere-ai
+Allow: /
+Disallow: /admin.html
+Disallow: /account.html
+Disallow: /api/admin/
+
+# 3. Khai báo Sơ đồ trang web (Sitemap XML)
+Sitemap: https://vusitien.click/sitemap.xml
