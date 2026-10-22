@@ -1268,3 +1268,88 @@ window.closeBookAnnotationModal = function() {
   }
 };
 
+
+
+// ==================== DYNAMIC BLOG POSTS LOADER FOR HOMEPAGE ====================
+async function loadHomeBlogPosts() {
+  const container = document.getElementById('home-blog-grid');
+  if (!container) return;
+
+  try {
+    const res = await fetch('/api/posts?status=PUBLISHED&limit=3');
+    if (!res.ok) throw new Error('Không thể nạp bài viết từ máy chủ');
+    const posts = await res.json();
+
+    if (!Array.isArray(posts) || posts.length === 0) {
+      container.innerHTML = `
+        <div class="col-span-full py-10 px-4 text-center rounded-2xl bg-stone-50 dark:bg-emerald-950/30 border border-stone-200 dark:border-emerald-800/40">
+          <p class="text-sm font-reading text-stone-500 dark:text-stone-400">Chưa có bài viết nào được xuất bản.</p>
+          <a href="/admin.html" class="inline-block mt-3 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline">
+            Vào Bảng Quản Trị để đăng bài viết đầu tiên &rarr;
+          </a>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = posts.map(post => {
+      const cover = post.cover_image || 'assets/blog/blog-default.jpg';
+      const date = new Date(post.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const readTime = post.reading_time || 5;
+      const safeTitle = (post.title || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeSummary = (post.summary || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeCategory = (post.category || 'Triết học').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeAuthor = (post.author || 'Sophia Codex').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeSlug = (post.slug || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      return `
+        <article class="group bg-white dark:bg-[#0E1A13] rounded-2xl border border-stone-200/90 dark:border-emerald-900/60 overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col h-full hover:-translate-y-1 duration-300">
+          <a href="/blog/${safeSlug}" class="block aspect-video overflow-hidden relative">
+            <img src="${cover}" alt="${safeTitle}" onerror="this.onerror=null; this.src='assets/blog/blog-default.jpg';" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+            <span class="absolute top-3 left-3 px-2.5 py-1 text-[11px] font-semibold bg-emerald-950/80 backdrop-blur-md text-amber-300 rounded-full border border-amber-500/30">
+              ${safeCategory}
+            </span>
+          </a>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2.5 text-[11px] text-stone-500 dark:text-stone-400 mb-2 font-mono">
+                <span>${date}</span>
+                <span>•</span>
+                <span>${readTime} phút đọc</span>
+              </div>
+              <h4 class="font-display font-bold text-base md:text-lg text-stone-900 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 mb-2 leading-snug">
+                <a href="/blog/${safeSlug}">${safeTitle}</a>
+              </h4>
+              <p class="font-reading text-xs text-stone-600 dark:text-stone-300 line-clamp-2 leading-relaxed mb-4">
+                ${safeSummary}
+              </p>
+            </div>
+            <div class="pt-3 border-t border-stone-100 dark:border-emerald-900/40 flex items-center justify-between text-xs">
+              <span class="text-[11px] text-stone-500 dark:text-stone-400">Tác giả: <strong class="text-stone-700 dark:text-stone-300">${safeAuthor}</strong></span>
+              <a href="/blog/${safeSlug}" class="font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Đọc bài &rarr;
+              </a>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    if (window.lucide) window.lucide.createIcons();
+  } catch (err) {
+    console.warn('Lỗi tải bài viết trang chủ:', err);
+    container.innerHTML = `
+      <div class="col-span-full py-6 text-center text-stone-400 text-xs">
+        Tạm thời chưa thể tải danh sách bài viết. Vui lòng thử lại sau.
+      </div>
+    `;
+  }
+}
+
+// Tự động nạp bài viết khi DOM sẵn sàng
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadHomeBlogPosts);
+} else {
+  loadHomeBlogPosts();
+}
+window.loadHomeBlogPosts = loadHomeBlogPosts;

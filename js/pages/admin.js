@@ -3794,7 +3794,7 @@ function openCreateBlogModal() {
 
 async function openEditBlogModal(id) {
   try {
-    const res = await fetch('/api/posts');
+    let res = await fetch('/api/admin/posts'); if (!res.ok) res = await fetch('/api/posts');
     const all = await res.json();
     const post = all.find(p => p.id === id);
     if (!post) {
@@ -3919,15 +3919,23 @@ async function handleSaveBlogPost(e) {
     const url = id ? `/api/posts/${id}` : '/api/posts';
     const method = id ? 'PUT' : 'POST';
 
+    const token = localStorage.getItem('token') || '';
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
     const res = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers,
+      credentials: 'include',
       body: JSON.stringify(payload)
     });
 
     if (!res.ok) {
-      const errData = await res.json();
-      throw new Error(errData.error || 'Lỗi khi lưu bài viết');
+      const errData = await res.json().catch(() => ({}));
+      const errMsg = typeof errData.error === 'object' 
+        ? (errData.error.message || JSON.stringify(errData.error))
+        : (errData.error || errData.message || 'Lỗi khi lưu bài viết');
+      throw new Error(errMsg);
     }
 
     showToast(id ? '✅ Đã cập nhật bài viết thành công!' : '✅ Đã tạo và xuất bản bài viết thành công!');
@@ -3941,8 +3949,22 @@ async function handleSaveBlogPost(e) {
 async function handleDeleteBlogPost(id) {
   if (!confirm('Bạn có chắc chắn muốn xóa bài viết này?')) return;
   try {
-    const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Không thể xóa bài viết');
+    const token = localStorage.getItem('token') || '';
+    const headers = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    const res = await fetch(`/api/posts/${id}`, {
+      method: 'DELETE',
+      headers,
+      credentials: 'include'
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      const errMsg = typeof errData.error === 'object'
+        ? (errData.error.message || JSON.stringify(errData.error))
+        : (errData.error || errData.message || 'Không thể xóa bài viết');
+      throw new Error(errMsg);
+    }
     showToast('🗑️ Đã xóa bài viết thành công');
     loadAdminBlogPosts();
   } catch (err) {
@@ -3959,8 +3981,13 @@ async function uploadBlogImageFile(event, targetInputId) {
 
   try {
     showToast('⏳ Đang tải ảnh lên...');
+    const uploadHeaders = {};
+    const uploadToken = localStorage.getItem('token') || '';
+    if (uploadToken) uploadHeaders['Authorization'] = 'Bearer ' + uploadToken;
     const res = await fetch('/api/posts/upload-image', {
       method: 'POST',
+      headers: uploadHeaders,
+      credentials: 'include',
       body: formData
     });
     const data = await res.json();
@@ -3982,8 +4009,13 @@ async function uploadContentImageFile(event) {
 
   try {
     showToast('⏳ Đang tải ảnh vào nội dung...');
+    const uploadHeaders = {};
+    const uploadToken = localStorage.getItem('token') || '';
+    if (uploadToken) uploadHeaders['Authorization'] = 'Bearer ' + uploadToken;
     const res = await fetch('/api/posts/upload-image', {
       method: 'POST',
+      headers: uploadHeaders,
+      credentials: 'include',
       body: formData
     });
     const data = await res.json();
@@ -4014,10 +4046,15 @@ function setupEditorPasteAndDrop() {
 
         showToast('⏳ Đang tải ảnh dán từ clipboard...');
         try {
-          const res = await fetch('/api/posts/upload-image', {
-            method: 'POST',
-            body: formData
-          });
+          const uploadHeaders = {};
+    const uploadToken = localStorage.getItem('token') || '';
+    if (uploadToken) uploadHeaders['Authorization'] = 'Bearer ' + uploadToken;
+    const res = await fetch('/api/posts/upload-image', {
+      method: 'POST',
+      headers: uploadHeaders,
+      credentials: 'include',
+      body: formData
+    });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Lỗi dán ảnh');
 
@@ -4046,10 +4083,15 @@ function setupEditorPasteAndDrop() {
 
       showToast('⏳ Đang tải ảnh kéo thả...');
       try {
-        const res = await fetch('/api/posts/upload-image', {
-          method: 'POST',
-          body: formData
-        });
+        const uploadHeaders = {};
+    const uploadToken = localStorage.getItem('token') || '';
+    if (uploadToken) uploadHeaders['Authorization'] = 'Bearer ' + uploadToken;
+    const res = await fetch('/api/posts/upload-image', {
+      method: 'POST',
+      headers: uploadHeaders,
+      credentials: 'include',
+      body: formData
+    });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Lỗi tải ảnh');
 

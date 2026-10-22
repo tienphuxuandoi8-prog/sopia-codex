@@ -157,6 +157,12 @@
           <span>Quản Trị</span>
         </a>
 
+        <!-- Blog Link -->
+        <a href="/blog" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-stone-200/80 dark:bg-emerald-900/60 hover:bg-stone-300 dark:hover:bg-emerald-900 text-stone-800 dark:text-stone-200 border border-stone-300/60 dark:border-emerald-800/60 transition-all" title="Blog Minh Triết">
+          <i data-lucide="newspaper" class="w-3.5 h-3.5 text-amber-500"></i>
+          <span>Blog</span>
+        </a>
+
         <!-- AI Companion Sidebar Toggle -->
         <button id="ai-toggle-btn" 
                 class="flex items-center gap-2 bg-gradient-to-r from-emerald-950 to-[#10241A] hover:opacity-95 text-amber-200 px-3.5 py-2 rounded-full text-xs md:text-sm font-semibold shadow-md border border-amber-500/40 transition-all hover:scale-[1.02]">
@@ -231,6 +237,16 @@
              title="Tủ Sách Cá Nhân & Sổ Tay Ghi Chú">
             <i data-lucide="bookmark" class="nav-icon w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0"></i>
             <span class="md:hidden lg:inline">Tủ Sách & Trích Dẫn</span>
+          </a>
+
+          <!-- 2.5. Blog Minh Triết -->
+          <a id="nav-btn-blog"
+             data-nav-id="blog"
+             href="/blog"
+             class="sidebar-nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-200/60 dark:hover:bg-emerald-900/60 border border-transparent transition-all text-left"
+             title="Blog Minh Triết và Chiêm Nghiệm Cuộc Sống">
+            <i data-lucide="newspaper" class="nav-icon w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0"></i>
+            <span class="md:hidden lg:inline">Blog & Chiêm Nghiệm</span>
           </a>
 
           <!-- 3. Gói Sophia Premium -->
@@ -801,6 +817,34 @@
             <button id="random-quote-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs bg-white dark:bg-emerald-950 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-emerald-800 shadow-sm hover:bg-stone-100 transition-colors">
               <i data-lucide="refresh-cw" class="w-3 h-3"></i> Đổi danh ngôn khác
             </button>
+          </div>
+        </div>
+
+      
+        <!-- SECTION: BÀI VIẾT VÀ CHIÊM NGHIỆM MINH TRIẾT (BLOG SYSTEM) -->
+        <div id="home-blog-section" class="p-6 md:p-8 rounded-3xl bg-white/80 dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/25 mb-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Chiêm Nghiệm Mới Nhất
+              </div>
+              <h3 class="font-display font-bold text-xl md:text-2xl text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <i data-lucide="newspaper" class="w-5 h-5 text-amber-600 dark:text-amber-400"></i>
+                Góc Nhìn Minh Triết Trong Thời Đại Số
+              </h3>
+              <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">Những bài viết thực hành triết học, nghệ thuật sống tĩnh tại và thức tỉnh nội tâm</p>
+            </div>
+            <a href="/blog" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline shrink-0">
+              Xem tất cả bài viết <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- Dynamic Blog Cards Grid (Nạp tự động qua API /api/posts) -->
+          <div id="home-blog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full py-10 text-center text-stone-400 dark:text-stone-500">
+              <i data-lucide="loader" class="w-5 h-5 animate-spin mx-auto mb-2 text-amber-500"></i>
+              Đang tải các bài viết mới nhất...
+            </div>
           </div>
         </div>
 
