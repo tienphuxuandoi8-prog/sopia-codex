@@ -239,6 +239,75 @@ class ReaderEngine {
       const chap = (book.chapters && book.chapters[chapterIndex]) ? book.chapters[chapterIndex] : null;
       window.aiChat.setContext(book, chap);
     }
+
+    // Dynamic On-Page Meta & OpenGraph Update (SEO / AEO Chuẩn SOPHIA-SEO)
+    this.updateDynamicBookSEO(book);
+  }
+
+  updateDynamicBookSEO(book) {
+    if (!book) return;
+    try {
+      const bookTitle = book.title || 'Tác Phẩm Triết Học';
+      const authorName = book.author || 'Hiền Triết';
+      const cleanTitle = bookTitle.replace(/\s*\(.*?\)\s*/g, '').trim();
+      
+      // 1. Chuẩn hóa Document Title (< 60 ký tự)
+      const dynamicTitle = `${cleanTitle} — ${authorName} | Sophia Codex`;
+      document.title = dynamicTitle;
+
+      // 2. Chuẩn hóa Meta Description (140 - 155 ký tự)
+      let metaDesc = book.summary || book.annotation || '';
+      metaDesc = metaDesc.replace(/[\r\n]+/g, ' ').trim();
+      if (metaDesc.length > 152) {
+        metaDesc = metaDesc.substring(0, 149).trim() + '...';
+      } else if (metaDesc.length < 135) {
+        metaDesc = `Đọc toàn văn ${cleanTitle} của ${authorName} tại Sophia Codex. ${metaDesc}`.trim();
+        if (metaDesc.length > 152) metaDesc = metaDesc.substring(0, 149).trim() + '...';
+      }
+
+      const updateTag = (selector, attr, value) => {
+        let el = document.querySelector(selector);
+        if (el) {
+          el.setAttribute(attr, value);
+        } else {
+          el = document.createElement('meta');
+          const [key, val] = selector.replace(/[\[\]"]/g, '').split('=');
+          el.setAttribute(key, val);
+          el.setAttribute(attr, value);
+          document.head.appendChild(el);
+        }
+      };
+
+      updateTag('meta[name="description"]', 'content', metaDesc);
+      updateTag('meta[property="og:title"]', 'content', dynamicTitle);
+      updateTag('meta[property="og:description"]', 'content', metaDesc);
+      updateTag('meta[property="og:type"]', 'content', 'book');
+      
+      const bookUrl = `https://vusitien.click/?book=${encodeURIComponent(book.id || book.slug)}`;
+      updateTag('meta[property="og:url"]', 'content', bookUrl);
+
+      let canonicalEl = document.querySelector('link[rel="canonical"]');
+      if (canonicalEl) {
+        canonicalEl.setAttribute('href', bookUrl);
+      }
+
+      if (book.coverImage) {
+        const fullImg = book.coverImage.startsWith('http') ? book.coverImage : `https://vusitien.click/${book.coverImage.replace(/^\//, '')}`;
+        updateTag('meta[property="og:image"]', 'content', fullImg);
+        updateTag('meta[name="twitter:image"]', 'content', fullImg);
+      }
+      updateTag('meta[name="twitter:title"]', 'content', dynamicTitle);
+      updateTag('meta[name="twitter:description"]', 'content', metaDesc);
+
+      // Đồng bộ URL query param trên trình duyệt không tải lại trang
+      if (window.history && window.history.pushState) {
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('book', book.id || book.slug);
+        window.history.pushState({ bookId: book.id }, dynamicTitle, newUrl.toString());
+      }
+    } catch (e) {
+      console.warn('Lỗi cập nhật Dynamic SEO Meta:', e);
+    }
   }
 
   closeReader() {
@@ -248,6 +317,28 @@ class ReaderEngine {
       window.audioEngine.stop();
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Khôi phục Default Title & Meta
+    document.title = 'Sophia Codex — Thư Viện Triết Học Toàn Cầu & Đối Thoại Socrates AI';
+    const defaultDesc = 'Khám phá Sophia Codex: Thư viện triết học toàn văn kinh điển phương Đông & Tây (Đạo Đức Kinh, Suy Tưởng, Cộng Hòa) cùng trợ lý triết học AI Socrates phản tư sâu sắc.';
+    const updateTag = (selector, attr, value) => {
+      const el = document.querySelector(selector);
+      if (el) el.setAttribute(attr, value);
+    };
+    updateTag('meta[name="description"]', 'content', defaultDesc);
+    updateTag('meta[property="og:title"]', 'content', 'Sophia Codex — Thư Viện Triết Học Toàn Cầu & Đối Thoại Socrates AI');
+    updateTag('meta[property="og:description"]', 'content', 'Thư viện triết học số tinh hoa với văn bản toàn văn, giọng đọc Audio Studio, nhạc nền thiền và trợ lý AI Socrates đồng hành chiêm nghiệm.');
+    updateTag('meta[property="og:type"]', 'content', 'website');
+    updateTag('meta[property="og:url"]', 'content', 'https://vusitien.click/');
+    updateTag('meta[property="og:image"]', 'content', 'https://vusitien.click/assets/covers/suy-tuong.svg');
+    const canonicalEl = document.querySelector('link[rel="canonical"]');
+    if (canonicalEl) canonicalEl.setAttribute('href', 'https://vusitien.click/');
+
+    if (window.history && window.history.pushState) {
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('book');
+      window.history.pushState({}, document.title, newUrl.pathname + (newUrl.search ? newUrl.search : ''));
+    }
   }
 
   renderTOC() {

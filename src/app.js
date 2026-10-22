@@ -56,7 +56,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// --- 3. Static Assets (phục vụ frontend từ public/) ---
+// --- 3. SEO & AI Engine Routes (Ưu tiên động cho sitemap.xml, robots.txt, llms.txt) ---
+app.use('/', seoRoutes);
+
+// --- 3.1 Static Assets (phục vụ frontend từ public/) ---
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 app.use(express.static(PUBLIC_DIR, {
   maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
@@ -152,8 +155,7 @@ apiV1Router.get('/cron/daily', async (req, res) => {
 // Gắn API v1 Router
 app.use('/api/v1', apiV1Router);
 
-// --- 5.1 Blog & SEO / AI Crawler Routes ---
-app.use('/', seoRoutes);
+// --- 5.1 Blog Routes ---
 app.use('/blog', blogRoutes);
 
 // --- 6. SQLite API Router (hỗ trợ toàn bộ Admin Studio & REST API) ---

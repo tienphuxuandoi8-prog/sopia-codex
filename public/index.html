@@ -41,7 +41,7 @@
     gtag('config', 'G-S9D1Q8DP1L');
   </script>
 
-  <!-- Structured Data / JSON-LD Schema (WebSite, Organization, SearchAction) -->
+  <!-- Structured Data / JSON-LD Schema (WebSite, Organization, SearchAction, Book, Person, FAQPage) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -58,7 +58,7 @@
         },
         "description": "Nền tảng thư viện triết học số toàn văn, lưu trữ và truyền bá tư tưởng tinh hoa nhân loại kết hợp trí tuệ nhân tạo chiêm nghiệm.",
         "sameAs": [
-          "https://github.com",
+          "https://github.com/tienphuxuandoi8-prog/sopia-codex",
           "https://twitter.com"
         ]
       },
@@ -76,6 +76,203 @@
           "target": "https://vusitien.click/library.html?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://vusitien.click/#person-marcus-aurelius",
+        "name": "Marcus Aurelius",
+        "alternateName": "Marcus Aurelius Antoninus",
+        "description": "Hoàng đế La Mã và triết gia lỗi lạc của Chủ nghĩa Khắc Kỷ (Stoicism), tác giả cuốn Suy Tưởng (Meditations).",
+        "sameAs": [
+          "https://vi.wikipedia.org/wiki/Marcus_Aurelius",
+          "https://en.wikipedia.org/wiki/Marcus_Aurelius",
+          "https://www.wikidata.org/wiki/Q1430"
+        ]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://vusitien.click/#person-lao-tzu",
+        "name": "Lão Tử",
+        "alternateName": ["Laozi", "Lao Tzu", "Lao-Tze"],
+        "description": "Bậc thầy triết học cổ đại phương Đông, người sáng lập Đạo gia với tư tưởng Vô vi và tác giả kiệt tác Đạo Đức Kinh.",
+        "sameAs": [
+          "https://vi.wikipedia.org/wiki/L%C3%A3o_T%E1%BB%AD",
+          "https://en.wikipedia.org/wiki/Laozi",
+          "https://www.wikidata.org/wiki/Q9333"
+        ]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://vusitien.click/#person-plato",
+        "name": "Plato & Socrates",
+        "alternateName": ["Plato", "Platon", "Socrates"],
+        "description": "Cội nguồn triết học cổ điển Hy Lạp và phương Tây, tác giả tác phẩm Cộng Hòa (The Republic) và phương pháp truy vấn Socratic.",
+        "sameAs": [
+          "https://vi.wikipedia.org/wiki/Plat%C3%B4n",
+          "https://vi.wikipedia.org/wiki/Socrates",
+          "https://www.wikidata.org/wiki/Q859",
+          "https://www.wikidata.org/wiki/Q913"
+        ]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://vusitien.click/#person-nietzsche",
+        "name": "Friedrich Nietzsche",
+        "alternateName": "Friedrich Wilhelm Nietzsche",
+        "description": "Nhà tư tưởng Hiện sinh lừng danh người Đức, tác giả Zarathustra Đã Nói Như Thế với học thuyết Siêu nhân (Übermensch) và Ý chí Quyền lực.",
+        "sameAs": [
+          "https://vi.wikipedia.org/wiki/Friedrich_Nietzsche",
+          "https://en.wikipedia.org/wiki/Friedrich_Nietzsche",
+          "https://www.wikidata.org/wiki/Q9358"
+        ]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://vusitien.click/#person-mill",
+        "name": "John Stuart Mill",
+        "alternateName": "J. S. Mill",
+        "description": "Triết gia và nhà kinh tế chính trị học người Anh, tiên phong bảo vệ quyền tự do cá nhân và nguyên lý gây hại trong Bàn Về Tự Do.",
+        "sameAs": [
+          "https://vi.wikipedia.org/wiki/John_Stuart_Mill",
+          "https://en.wikipedia.org/wiki/John_Stuart_Mill",
+          "https://www.wikidata.org/wiki/Q50020"
+        ]
+      },
+      {
+        "@type": "Book",
+        "@id": "https://vusitien.click/?book=dao-duc-kinh#book",
+        "url": "https://vusitien.click/?book=dao-duc-kinh",
+        "name": "Đạo Đức Kinh",
+        "alternateName": "Tao Te Ching",
+        "author": {
+          "@id": "https://vusitien.click/#person-lao-tzu"
+        },
+        "genre": "Triết học Phương Đông & Đạo Gia",
+        "inLanguage": "vi",
+        "image": "https://vusitien.click/assets/covers/dao-duc-kinh.svg",
+        "description": "Tuyệt tác triết học phương Đông 81 chương của Lão Tử về bản thể của Đạo tự nhiên, nghệ thuật Vô vi và sự hài hòa tối thượng dĩ nhu thắng cương.",
+        "numberOfPages": 81,
+        "publisher": {
+          "@id": "https://vusitien.click/#organization"
+        }
+      },
+      {
+        "@type": "Book",
+        "@id": "https://vusitien.click/?book=suy-tuong#book",
+        "url": "https://vusitien.click/?book=suy-tuong",
+        "name": "Suy Tưởng",
+        "alternateName": "Meditations",
+        "author": {
+          "@id": "https://vusitien.click/#person-marcus-aurelius"
+        },
+        "genre": "Chủ nghĩa Khắc Kỷ (Stoicism)",
+        "inLanguage": "vi",
+        "image": "https://vusitien.click/assets/covers/suy-tuong.svg",
+        "description": "Nhật ký tự vấn tâm thức 12 quyển bất hủ của hoàng đế La Mã Marcus Aurelius, rèn luyện sự bình thản trước nghịch cảnh và nhị phân quyền kiểm soát.",
+        "numberOfPages": 12,
+        "publisher": {
+          "@id": "https://vusitien.click/#organization"
+        }
+      },
+      {
+        "@type": "Book",
+        "@id": "https://vusitien.click/?book=cong-hoa#book",
+        "url": "https://vusitien.click/?book=cong-hoa",
+        "name": "Cộng Hòa",
+        "alternateName": "The Republic",
+        "author": {
+          "@id": "https://vusitien.click/#person-plato"
+        },
+        "genre": "Triết học Cổ điển Hy Lạp",
+        "inLanguage": "vi",
+        "image": "https://vusitien.click/assets/covers/cong-hoa.svg",
+        "description": "Kiệt tác đối thoại triết học kinh điển gồm 10 quyển của Plato xoay quanh công lý, Nhà nước lý tưởng và ẩn dụ Hang động khai phóng nhận thức.",
+        "numberOfPages": 10,
+        "publisher": {
+          "@id": "https://vusitien.click/#organization"
+        }
+      },
+      {
+        "@type": "Book",
+        "@id": "https://vusitien.click/?book=zarathustra#book",
+        "url": "https://vusitien.click/?book=zarathustra",
+        "name": "Zarathustra Đã Nói Như Thế",
+        "alternateName": "Thus Spoke Zarathustra",
+        "author": {
+          "@id": "https://vusitien.click/#person-nietzsche"
+        },
+        "genre": "Chủ nghĩa Hiện sinh",
+        "inLanguage": "vi",
+        "image": "https://vusitien.click/assets/covers/zarathustra.svg",
+        "description": "Tác phẩm triết học hiện sinh kiệt xuất của Friedrich Nietzsche về hình mẫu Siêu nhân (Übermensch), Ý chí quyền lực và tình yêu định mệnh Amor Fati.",
+        "numberOfPages": 16,
+        "publisher": {
+          "@id": "https://vusitien.click/#organization"
+        }
+      },
+      {
+        "@type": "Book",
+        "@id": "https://vusitien.click/?book=ban-ve-tu-do#book",
+        "url": "https://vusitien.click/?book=ban-ve-tu-do",
+        "name": "Bàn Về Tự Do",
+        "alternateName": "On Liberty",
+        "author": {
+          "@id": "https://vusitien.click/#person-mill"
+        },
+        "genre": "Thời kỳ Khai Sáng & Triết học Chính trị",
+        "inLanguage": "vi",
+        "image": "https://vusitien.click/assets/covers/ban-ve-tu-do.svg",
+        "description": "Văn bản triết học mẫu mực của John Stuart Mill xác lập nguyên lý gây hại (Harm Principle) và ranh giới quyền tự do cá nhân trước quyền lực xã hội.",
+        "numberOfPages": 5,
+        "publisher": {
+          "@id": "https://vusitien.click/#organization"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://vusitien.click/#socrates-faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Socrates AI và phương pháp đối thoại phản biện triết học hoạt động như thế nào?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Socrates AI hoạt động dựa trên phương pháp bác bỏ và đối thoại truy vấn Elenchus của hiền triết Socrates. Thay vì cung cấp câu trả lời áp đặt, AI đặt các câu hỏi tự vấn ngược vào niềm tin cốt lõi của người đọc, bóc tách định kiến và soi sáng nguyên lý triết học ứng dụng vào đời sống hiện đại."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Chủ nghĩa Khắc Kỷ (Stoicism) trong 'Suy Tưởng' của Marcus Aurelius giúp gì cho con người hiện đại?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Chủ nghĩa Khắc Kỷ dạy nhị phân quyền kiểm soát (Dichotomy of Control): phân biệt rõ điều ta làm chủ (suy nghĩ, phản ứng, đạo đức bản thân) và điều nằm ngoài tầm kiểm soát (biến cố ngoại cảnh, dư luận). Nhờ đó, người đọc xây dựng thành lũy nội tâm kiên cố (Inner Citadel), đạt được sự bình thản tuyệt đối (Ataraxia)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Triết lý 'Vô vi' trong Đạo Đức Kinh của Lão Tử có phải là buông xuôi thụ động không?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Hoàn toàn không. Vô vi (无为) trong Đạo Đức Kinh nghĩa là hành động thuận theo tự nhiên và quy luật khách quan, không làm điều gượng ép, cưỡng cầu tư lợi hay áp đặt chủ quan. Đỉnh cao của Vô vi là như nước (Thượng thiện nhược thủy), mềm mại, khiêm nhường nuôi dưỡng vạn vật mà việc gì cũng thành tựu trọn vẹn."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Khái niệm Amor Fati của Friedrich Nietzsche và Marcus Aurelius có ý nghĩa gì?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Amor Fati (Tình yêu định mệnh) là nghệ thuật đón nhận mọi biến cố cuộc đời — bao gồm thử thách, đau đớn và thất bại — không phải với tâm thế cam chịu mà với lòng biết ơn sâu sắc. Biến nghịch cảnh thành chất liệu rèn luyện bản lĩnh kiên cường theo châm ngôn: 'Vật cản trên đường trở thành con đường'."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Nguyên lý gây hại (Harm Principle) trong 'Bàn Về Tự Do' của John Stuart Mill là gì?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Nguyên lý gây hại khẳng định mục đích duy nhất mà quyền lực xã hội có thể can thiệp chính đáng vào tự do của một cá nhân là để ngăn ngừa sự tổn hại tới người khác. Đối với chính bản thân mình — thể xác và tâm trí — mỗi cá nhân là một thực thể độc lập có chủ quyền tối cao."
+            }
+          }
+        ]
       }
     ]
   }
@@ -895,6 +1092,114 @@
             </button>
           </div>
         </div>
+
+        <!-- SECTION: SOCRATES AI VẤN ĐÁP & PHẢN TƯ TRIẾT HỌC (AEO TOP 0 ANSWER BOX) -->
+        <section id="socrates-faq-section" class="p-6 md:p-8 rounded-3xl bg-white/90 dark:bg-[#111E17] border border-stone-200/90 dark:border-emerald-900/60 shadow-sm space-y-6">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/25 mb-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-500"></i> Answer Engine Optimization (AEO)
+              </div>
+              <h3 class="text-xl md:text-2xl font-display font-bold text-stone-900 dark:text-stone-100">
+                Đối Thoại Socrates AI — Vấn Đáp & Phản Tư Triết Học
+              </h3>
+              <p class="text-xs text-stone-600 dark:text-stone-400 mt-1 max-w-2xl leading-relaxed">
+                Những câu hỏi then chốt về nhân sinh và giải đáp trực diện cô đọng theo phương pháp truy vấn Socratic, tối ưu chuẩn trích dẫn AI và công cụ tìm kiếm.
+              </p>
+            </div>
+            <button onclick="window.openAIChatWithBook('suy-tuong')" class="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-950 hover:bg-emerald-900 text-amber-200 text-xs font-semibold shadow-sm border border-amber-600/30 transition-all">
+              <i data-lucide="message-square" class="w-4 h-4 text-amber-300"></i> Đàm Đạo Trực Tiếp Với AI
+            </button>
+          </div>
+
+          <!-- FAQ Accordion List -->
+          <div class="space-y-3 pt-2">
+            <!-- FAQ 1 -->
+            <details class="group rounded-2xl bg-stone-50 dark:bg-emerald-950/20 border border-stone-200/80 dark:border-emerald-900/40 p-4 transition-all open:bg-amber-500/5 open:border-amber-500/40" open>
+              <summary class="flex items-center justify-between cursor-pointer list-none font-display font-bold text-sm md:text-base text-stone-900 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">
+                <span class="flex items-center gap-2.5">
+                  <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex items-center justify-center font-bold">1</span>
+                  Socrates AI và phương pháp đối thoại phản biện triết học hoạt động như thế nào?
+                </span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <div class="mt-3 text-xs md:text-sm text-stone-700 dark:text-stone-300 leading-relaxed font-ui border-t border-stone-200/60 dark:border-emerald-900/40 pt-3">
+                <p class="font-medium text-emerald-950 dark:text-amber-200 mb-1.5">
+                  <strong>Câu trả lời chuẩn AEO:</strong>
+                </p>
+                Socrates AI hoạt động dựa trên phương pháp bác bỏ và đối thoại truy vấn Elenchus của hiền triết Socrates. Thay vì cung cấp câu trả lời áp đặt, AI đặt các câu hỏi tự vấn ngược vào niềm tin cốt lõi của người đọc, bóc tách định kiến và soi sáng nguyên lý triết học ứng dụng vào đời sống hiện đại.
+              </div>
+            </details>
+
+            <!-- FAQ 2 -->
+            <details class="group rounded-2xl bg-stone-50 dark:bg-emerald-950/20 border border-stone-200/80 dark:border-emerald-900/40 p-4 transition-all open:bg-amber-500/5 open:border-amber-500/40">
+              <summary class="flex items-center justify-between cursor-pointer list-none font-display font-bold text-sm md:text-base text-stone-900 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">
+                <span class="flex items-center gap-2.5">
+                  <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex items-center justify-center font-bold">2</span>
+                  Chủ nghĩa Khắc Kỷ trong 'Suy Tưởng' của Marcus Aurelius giúp gì cho con người hiện đại?
+                </span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <div class="mt-3 text-xs md:text-sm text-stone-700 dark:text-stone-300 leading-relaxed font-ui border-t border-stone-200/60 dark:border-emerald-900/40 pt-3">
+                <p class="font-medium text-emerald-950 dark:text-amber-200 mb-1.5">
+                  <strong>Câu trả lời chuẩn AEO:</strong>
+                </p>
+                Chủ nghĩa Khắc Kỷ dạy nhị phân quyền kiểm soát (Dichotomy of Control): phân biệt rõ điều ta làm chủ (suy nghĩ, phản ứng, đạo đức bản thân) và điều nằm ngoài tầm kiểm soát (biến cố ngoại cảnh, dư luận). Nhờ đó, người đọc xây dựng thành lũy nội tâm kiên cố (Inner Citadel), đạt được sự bình thản tuyệt đối (Ataraxia).
+              </div>
+            </details>
+
+            <!-- FAQ 3 -->
+            <details class="group rounded-2xl bg-stone-50 dark:bg-emerald-950/20 border border-stone-200/80 dark:border-emerald-900/40 p-4 transition-all open:bg-amber-500/5 open:border-amber-500/40">
+              <summary class="flex items-center justify-between cursor-pointer list-none font-display font-bold text-sm md:text-base text-stone-900 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">
+                <span class="flex items-center gap-2.5">
+                  <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex items-center justify-center font-bold">3</span>
+                  Triết lý 'Vô vi' trong Đạo Đức Kinh của Lão Tử có phải là buông xuôi thụ động không?
+                </span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <div class="mt-3 text-xs md:text-sm text-stone-700 dark:text-stone-300 leading-relaxed font-ui border-t border-stone-200/60 dark:border-emerald-900/40 pt-3">
+                <p class="font-medium text-emerald-950 dark:text-amber-200 mb-1.5">
+                  <strong>Câu trả lời chuẩn AEO:</strong>
+                </p>
+                Hoàn toàn không. Vô vi (无为) trong Đạo Đức Kinh nghĩa là hành động thuận theo tự nhiên và quy luật khách quan, không làm điều gượng ép, cưỡng cầu tư lợi hay áp đặt chủ quan. Đỉnh cao của Vô vi là như nước (Thượng thiện nhược thủy), mềm mại, khiêm nhường nuôi dưỡng vạn vật mà việc gì cũng thành tựu trọn vẹn.
+              </div>
+            </details>
+
+            <!-- FAQ 4 -->
+            <details class="group rounded-2xl bg-stone-50 dark:bg-emerald-950/20 border border-stone-200/80 dark:border-emerald-900/40 p-4 transition-all open:bg-amber-500/5 open:border-amber-500/40">
+              <summary class="flex items-center justify-between cursor-pointer list-none font-display font-bold text-sm md:text-base text-stone-900 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">
+                <span class="flex items-center gap-2.5">
+                  <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex items-center justify-center font-bold">4</span>
+                  Khái niệm Amor Fati của Friedrich Nietzsche và Marcus Aurelius có ý nghĩa gì?
+                </span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <div class="mt-3 text-xs md:text-sm text-stone-700 dark:text-stone-300 leading-relaxed font-ui border-t border-stone-200/60 dark:border-emerald-900/40 pt-3">
+                <p class="font-medium text-emerald-950 dark:text-amber-200 mb-1.5">
+                  <strong>Câu trả lời chuẩn AEO:</strong>
+                </p>
+                Amor Fati (Tình yêu định mệnh) là nghệ thuật đón nhận mọi biến cố cuộc đời — bao gồm thử thách, đau đớn và thất bại — không phải với tâm thế cam chịu mà với lòng biết ơn sâu sắc. Biến nghịch cảnh thành chất liệu rèn luyện bản lĩnh kiên cường theo châm ngôn: 'Vật cản trên đường trở thành con đường'.
+              </div>
+            </details>
+
+            <!-- FAQ 5 -->
+            <details class="group rounded-2xl bg-stone-50 dark:bg-emerald-950/20 border border-stone-200/80 dark:border-emerald-900/40 p-4 transition-all open:bg-amber-500/5 open:border-amber-500/40">
+              <summary class="flex items-center justify-between cursor-pointer list-none font-display font-bold text-sm md:text-base text-stone-900 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">
+                <span class="flex items-center gap-2.5">
+                  <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex items-center justify-center font-bold">5</span>
+                  Nguyên lý gây hại (Harm Principle) trong 'Bàn Về Tự Do' của John Stuart Mill là gì?
+                </span>
+                <i data-lucide="chevron-down" class="w-4 h-4 text-stone-400 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <div class="mt-3 text-xs md:text-sm text-stone-700 dark:text-stone-300 leading-relaxed font-ui border-t border-stone-200/60 dark:border-emerald-900/40 pt-3">
+                <p class="font-medium text-emerald-950 dark:text-amber-200 mb-1.5">
+                  <strong>Câu trả lời chuẩn AEO:</strong>
+                </p>
+                Nguyên lý gây hại khẳng định mục đích duy nhất mà quyền lực xã hội có thể can thiệp chính đáng vào tự do của một cá nhân là để ngăn ngừa sự tổn hại tới người khác. Đối với chính bản thân mình — thể xác và tâm trí — mỗi cá nhân là một thực thể độc lập có chủ quyền tối cao.
+              </div>
+            </details>
+          </div>
+        </section>
 
       
         <!-- SECTION: BÀI VIẾT VÀ CHIÊM NGHIỆM MINH TRIẾT (BLOG SYSTEM) -->
