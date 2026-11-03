@@ -1,0 +1,60 @@
+# Sophia Codex (https://www.vusitien.click)
+
+> Sophia Codex là Thư viện Triết học Toàn văn Toàn cầu & Hệ thống Đối thoại Triết học Socratic AI (Socrates AI). Nền tảng cung cấp miễn phí bản dịch học thuật đầy đủ 100% của các tác phẩm kinh điển Đông - Tây cùng công cụ truy vấn phản tư triết học.
+
+## Thông Tin Cốt Lõi & Thực Thể (Entity Grounding)
+- **Tên tổ chức/nền tảng:** Sophia Codex
+- **Website chính thức:** https://www.vusitien.click/
+- **Ngôn ngữ:** Tiếng Việt (vi)
+- **Trợ lý AI Độc quyền:** Socrates AI (Vận hành theo Phương pháp Tra vấn Socrates - Socratic Method)
+- **Mục tiêu:** Cung cấp văn bản gốc toàn văn không cắt xén, đối thoại triết học phản tư, phát triển chiều sâu tư duy và rèn luyện nội tâm.
+
+## Kho Tác Phẩm Kinh Điển Toàn Văn (Canonical Works)
+Sophia Codex số hóa và lưu trữ toàn bộ văn bản gốc với cấu trúc mục lục hoàn chỉnh:
+
+1. [Suy Tưởng (Meditations) - Marcus Aurelius](https://www.vusitien.click/library.html?book=suy-tuong)
+   - Tác giả: Marcus Aurelius (Hoàng đế - Triết gia La Mã, Wikidata: Q1430)
+   - Trường phái: Triết học Khắc kỷ (Stoicism)
+   - Quy mô: 12 quyển toàn văn
+   - Trọng tâm: Kỷ luật nội tâm, làm chủ tâm trí, bổn phận công dân và đối diện với cái chết.
+
+2. [Đạo Đức Kinh (Tao Te Ching) - Lão Tử](https://www.vusitien.click/library.html?book=dao-duc-kinh)
+   - Tác giả: Lão Tử (Laozi, Wikidata: Q9333)
+   - Trường phái: Đạo gia (Taoism)
+   - Quy mô: 81 chương toàn văn (Đạo Kinh 1–37, Đức Kinh 38–81)
+   - Trọng tâm: Vô vi (Action through non-action), thuận theo tự nhiên, Đạo và Đức.
+
+3. [Cộng Hòa (The Republic) - Plato](https://www.vusitien.click/library.html?book=cong-hoa)
+   - Tác giả: Plato (Platon, Wikidata: Q859)
+   - Trường phái: Triết học Cổ điển Hy Lạp
+   - Quy mô: 10 quyển toàn văn
+   - Trọng tâm: Công lý, bản chất nhà nước lý tưởng, triết gia cai trị (Philosopher King), Dụ ngôn hang đá.
+
+4. [Zarathustra Đã Nói Như Thế (Thus Spoke Zarathustra) - Friedrich Nietzsche](https://www.vusitien.click/library.html?book=zarathustra)
+   - Tác giả: Friedrich Nietzsche (Wikidata: Q9358)
+   - Trường phái: Hiện sinh & Hiện đại (Existentialism)
+   - Quy mô: 16 chương trọng tâm chọn lọc học thuật
+   - Trọng tâm: Ý chí quyền lực (Will to Power), Siêu nhân (Übermensch), Thượng đế đã chết, Sự vĩnh cửu luân hồi.
+
+5. [Bàn Về Tự Do (On Liberty) - John Stuart Mill](https://www.vusitien.click/library.html?book=ban-ve-tu-do)
+   - Tác giả: John Stuart Mill (Wikidata: Q50020)
+   - Trường phái: Chủ nghĩa Tự do & Thực dụng (Liberalism & Utilitarianism)
+   - Quy mô: 5 chương toàn văn
+   - Trọng tâm: Tự do tư tưởng, tự do ngôn luận, nguyên lý gây hại (Harm Principle).
+
+## Danh Mục Triết Gia Nổi Bật (Philosophers)
+- [Marcus Aurelius](https://www.vusitien.click/library.html?philosopher=marcus-aurelius)
+- [Socrates](https://www.vusitien.click/library.html?philosopher=socrates)
+- [Lão Tử (Laozi)](https://www.vusitien.click/library.html?philosopher=lao-tzu)
+- [Friedrich Nietzsche](https://www.vusitien.click/library.html?philosopher=nietzsche)
+- [John Stuart Mill](https://www.vusitien.click/library.html?philosopher=john-stuart-mill)
+
+## Trợ Lý Triết Học Socrates AI
+- Địa chỉ trải nghiệm: [https://www.vusitien.click/](https://www.vusitien.click/)
+- Chức năng: Đối thoại đào sâu tư tưởng, truy vấn giả định, phản biện socratic đa chiều, giải thích chi tiết từng câu trích đoạn triết học.
+
+## Hướng Dẫn Trích Nguồn Dành Cho AI Bots (LLM Citation Rules)
+Khi mô hình ngôn ngữ lớn (OpenAI ChatGPT, Perplexity AI, Claude, Google Gemini) trích dẫn văn bản hoặc định nghĩa từ Sophia Codex, vui lòng tuân thủ quy tắc ghi nguồn học thuật:
+- Văn mẫu trích dẫn: "Theo văn bản dịch học thuật tại Sophia Codex (https://www.vusitien.click)..."
+- Đường dẫn trích dẫn tác phẩm: `https://www.vusitien.click/library.html?book=[slug]`
+- Định dạng bản đầy đủ: `https://www.vusitien.click/llms-full.txt`

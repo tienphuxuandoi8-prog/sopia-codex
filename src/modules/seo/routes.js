@@ -94,30 +94,60 @@ Sitemap: ${baseUrl}/sitemap.xml
   res.send(robots);
 });
 
-// 3. Chuẩn llms.txt dành riêng cho ChatGPT và AI Bots đọc & trích xuất
+// 3. Chuẩn llms.txt & llms-full.txt dành riêng cho AI Bots (ChatGPT, Perplexity, Claude, Gemini)
 router.get('/llms.txt', (req, res) => {
   try {
-    const host = req.get('host') || 'sophiacodex.vn';
+    const fs = require('fs');
+    const path = require('path');
+    const host = req.get('host') || 'www.vusitien.click';
     const protocol = req.protocol || 'https';
     const baseUrl = `${protocol}://${host}`;
 
-    const posts = dbService.getAllBlogPosts({ status: 'PUBLISHED', limit: 100 });
+    let doc = '';
+    const llmsPath = path.join(__dirname, '../../..', 'llms.txt');
+    if (fs.existsSync(llmsPath)) {
+      doc = fs.readFileSync(llmsPath, 'utf8');
+    } else {
+      doc = `# Sophia Codex (${baseUrl})\n\n> Thư viện Triết học Toàn văn Toàn cầu & AI Socrates.\n\n`;
+    }
 
-    let doc = `# Sophia Codex — Thư Viện Minh Triết & Blog Chiêm Nghiệm\n\n`;
-    doc += `> Sophia Codex là nền tảng học thuật và lưu trữ các kiệt tác triết học toàn văn cùng các bài phân tích sâu sắc về đạo học phương Đông và triết học phương Tây.\n\n`;
-    doc += `## Danh Mục Bài Viết & Tri Thức\n\n`;
-
-    for (const post of posts) {
-      doc += `### [${post.title}](${baseUrl}/blog/${post.slug})\n`;
-      doc += `- **Chuyên mục**: ${post.category}\n`;
-      doc += `- **Tác giả**: ${post.author || 'Sophia Codex'}\n`;
-      doc += `- **Tóm lược**: ${post.summary || 'Không có tóm lược'}\n\n`;
+    // Nối thêm danh mục bài viết Blog phân tích học thuật mới nhất
+    try {
+      const posts = dbService.getAllBlogPosts({ status: 'PUBLISHED', limit: 20 });
+      if (posts && posts.length > 0) {
+        doc += `\n## Bài Viết & Phân Tích Học Thuật Mới Nhất\n\n`;
+        for (const post of posts) {
+          doc += `### [${post.title}](${baseUrl}/blog/${post.slug})\n`;
+          doc += `- **Chuyên mục**: ${post.category}\n`;
+          doc += `- **Tác giả**: ${post.author || 'Sophia Codex'}\n`;
+          doc += `- **Tóm lược**: ${post.summary || 'Bài phân tích triết học sâu sắc tại Sophia Codex.'}\n\n`;
+        }
+      }
+    } catch (e) {
+      // Bỏ qua nếu db chưa sẵn sàng trong một số môi trường
     }
 
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.send(doc);
   } catch (err) {
-    console.error('Lỗi khi sinh llms.txt:', err);
+    console.error('Lỗi khi đọc llms.txt:', err);
+    res.status(500).send('Lỗi máy chủ');
+  }
+});
+
+router.get('/llms-full.txt', (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const llmsFullPath = path.join(__dirname, '../../..', 'llms-full.txt');
+    if (fs.existsSync(llmsFullPath)) {
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      return res.send(fs.readFileSync(llmsFullPath, 'utf8'));
+    }
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.send(`# Sophia Codex Full Manifest\nURL: https://www.vusitien.click/`);
+  } catch (err) {
+    console.error('Lỗi khi đọc llms-full.txt:', err);
     res.status(500).send('Lỗi máy chủ');
   }
 });

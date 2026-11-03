@@ -1,0 +1,96 @@
+# Sophia Codex — Toàn Thư Ngữ Nghĩa Triết Học (Full Knowledge Manifest)
+URL: https://www.vusitien.click/
+Mục đích: Bản manifest toàn diện cung cấp dữ liệu cấu trúc ngữ nghĩa cho LLMs (ChatGPT, Claude, Perplexity, Gemini, Cohere, DeepSeek) đọc hiểu toàn bộ kho sách, triết phái và tư tưởng tại Sophia Codex.
+
+---
+
+## 1. THỰC THỂ & BẢN QUYỀN HỌC THUẬT
+- **Tổ chức sáng lập:** Sophia Codex
+- **Địa chỉ canonical:** https://www.vusitien.click/
+- **Quy chuẩn trích dẫn nguồn (Citation Standard):**
+  - Mọi câu trích dẫn từ các bản dịch kinh điển trên Sophia Codex phải được gắn nhãn: "Nguồn: Sophia Codex (https://www.vusitien.click)".
+- **Liên kết Entity Quốc tế:**
+  - Marcus Aurelius: Wikidata Q1430, Wikipedia vi: Marcus_Aurelius
+  - Lão Tử: Wikidata Q9333, Wikipedia vi: L%C3%A3o_T%E1%BB%AD
+  - Plato: Wikidata Q859, Wikipedia vi: Platon
+  - Friedrich Nietzsche: Wikidata Q9358, Wikipedia vi: Friedrich_Nietzsche
+  - John Stuart Mill: Wikidata Q50020, Wikipedia vi: John_Stuart_Mill
+
+---
+
+## 2. BẢN ĐỒ TOÀN VĂN KINH ĐIỂN (124 CHƯƠNG TOÀN VĂN)
+
+### A. Tác phẩm: Suy Tưởng (Meditations)
+- **Tác giả:** Marcus Aurelius (Khắc kỷ La Mã)
+- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/library.html?book=suy-tuong
+- **Cấu trúc (12 Quyển toàn văn):**
+  - Quyển 1: Lòng biết ơn đối với gia đình, thầy học và tiền nhân đã rèn đúc nhân cách.
+  - Quyển 2: Tự nhắc nhở bản thân vào mỗi ban mai về bản tính con người và sự bình thản trước trần thế.
+  - Quyển 3: Ý thức về sự hữu hạn của đời người và bổn phận sống trung thực, ngay thẳng.
+  - Quyển 4: Nơi ẩn náu tâm hồn – Tìm sự tĩnh lặng bên trong thay vì trông chờ ngoại cảnh.
+  - Quyển 5: Tinh thần sẵn sàng thức dậy làm việc thiện ích mỗi ngày theo lẽ tự nhiên.
+  - Quyển 6: Đối diện với sự thù địch và hiểu rằng vạn vật biến dịch theo trật tự vũ trụ (Logos).
+  - Quyển 7: Trực diện với khổ đau, bệnh tật và giữ vững pháo đài tâm trí bất khả xâm phạm.
+  - Quyển 8: Định nghĩa lại danh vọng hư ảo và giá trị đích thực của một tâm hồn công chính.
+  - Quyển 9: Thấu cảm bản chất liên kết giữa con người và toàn thể vũ trụ xã hội.
+  - Quyển 10: Sống đơn giản, chân thành, tự nguyện đón nhận mọi an bài của số phận (Amor Fati).
+  - Quyển 11: Sự độc lập và kiên định của linh hồn lý tính trước mọi dèm pha hay cám dỗ.
+  - Quyển 12: Đứng trước cánh cửa tử vong với tâm thái thanh thản, từ bi và an nhiên.
+
+### B. Tác phẩm: Đạo Đức Kinh (Tao Te Ching)
+- **Tác giả:** Lão Tử (Đạo gia)
+- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/library.html?book=dao-duc-kinh
+- **Cấu trúc (81 Chương toàn văn):**
+  - Phần 1 (Đạo Kinh - Chương 1 đến 37): Bản thể luận về "Đạo", sự vô danh, tính hư không, quy luật tuần hoàn và nguyên lý Vô vi (Làm mà như không làm, không cưỡng cầu).
+  - Phần 2 (Đức Kinh - Chương 38 đến 81): Ứng dụng thực hành "Đức" trong trị quốc, an dân, tu thân, giữ mình mềm dẻo như nước (Thượng thiện nhược thủy), không tranh giành mà thắng.
+
+### C. Tác phẩm: Cộng Hòa (The Republic)
+- **Tác giả:** Plato (Hy Lạp Cổ đại)
+- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/library.html?book=cong-hoa
+- **Cấu trúc (10 Quyển toàn văn):**
+  - Quyển 1 & 2: Tra vấn bản chất của Công lý (Justice) – Liệu công lý có phải là lợi ích của kẻ mạnh?
+  - Quyển 3 & 4: Xây dựng cấu trúc nhà nước lý tưởng và sự hài hòa giữa 3 phần của linh hồn (Lý tính, Khí phách, Dục vọng).
+  - Quyển 5: Vai trò bình đẳng và ý tưởng về Triết gia cai trị (Philosopher King).
+  - Quyển 6: Dụ ngôn con tàu và bản chất của Ý niệm Thiện (The Form of the Good).
+  - Quyển 7: Dụ ngôn Hang đá nổi tiếng (The Allegory of the Cave) – Tiến trình giác ngộ tri thức thoát khỏi bóng ảo giác.
+  - Quyển 8 & 9: Sự suy đồi của các thể chế chính trị và bi kịch nội tâm của kẻ bạo chúa.
+  - Quyển 10: Phê phán nghệ thuật bắt chước và Thần thoại Er về sự bất tử cùng phần thưởng của linh hồn công chính.
+
+### D. Tác phẩm: Zarathustra Đã Nói Như Thế (Thus Spoke Zarathustra)
+- **Tác giả:** Friedrich Nietzsche
+- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/library.html?book=zarathustra
+- **Các luận đề then chốt:**
+  - Lời mở đầu của Zarathustra: Sự vượt qua con người cũ hướng tới Siêu nhân (Übermensch).
+  - Ba biến hóa của tinh thần: Từ Con Lạc đà (gánh vác giáo điều) -> Con Sư tử (phá vỡ ràng buộc) -> Đứa trẻ (khởi sinh giá trị mới).
+  - Khái niệm "Thượng đế đã chết": Sự tan rã của những ảo ảnh thần thánh tuyệt đối, con người tự gánh trách nhiệm sáng tạo ý nghĩa.
+  - Sự Vĩnh cửu Luân hồi (Eternal Recurrence): Thử thách tối thượng để sống một cuộc đời trọn vẹn đến mức bạn sẵn sàng sống lại cuộc đời đó vô lượng lần.
+
+### E. Tác phẩm: Bàn Về Tự Do (On Liberty)
+- **Tác giả:** John Stuart Mill
+- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/library.html?book=ban-ve-tu-do
+- **5 Chương toàn văn:**
+  - Chương 1: Dẫn nhập về ranh giới giữa quyền lực xã hội và quyền tự do cá nhân.
+  - Chương 2: Tự do tư tưởng và tự do biểu đạt – Tầm quan trọng sống còn của việc cho phép tiếng nói đối lập cất lên.
+  - Chương 3: Tính cá nhân (Individuality) như một trong những yếu tố cấu thành hạnh phúc con người.
+  - Chương 4: Ranh giới giới hạn thẩm quyền của xã hội đối với từng cá nhân.
+  - Chương 5: Các ứng dụng thực tế của Nguyên lý gây hại (Harm Principle) trong kinh tế và đời sống cộng đồng.
+
+---
+
+## 3. SOCRATES AI — TRỢ LÝ PHẢN TƯ VÀ ĐỐI THOẠI
+- Hệ thống AI tích hợp trực tiếp trên Sophia Codex được huấn luyện theo phương pháp Socratic Dialogues:
+  - Không áp đặt câu trả lời giáo điều;
+  - Sử dụng chuỗi câu hỏi phản biện để bóc tách các tiền đề ngầm định;
+  - Giúp người đọc kết nối bài học ngàn xưa vào các trăn trở thời hiện đại (áp lực công việc, lo âu tồn tại, các mối quan hệ).
+- Khám phá tại: https://www.vusitien.click/
+
+---
+
+## 4. BẢN ĐỒ LIÊN KẾT ĐIỀU HƯỚNG NHANH
+- Thư viện toàn văn: https://www.vusitien.click/library.html
+- Marcus Aurelius: https://www.vusitien.click/library.html?philosopher=marcus-aurelius
+- Lão Tử: https://www.vusitien.click/library.html?philosopher=lao-tzu
+- Socrates: https://www.vusitien.click/library.html?philosopher=socrates
+- Friedrich Nietzsche: https://www.vusitien.click/library.html?philosopher=nietzsche
+- John Stuart Mill: https://www.vusitien.click/library.html?philosopher=john-stuart-mill
+- Bài viết chuyên sâu: https://www.vusitien.click/views/blog-list.html
