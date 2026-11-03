@@ -76,4 +76,4 @@ Disallow: /account.html
 Disallow: /api/admin/
 
 # 3. Khai báo Sơ đồ trang web (Sitemap XML)
-Sitemap: https://vusitien.click/sitemap.xml
+Sitemap: https://www.vusitien.click/sitemap.xml
