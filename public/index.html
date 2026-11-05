@@ -27,18 +27,36 @@
   <meta name="twitter:description" content="Đọc toàn văn kiệt tác triết học phương Đông &amp; Tây kết hợp hỏi đáp phản tư cùng hiền triết Socrates AI.">
   <meta name="twitter:image" content="https://www.vusitien.click/assets/covers/suy-tuong.svg">
 
-  <!-- Google Search Console Site Verification -->
-  <!-- THAY MÃ_XÁC_MINH BẰNG MÃ GOOGLE SEARCH CONSOLE CỦA BẠN (Ví dụ: content="xxxxxxxxxxxxxxxxxxxx") -->
-  <meta name="google-site-verification" content="GOOGLE_SEARCH_CONSOLE_VERIFICATION_CODE">
+  <!-- AI Engine & LLM Search Discovery (AEO / GEO Standard) -->
+  <link rel="alternate" type="text/plain" href="https://www.vusitien.click/llms.txt" title="Sophia Codex AI Summary">
+  <link rel="alternate" type="text/plain" href="https://www.vusitien.click/llms-full.txt" title="Sophia Codex Full AI Knowledge Base">
 
-  <!-- Google tag (gtag.js) - Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-S9D1Q8DP1L"></script>
+  <!-- Multi-Engine Site Verification (Điền mã xác thực thực tế khi kích hoạt từng công cụ) -->
+  <!-- <meta name="google-site-verification" content="YOUR_GOOGLE_SEARCH_CONSOLE_CODE"> -->
+  <!-- <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE"> -->
+
+  <!-- Google Tag Manager (GTM) Container Template (GTM-XXXXXXX) -->
+  <!--
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+  -->
+
+  <!-- Google tag (gtag.js) - Google Analytics 4 (Deferred) -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-S9D1Q8DP1L');
+
+    window.addEventListener('load', function() {
+      const gaScript = document.createElement('script');
+      gaScript.async = true;
+      gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-S9D1Q8DP1L';
+      document.head.appendChild(gaScript);
+    });
   </script>
 
   <!-- Structured Data / JSON-LD Schema (WebSite, Organization, SearchAction, Book, Person, FAQPage) -->
@@ -281,47 +299,12 @@
   <!-- Google Fonts: 6 Bộ Font Học Viện & Triết Học Toàn Cầu (Đầy đủ biến thể tiếng Việt) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
   
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            ui: ['"Be Vietnam Pro"', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-            reading: ['Lora', 'Merriweather', 'Times New Roman', 'serif'],
-            display: ['"Playfair Display"', 'Merriweather', 'Times New Roman', 'serif'],
-            heading: ['"Playfair Display"', 'Merriweather', 'Times New Roman', 'serif'],
-            serif: ['Lora', 'Merriweather', 'Times New Roman', 'serif']
-          },
-          colors: {
-            scholar: {
-              50: '#F5F8F6',
-              100: '#E4ECE7',
-              700: '#234C38',
-              800: '#163526',
-              900: '#10261C',
-              950: '#0B1A13'
-            },
-            parchment: {
-              50: '#FDFBF7',
-              100: '#F8F4EB',
-              200: '#EFE8D8',
-              300: '#E4D8BE'
-            },
-            gold: {
-              400: '#DDB35D',
-              500: '#C59B4B',
-              600: '#A97F33'
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <!-- Preload Critical LCP Asset -->
+  <link rel="preload" as="image" href="assets/covers/suy-tuong.svg" type="image/svg+xml" fetchpriority="high">
+  <!-- Pre-compiled Static Tailwind CSS (High Performance) -->
+  <link rel="stylesheet" href="css/tailwind.min.css">
 
   <!-- PWA App Manifest & Theme Color -->
   <link rel="manifest" href="manifest.json">
@@ -666,6 +649,8 @@
               <div class="book-foil-frame"></div>
               <img src="assets/covers/suy-tuong.svg" 
                    alt="Suy Tưởng - Marcus Aurelius (Bìa Cổ Dát Vàng)" 
+                   width="224" height="320"
+                   fetchpriority="high"
                    class="book-art shadow-2xl">
             </div>
           </div>
@@ -2204,18 +2189,18 @@
 
 
 
-  <!-- Application Scripts -->
-  <script src="js/core/api.js"></script>
-  <script src="js/core/auth.js"></script>
-  <script src="js/core/payment-config.js"></script>
-  <script src="js/core/dom.js"></script>
-  <script src="js/pages/data.js"></script>
-  <script src="js/pages/bgm.js"></script>
-  <script src="js/pages/audio.js"></script>
-  <script src="js/pages/quote-card.js"></script>
-  <script src="js/pages/ai-chat.js"></script>
-  <script src="js/pages/reader.js"></script>
-  <script src="js/pages/app.js"></script>
+  <!-- Application Scripts (Deferred for Performance) -->
+  <script defer src="js/core/api.js"></script>
+  <script defer src="js/core/auth.js"></script>
+  <script defer src="js/core/payment-config.js"></script>
+  <script defer src="js/core/dom.js"></script>
+  <script defer src="js/pages/data.js"></script>
+  <script defer src="js/pages/bgm.js"></script>
+  <script defer src="js/pages/audio.js"></script>
+  <script defer src="js/pages/quote-card.js"></script>
+  <script defer src="js/pages/ai-chat.js"></script>
+  <script defer src="js/pages/reader.js"></script>
+  <script defer src="js/pages/app.js"></script>
 
   <!-- PWA Service Worker Registration -->
   <script>
