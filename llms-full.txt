@@ -22,7 +22,7 @@ Mục đích: Bản manifest toàn diện cung cấp dữ liệu cấu trúc ng�
 
 ### A. Tác phẩm: Suy Tưởng (Meditations)
 - **Tác giả:** Marcus Aurelius (Khắc kỷ La Mã)
-- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/library.html?book=suy-tuong
+- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/kinh-dien/suy-tuong
 - **Cấu trúc (12 Quyển toàn văn):**
   - Quyển 1: Lòng biết ơn đối với gia đình, thầy học và tiền nhân đã rèn đúc nhân cách.
   - Quyển 2: Tự nhắc nhở bản thân vào mỗi ban mai về bản tính con người và sự bình thản trước trần thế.
@@ -39,14 +39,14 @@ Mục đích: Bản manifest toàn diện cung cấp dữ liệu cấu trúc ng�
 
 ### B. Tác phẩm: Đạo Đức Kinh (Tao Te Ching)
 - **Tác giả:** Lão Tử (Đạo gia)
-- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/library.html?book=dao-duc-kinh
+- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/kinh-dien/dao-duc-kinh
 - **Cấu trúc (81 Chương toàn văn):**
   - Phần 1 (Đạo Kinh - Chương 1 đến 37): Bản thể luận về "Đạo", sự vô danh, tính hư không, quy luật tuần hoàn và nguyên lý Vô vi (Làm mà như không làm, không cưỡng cầu).
   - Phần 2 (Đức Kinh - Chương 38 đến 81): Ứng dụng thực hành "Đức" trong trị quốc, an dân, tu thân, giữ mình mềm dẻo như nước (Thượng thiện nhược thủy), không tranh giành mà thắng.
 
 ### C. Tác phẩm: Cộng Hòa (The Republic)
 - **Tác giả:** Plato (Hy Lạp Cổ đại)
-- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/library.html?book=cong-hoa
+- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/kinh-dien/cong-hoa
 - **Cấu trúc (10 Quyển toàn văn):**
   - Quyển 1 & 2: Tra vấn bản chất của Công lý (Justice) – Liệu công lý có phải là lợi ích của kẻ mạnh?
   - Quyển 3 & 4: Xây dựng cấu trúc nhà nước lý tưởng và sự hài hòa giữa 3 phần của linh hồn (Lý tính, Khí phách, Dục vọng).
@@ -58,7 +58,7 @@ Mục đích: Bản manifest toàn diện cung cấp dữ liệu cấu trúc ng�
 
 ### D. Tác phẩm: Zarathustra Đã Nói Như Thế (Thus Spoke Zarathustra)
 - **Tác giả:** Friedrich Nietzsche
-- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/library.html?book=zarathustra
+- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/kinh-dien/zarathustra
 - **Các luận đề then chốt:**
   - Lời mở đầu của Zarathustra: Sự vượt qua con người cũ hướng tới Siêu nhân (Übermensch).
   - Ba biến hóa của tinh thần: Từ Con Lạc đà (gánh vác giáo điều) -> Con Sư tử (phá vỡ ràng buộc) -> Đứa trẻ (khởi sinh giá trị mới).
@@ -67,7 +67,7 @@ Mục đích: Bản manifest toàn diện cung cấp dữ liệu cấu trúc ng�
 
 ### E. Tác phẩm: Bàn Về Tự Do (On Liberty)
 - **Tác giả:** John Stuart Mill
-- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/library.html?book=ban-ve-tu-do
+- **Đường dẫn đọc trực tiếp:** https://www.vusitien.click/kinh-dien/ban-ve-tu-do
 - **5 Chương toàn văn:**
   - Chương 1: Dẫn nhập về ranh giới giữa quyền lực xã hội và quyền tự do cá nhân.
   - Chương 2: Tự do tư tưởng và tự do biểu đạt – Tầm quan trọng sống còn của việc cho phép tiếng nói đối lập cất lên.
@@ -88,9 +88,28 @@ Mục đích: Bản manifest toàn diện cung cấp dữ liệu cấu trúc ng�
 
 ## 4. BẢN ĐỒ LIÊN KẾT ĐIỀU HƯỚNG NHANH
 - Thư viện toàn văn: https://www.vusitien.click/library.html
-- Marcus Aurelius: https://www.vusitien.click/library.html?philosopher=marcus-aurelius
-- Lão Tử: https://www.vusitien.click/library.html?philosopher=lao-tzu
-- Socrates: https://www.vusitien.click/library.html?philosopher=socrates
-- Friedrich Nietzsche: https://www.vusitien.click/library.html?philosopher=nietzsche
-- John Stuart Mill: https://www.vusitien.click/library.html?philosopher=john-stuart-mill
+- Marcus Aurelius: https://www.vusitien.click/triet-gia/marcus-aurelius
+- Lão Tử: https://www.vusitien.click/triet-gia/lao-tzu
+- Socrates: https://www.vusitien.click/triet-gia/socrates
+- Friedrich Nietzsche: https://www.vusitien.click/triet-gia/nietzsche
+- John Stuart Mill: https://www.vusitien.click/triet-gia/john-stuart-mill
 - Bài viết chuyên sâu: https://www.vusitien.click/views/blog-list.html
+
+---
+
+## 3. BÀI PHÂN TÍCH HỌC THUẬT & CHUYÊN LUẬN (TOPIC CLUSTERS)
+1. Đạo Đức Kinh & Triết Lý Vô Vi: Nghệ Thuật Sống Thuận Tự Nhiên Giữa Áp Lực Hiện Đại
+   - URL: https://www.vusitien.click/blog/dao-duc-kinh-triet-ly-vo-vi-nghe-thuat-song-thuan-tu-nhien
+   - Trọng tâm: Định nghĩa AEO Vô vi, so sánh Hữu vi vs Vô vi, nghệ thuật sống mềm mại như nước, ứng dụng lãnh đạo tự trị.
+
+2. Ẩn Dụ Hang Động Của Plato: Nhận Thức Thực Tại Hay Ảo Ảnh Của Thuật Toán Số?
+   - URL: https://www.vusitien.click/blog/an-du-hang-dong-plato-thuc-tai-hay-ao-anh-thuat-toan
+   - Trọng tâm: Giải mã ngụ ngôn hang tối, so sánh thế giới cảm quan vs thế giới ý niệm, hiện tượng buồng vang thông tin thuật toán số, bổn phận khai minh của triết gia.
+
+3. Ý Chí Hùng Cường & Amor Fati: Cách Friedrich Nietzsche Dạy Ta Yêu Lấy Nghịch Cảnh
+   - URL: https://www.vusitien.click/blog/y-chi-hung-cuong-amor-fati-nietzsche-nghe-thuat-yeu-nghich-canh
+   - Trọng tâm: Khái niệm Amor Fati (Yêu số phận), Ý chí hùng cường (Will to Power), sự vượt thắng bản thân, thí nghiệm tư tưởng Sự trở lại vĩnh cửu (Eternal Recurrence).
+
+4. Nguyên Lý Gây Hại Của John Stuart Mill: Ranh Giới Tự Do Cá Nhân Trong Kỷ Nguyên Mạng
+   - URL: https://www.vusitien.click/blog/nguyen-ly-gay-hai-john-stuart-mill-ranh-gioi-tu-do-ca-nhan
+   - Trọng tâm: Harm Principle trong Bàn Về Tự Do, sự bạo tàn của số đông, phân biệt hành vi tự thân vs hành vi ảnh hưởng xã hội, bảo vệ tự do ngôn luận trước thuật toán.

@@ -283,7 +283,8 @@ class ReaderEngine {
       updateTag('meta[property="og:description"]', 'content', metaDesc);
       updateTag('meta[property="og:type"]', 'content', 'book');
       
-      const bookUrl = `https://www.vusitien.click/?book=${encodeURIComponent(book.id || book.slug)}`;
+      const bookSlug = encodeURIComponent(book.id || book.slug);
+      const bookUrl = `https://www.vusitien.click/kinh-dien/${bookSlug}`;
       updateTag('meta[property="og:url"]', 'content', bookUrl);
 
       let canonicalEl = document.querySelector('link[rel="canonical"]');
@@ -299,12 +300,82 @@ class ReaderEngine {
       updateTag('meta[name="twitter:title"]', 'content', dynamicTitle);
       updateTag('meta[name="twitter:description"]', 'content', metaDesc);
 
-      // Đồng bộ URL query param trên trình duyệt không tải lại trang
+      // 3. Đồng bộ Clean URL trên trình duyệt
       if (window.history && window.history.pushState) {
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.set('book', book.id || book.slug);
-        window.history.pushState({ bookId: book.id }, dynamicTitle, newUrl.toString());
+        window.history.pushState({ bookId: book.id }, dynamicTitle, `/kinh-dien/${bookSlug}`);
       }
+
+      // 4. AEO Direct Answer Box Injection (40 - 55 từ)
+      const aeoDefinitions = {
+        'suy-tuong': 'Chủ nghĩa Khắc Kỷ trong "Suy Tưởng" của Marcus Aurelius tập trung vào nguyên lý Nhị phân quyền kiểm soát (Dichotomy of Control): Phân định rõ điều ta làm chủ (tâm trí, phản ứng cá nhân) và điều ta không thể làm chủ (ngoại cảnh, nghịch cảnh), qua đó gìn giữ pháo đài bình an nội tại.',
+        'dao-duc-kinh': 'Triết lý Vô vi trong "Đạo Đức Kinh" của Lão Tử hướng dẫn con người hành động thuận theo quy luật tự nhiên (Đạo), buông bỏ ý chí cưỡng cầu ích kỷ, giữ tâm mềm dẻo như nước để vạn sự tự thành mà không hao tổn sinh lực.',
+        'cong-hoa': 'Kiệt tác "Cộng Hòa" của Plato truy vấn bản chất của Công lý và sự khai minh của linh hồn: Vượt qua ảo giác cảm quan trong hang tối để chiêm nghiệm Ý niệm Chân - Thiện - Mỹ dưới ánh sáng lý tính và triết học.',
+        'zarathustra': 'Tư tưởng Amor Fati và Ý chí hùng cường trong "Zarathustra Đã Nói Như Thế" của Nietzsche kêu gọi con người can đảm đón nhận mọi biến cố đau khổ của số phận, vượt thắng sự tầm thường bầy đàn để tự kiến tạo ý nghĩa cuộc đời.',
+        'ban-ve-tu-do': 'Nguyên lý gây hại (Harm Principle) trong "Bàn Về Tự Do" của John Stuart Mill xác lập ranh giới đạo đức: Xã hội chỉ có quyền can thiệp chính đáng vào tự do cá nhân khi hành vi đó gây tổn hại trực tiếp đến quyền lợi của người khác.'
+      };
+
+      const aeoBox = document.getElementById('reader-aeo-box');
+      const aeoContent = document.getElementById('reader-aeo-content');
+      const aeoText = aeoDefinitions[book.id || book.slug] || metaDesc;
+
+      if (aeoBox && aeoContent) {
+        aeoContent.textContent = aeoText;
+        aeoBox.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      // 5. Dynamic Schema JSON-LD Injection (Book + Person + BreadcrumbList)
+      const wikidataMap = {
+        'suy-tuong': { authorSameAs: ['https://en.wikipedia.org/wiki/Marcus_Aurelius', 'https://www.wikidata.org/wiki/Q1430'], bookSameAs: ['https://en.wikipedia.org/wiki/Meditations', 'https://www.wikidata.org/wiki/Q660086'] },
+        'dao-duc-kinh': { authorSameAs: ['https://en.wikipedia.org/wiki/Laozi', 'https://www.wikidata.org/wiki/Q9333'], bookSameAs: ['https://en.wikipedia.org/wiki/Tao_Te_Ching', 'https://www.wikidata.org/wiki/Q129772'] },
+        'cong-hoa': { authorSameAs: ['https://en.wikipedia.org/wiki/Plato', 'https://www.wikidata.org/wiki/Q859'], bookSameAs: ['https://en.wikipedia.org/wiki/Republic_(Plato)', 'https://www.wikidata.org/wiki/Q123397'] },
+        'zarathustra': { authorSameAs: ['https://en.wikipedia.org/wiki/Friedrich_Nietzsche', 'https://www.wikidata.org/wiki/Q9358'], bookSameAs: ['https://en.wikipedia.org/wiki/Thus_Spoke_Zarathustra', 'https://www.wikidata.org/wiki/Q193630'] },
+        'ban-ve-tu-do': { authorSameAs: ['https://en.wikipedia.org/wiki/John_Stuart_Mill', 'https://www.wikidata.org/wiki/Q50020'], bookSameAs: ['https://en.wikipedia.org/wiki/On_Liberty', 'https://www.wikidata.org/wiki/Q1053913'] }
+      };
+
+      const meta = wikidataMap[book.id || book.slug] || {};
+      const dynamicSchema = {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Book",
+            "@id": `${bookUrl}#book`,
+            "name": cleanTitle,
+            "url": bookUrl,
+            "author": {
+              "@type": "Person",
+              "name": authorName,
+              ...(meta.authorSameAs ? { "sameAs": meta.authorSameAs } : {})
+            },
+            ...(meta.bookSameAs ? { "sameAs": meta.bookSameAs } : {}),
+            "inLanguage": "vi",
+            "description": aeoText,
+            "publisher": {
+              "@type": "Organization",
+              "name": "Sophia Codex",
+              "url": "https://www.vusitien.click"
+            }
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Trang Chủ", "item": "https://www.vusitien.click/" },
+              { "@type": "ListItem", "position": 2, "name": "Thư Viện", "item": "https://www.vusitien.click/thu-vien" },
+              { "@type": "ListItem", "position": 3, "name": cleanTitle, "item": bookUrl }
+            ]
+          }
+        ]
+      };
+
+      let schemaScript = document.getElementById('dynamic-book-schema');
+      if (!schemaScript) {
+        schemaScript = document.createElement('script');
+        schemaScript.id = 'dynamic-book-schema';
+        schemaScript.type = 'application/ld+json';
+        document.head.appendChild(schemaScript);
+      }
+      schemaScript.textContent = JSON.stringify(dynamicSchema, null, 2);
+
     } catch (e) {
       console.warn('Lỗi cập nhật Dynamic SEO Meta:', e);
     }

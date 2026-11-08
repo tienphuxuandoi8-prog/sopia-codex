@@ -153,8 +153,10 @@ router.get('/:slug', (req, res) => {
       `;
     }
 
-    const host = req.get('host') || 'localhost:3000';
-    const protocol = req.protocol || 'http';
+    const defaultHost = 'www.vusitien.click';
+    const host = req.get('host') || defaultHost;
+    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
+    const protocol = isLocal ? 'http' : 'https';
     const canonicalUrl = `${protocol}://${host}/blog/${post.slug}`;
     const coverImage = post.cover_image || `${protocol}://${host}/assets/blog/blog-default.jpg`;
     const publishDateIso = new Date(post.created_at).toISOString();

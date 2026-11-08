@@ -1337,6 +1337,17 @@
           <!-- Reading Canvas -->
           <div id="reader-scroll-container" class="lg:col-span-3 bg-white dark:bg-[#111E17] p-6 md:p-14 rounded-3xl border border-stone-200 dark:border-emerald-900 shadow-sm relative">
             
+                        <!-- AEO Direct Answer Box for Active Book (SOPHIA-SEO) -->
+            <div id="reader-aeo-box" class="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-600/30 text-stone-800 dark:text-stone-200 text-xs sm:text-sm leading-relaxed font-ui hidden">
+              <div class="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-400 mb-1.5">
+                <i data-lucide="sparkles" class="w-4 h-4 text-amber-600"></i>
+                <span id="reader-aeo-title">Luận Đề Cốt Lõi Tác Phẩm (AEO Featured Snippet):</span>
+              </div>
+              <p id="reader-aeo-content" class="font-reading text-xs sm:text-sm italic text-stone-700 dark:text-stone-300">
+                <!-- Injected dynamically by updateDynamicBookSEO -->
+              </p>
+            </div>
+
             <!-- Chapter Header -->
             <div class="border-b border-stone-200/80 dark:border-emerald-900 pb-6 mb-8 text-center space-y-2.5">
               <p id="reader-chapter-sub" class="text-xs uppercase tracking-widest text-amber-800 dark:text-amber-400 font-display font-semibold">
