@@ -189,6 +189,83 @@ router.get('/:slug', (req, res) => {
       }
     };
 
+    // Semantic Entity Grounding cho triết gia & tác phẩm (Wikidata IDs)
+    const slugLower = (post.slug || '').toLowerCase();
+    const contentLower = ((post.title || '') + ' ' + (post.content || '')).toLowerCase();
+
+    if (slugLower.includes('khac-ky') || contentLower.includes('marcus aurelius') || contentLower.includes('khắc kỷ')) {
+      articleSchema.about = {
+        "@type": "Person",
+        "name": "Marcus Aurelius",
+        "sameAs": ["https://www.wikidata.org/wiki/Q1430", "https://vi.wikipedia.org/wiki/Marcus_Aurelius"]
+      };
+      articleSchema.mentions = [
+        {
+          "@type": "Book",
+          "name": "Suy Tưởng (Meditations)",
+          "url": `${protocol}://${host}/kinh-dien/suy-tuong`,
+          "sameAs": ["https://www.wikidata.org/wiki/Q660086"]
+        }
+      ];
+    } else if (slugLower.includes('dao-duc-kinh') || slugLower.includes('vo-vi') || contentLower.includes('lão tử')) {
+      articleSchema.about = {
+        "@type": "Person",
+        "name": "Lão Tử",
+        "alternateName": "Laozi",
+        "sameAs": ["https://www.wikidata.org/wiki/Q9333", "https://vi.wikipedia.org/wiki/L%C3%A3o_T%E1%BB%AD"]
+      };
+      articleSchema.mentions = [
+        {
+          "@type": "Book",
+          "name": "Đạo Đức Kinh (Tao Te Ching)",
+          "url": `${protocol}://${host}/kinh-dien/dao-duc-kinh`,
+          "sameAs": ["https://www.wikidata.org/wiki/Q129772"]
+        }
+      ];
+    } else if (slugLower.includes('hang-dong') || slugLower.includes('plato') || contentLower.includes('cộng hòa')) {
+      articleSchema.about = {
+        "@type": "Person",
+        "name": "Plato",
+        "sameAs": ["https://www.wikidata.org/wiki/Q859", "https://vi.wikipedia.org/wiki/Plato"]
+      };
+      articleSchema.mentions = [
+        {
+          "@type": "Book",
+          "name": "Cộng Hòa (The Republic)",
+          "url": `${protocol}://${host}/kinh-dien/cong-hoa`,
+          "sameAs": ["https://www.wikidata.org/wiki/Q123397"]
+        }
+      ];
+    } else if (slugLower.includes('nietzsche') || slugLower.includes('amor-fati') || slugLower.includes('hung-cuong')) {
+      articleSchema.about = {
+        "@type": "Person",
+        "name": "Friedrich Nietzsche",
+        "sameAs": ["https://www.wikidata.org/wiki/Q9358", "https://vi.wikipedia.org/wiki/Friedrich_Nietzsche"]
+      };
+      articleSchema.mentions = [
+        {
+          "@type": "Book",
+          "name": "Zarathustra Đã Nói Như Thế",
+          "url": `${protocol}://${host}/kinh-dien/zarathustra`,
+          "sameAs": ["https://www.wikidata.org/wiki/Q193630"]
+        }
+      ];
+    } else if (slugLower.includes('john-stuart-mill') || slugLower.includes('gay-hai') || contentLower.includes('bàn về tự do')) {
+      articleSchema.about = {
+        "@type": "Person",
+        "name": "John Stuart Mill",
+        "sameAs": ["https://www.wikidata.org/wiki/Q50020", "https://vi.wikipedia.org/wiki/John_Stuart_Mill"]
+      };
+      articleSchema.mentions = [
+        {
+          "@type": "Book",
+          "name": "Bàn Về Tự Do (On Liberty)",
+          "url": `${protocol}://${host}/kinh-dien/ban-ve-tu-do`,
+          "sameAs": ["https://www.wikidata.org/wiki/Q1053913"]
+        }
+      ];
+    }
+
     // Breadcrumb Schema
     const breadcrumbSchema = {
       "@context": "https://schema.org",

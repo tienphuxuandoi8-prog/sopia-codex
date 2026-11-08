@@ -32,3 +32,6 @@ public/css/app.css
 # IDE
 .vscode/
 .idea/
+
+# Nested Repositories & Tools
+claude-seo/

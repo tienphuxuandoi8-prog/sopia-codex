@@ -484,6 +484,16 @@ if (fs.existsSync(publicDir)) {
     fs.writeFileSync(pubIndexHtml, rootHtml, 'utf8');
   }
 
+  // Đồng bộ các file tĩnh quan trọng sang public/ (SEO, GEO, AEO, Library)
+  const syncFiles = ['library.html', 'sitemap.xml', 'robots.txt', 'llms.txt', 'llms-full.txt', 'pricing.html', 'privacy.html', 'terms.html', '404.html'];
+  syncFiles.forEach(f => {
+    const src = path.join(__dirname, '..', f);
+    const dest = path.join(publicDir, f);
+    if (fs.existsSync(src)) {
+      fs.copyFileSync(src, dest);
+    }
+  });
+
   console.log(`  ✓ Đã đồng bộ toàn bộ file HTML, JS sang thư mục public/ thành công!`);
 }
 

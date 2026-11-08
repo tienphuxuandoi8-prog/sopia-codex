@@ -22,6 +22,7 @@ router.get('/sitemap.xml', (req, res) => {
     // Lấy tất cả bài viết đã xuất bản
     const posts = dbService.getAllBlogPosts ? dbService.getAllBlogPosts({ status: 'PUBLISHED', limit: 1000 }) : [];
     const books = dbService.getAllBooks ? dbService.getAllBooks() : [];
+    const philosophers = dbService.getAllPhilosophers ? dbService.getAllPhilosophers() : [];
 
     const staticPages = [
       { url: '/', changefreq: 'daily', priority: 1.0 },
@@ -51,6 +52,15 @@ router.get('/sitemap.xml', (req, res) => {
       xml += `    <loc>${baseUrl}/kinh-dien/${encodeURIComponent(book.id)}</loc>\n`;
       xml += `    <changefreq>weekly</changefreq>\n`;
       xml += `    <priority>0.9</priority>\n`;
+      xml += `  </url>\n`;
+    }
+
+    // Philosophers
+    for (const phil of philosophers) {
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}/triet-gia/${encodeURIComponent(phil.id)}</loc>\n`;
+      xml += `    <changefreq>monthly</changefreq>\n`;
+      xml += `    <priority>0.8</priority>\n`;
       xml += `  </url>\n`;
     }
 

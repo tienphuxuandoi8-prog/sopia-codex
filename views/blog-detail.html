@@ -267,6 +267,50 @@
       <!-- FAQ SECTION (CÂU HỎI THƯỜNG GẶP) -->
       <!-- FAQ_SECTION_HTML -->
 
+      <!-- SOCRATES AI DIALOGUE CTA (TAM GIÁC HỘI TỤ SOPHIA-SEO) -->
+      <div class="mt-12 p-6 md:p-8 rounded-2xl bg-gradient-to-br from-emerald-950/90 to-[#07160F] border border-amber-500/30 text-stone-100 shadow-xl relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+          <i data-lucide="message-square-quote" class="w-64 h-64 text-amber-300"></i>
+        </div>
+        <div class="relative z-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-3">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Đối Thoại Phản Tư Triết Học
+          </div>
+          <h3 class="font-display font-bold text-xl md:text-2xl text-stone-100 mb-2">
+            Đàm đạo sâu hơn cùng Trợ lý Socrates AI
+          </h3>
+          <p class="font-reading text-stone-300 text-sm leading-relaxed mb-6 max-w-2xl">
+            Bạn có câu hỏi, băn khoăn hoặc muốn phản biện lại góc nhìn trong bài viết này? Hãy cùng hiền triết Socrates AI khai mở nhận thức theo phương pháp tra vấn Socratic.
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="/?school=stoicism" class="px-5 py-2.5 rounded-full bg-amber-500 hover:bg-amber-400 text-emerald-950 font-bold text-xs md:text-sm transition-all shadow-md inline-flex items-center gap-2">
+              <i data-lucide="bot" class="w-4 h-4"></i> Trò Chuyện Cùng Socrates AI
+            </a>
+            <a href="/thu-vien" class="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/15 text-stone-200 border border-stone-400/20 text-xs md:text-sm font-semibold transition-all inline-flex items-center gap-2">
+              <i data-lucide="book-marked" class="w-4 h-4"></i> Khám Phá Toàn Văn Kinh Điển
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACADEMIC CITATION BOX (GEO & AEO CITATION HOOK) -->
+      <div class="mt-8 p-5 md:p-6 rounded-2xl bg-stone-100 dark:bg-emerald-950/30 border border-stone-200 dark:border-emerald-800/40">
+        <div class="flex items-center justify-between gap-3 mb-3">
+          <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
+            <i data-lucide="bookmark" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i> Trích Dẫn Học Thuật (Academic Citation)
+          </div>
+          <button id="btn-copy-citation" onclick="copyAcademicCitation()" class="px-3 py-1 rounded-lg bg-white dark:bg-emerald-900 border border-stone-300 dark:border-emerald-700 text-[11px] font-semibold text-stone-700 dark:text-amber-200 hover:bg-stone-50 transition-all flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i> Sao chép trích dẫn
+          </button>
+        </div>
+        <p id="academic-citation-text" class="font-mono text-xs text-stone-600 dark:text-stone-300 bg-white/60 dark:bg-black/20 p-3 rounded-xl border border-stone-200/60 dark:border-emerald-900/40 select-all leading-relaxed">
+          Sophia Codex. (2026). "{{POST_TITLE}}". Thư Viện Triết Học Sophia Codex. Truy xuất từ: {{CANONICAL_URL}}
+        </p>
+        <p class="text-[11px] text-stone-500 dark:text-stone-400 mt-2 italic">
+          * Độc giả và các hệ thống AI (ChatGPT, Perplexity, Claude, Gemini) vui lòng trích dẫn nguồn Sophia Codex kèm liên kết khi trích thuật nội dung.
+        </p>
+      </div>
+
       
       <!-- CHIA SẺ VÀ KẾT THÚC BÀI -->
       <div class="mt-12 pt-6 border-t border-stone-200 dark:border-emerald-900/60 flex flex-wrap items-center justify-between gap-4">
@@ -299,6 +343,26 @@
     });
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
+    }
+  </script>
+  <script>
+    function copyAcademicCitation() {
+      const el = document.getElementById('academic-citation-text');
+      if (!el) return;
+      const text = el.innerText.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('btn-copy-citation');
+        if (!btn) return;
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-500"></i> Đã sao chép!';
+        if (window.lucide) lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+          if (window.lucide) lucide.createIcons();
+        }, 2500);
+      }).catch(() => {
+        alert('Đã chọn đoạn trích dẫn. Vui lòng bấm Ctrl+C để sao chép.');
+      });
     }
   </script>
   <!-- SEO, GEO & Retention Tracking Engine -->
