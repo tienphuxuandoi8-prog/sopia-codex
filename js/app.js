@@ -19,7 +19,12 @@ function initApp() {
   // Check URL query parameters (hỗ trợ điều hướng liên kết từ library, pricing, admin)
   try {
     const params = new URLSearchParams(window.location.search);
-    const bookParam = params.get('book');
+    let bookParam = params.get('book');
+    const pathname = window.location.pathname;
+    const cleanMatch = pathname.match(/\/kinh-dien\/([a-zA-Z0-9_-]+)/);
+    if (cleanMatch) {
+      bookParam = cleanMatch[1];
+    }
     const schoolParam = params.get('school');
     const actionParam = params.get('action');
 

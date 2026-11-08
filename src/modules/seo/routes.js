@@ -1,22 +1,35 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
+const fs = require('fs');
 const dbService = require('../../../server/db');
 
-// 1. Tự động sinh sitemap.xml cập nhật trực tiếp theo thời gian thực
+const DEFAULT_DOMAIN = 'www.vusitien.click';
+
+// 1. Tự động sinh sitemap.xml cập nhật trực tiếp theo thời gian thực (Chuẩn Clean URLs)
 router.get('/sitemap.xml', (req, res) => {
   try {
-    const host = req.get('host') || 'sophiacodex.vn';
-    const protocol = req.protocol || 'https';
+    const rootSitemapPath = path.join(__dirname, '../../..', 'sitemap.xml');
+    if (fs.existsSync(rootSitemapPath)) {
+      res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+      return res.send(fs.readFileSync(rootSitemapPath, 'utf8'));
+    }
+
+    const host = req.get('host') || DEFAULT_DOMAIN;
+    const protocol = req.protocol === 'http' && !req.get('x-forwarded-proto') ? 'http' : 'https';
     const baseUrl = `${protocol}://${host}`;
 
     // Lấy tất cả bài viết đã xuất bản
-    const posts = dbService.getAllBlogPosts({ status: 'PUBLISHED', limit: 1000 });
+    const posts = dbService.getAllBlogPosts ? dbService.getAllBlogPosts({ status: 'PUBLISHED', limit: 1000 }) : [];
+    const books = dbService.getAllBooks ? dbService.getAllBooks() : [];
 
     const staticPages = [
       { url: '/', changefreq: 'daily', priority: 1.0 },
+      { url: '/thu-vien', changefreq: 'daily', priority: 0.9 },
       { url: '/blog', changefreq: 'daily', priority: 0.9 },
-      { url: '/library.html', changefreq: 'weekly', priority: 0.8 },
-      { url: '/pricing.html', changefreq: 'monthly', priority: 0.7 }
+      { url: '/pricing.html', changefreq: 'weekly', priority: 0.8 },
+      { url: '/privacy.html', changefreq: 'yearly', priority: 0.3 },
+      { url: '/terms.html', changefreq: 'yearly', priority: 0.3 }
     ];
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
@@ -28,6 +41,16 @@ router.get('/sitemap.xml', (req, res) => {
       xml += `    <loc>${baseUrl}${page.url}</loc>\n`;
       xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
       xml += `    <priority>${page.priority}</priority>\n`;
+      xml += `  </url>\n`;
+    }
+
+    // Classic Books
+    for (const book of books) {
+      if (book.status && book.status !== 'published') continue;
+      xml += `  <url>\n`;
+      xml += `    <loc>${baseUrl}/kinh-dien/${encodeURIComponent(book.id)}</loc>\n`;
+      xml += `    <changefreq>weekly</changefreq>\n`;
+      xml += `    <priority>0.9</priority>\n`;
       xml += `  </url>\n`;
     }
 
@@ -44,7 +67,7 @@ router.get('/sitemap.xml', (req, res) => {
 
     xml += `</urlset>`;
 
-    res.setHeader('Content-Type', 'application/xml');
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.send(xml);
   } catch (err) {
     console.error('Lỗi sinh sitemap.xml:', err);
@@ -52,55 +75,78 @@ router.get('/sitemap.xml', (req, res) => {
   }
 });
 
-// 2. Tự động sinh robots.txt chuẩn SEO & hỗ trợ AI crawlers
+// 2. Tự động phục vụ robots.txt chuẩn SEO, AEO & hỗ trợ AI crawlers
 router.get('/robots.txt', (req, res) => {
-  const host = req.get('host') || 'sophiacodex.vn';
-  const protocol = req.protocol || 'https';
-  const baseUrl = `${protocol}://${host}`;
+  try {
+    const rootRobotsPath = path.join(__dirname, '../../..', 'robots.txt');
+    if (fs.existsSync(rootRobotsPath)) {
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      return res.send(fs.readFileSync(rootRobotsPath, 'utf8'));
+    }
 
-  const robots = `User-agent: *
+    const host = req.get('host') || DEFAULT_DOMAIN;
+    const protocol = req.protocol === 'http' && !req.get('x-forwarded-proto') ? 'http' : 'https';
+    const baseUrl = `${protocol}://${host}`;
+
+    const robots = `# SOPHIA CODEX - ROBOTS.TXT
+User-agent: *
 Allow: /
-Allow: /blog
-Allow: /blog/*
+Allow: /thu-vien
+Allow: /library.html
+Allow: /kinh-dien/
+Allow: /blog/
 Disallow: /admin
 Disallow: /admin.html
-Disallow: /api/admin/*
+Disallow: /account.html
+Disallow: /api/admin/
 
-# Hỗ trợ OpenAI & Perplexity AI Search Crawler
+# AI Search Crawlers (GEO Ready)
 User-agent: GPTBot
 Allow: /
-Allow: /blog
-Allow: /llms.txt
-
-User-agent: OAI-SearchBot
-Allow: /
-Allow: /blog
-Allow: /llms.txt
 
 User-agent: PerplexityBot
 Allow: /
-Allow: /blog
-Allow: /llms.txt
 
 User-agent: ClaudeBot
 Allow: /
-Allow: /blog
-Allow: /llms.txt
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# International Search Engines
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 1
 
 Sitemap: ${baseUrl}/sitemap.xml
 `;
-
-  res.setHeader('Content-Type', 'text/plain');
-  res.send(robots);
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.send(robots);
+  } catch (err) {
+    console.error('Lỗi khi đọc robots.txt:', err);
+    res.status(500).send('Lỗi máy chủ');
+  }
 });
 
 // 3. Chuẩn llms.txt & llms-full.txt dành riêng cho AI Bots (ChatGPT, Perplexity, Claude, Gemini)
 router.get('/llms.txt', (req, res) => {
   try {
-    const fs = require('fs');
-    const path = require('path');
-    const host = req.get('host') || 'www.vusitien.click';
-    const protocol = req.protocol || 'https';
+    const host = req.get('host') || DEFAULT_DOMAIN;
+    const protocol = req.protocol === 'http' && !req.get('x-forwarded-proto') ? 'http' : 'https';
     const baseUrl = `${protocol}://${host}`;
 
     let doc = '';
@@ -113,7 +159,7 @@ router.get('/llms.txt', (req, res) => {
 
     // Nối thêm danh mục bài viết Blog phân tích học thuật mới nhất
     try {
-      const posts = dbService.getAllBlogPosts({ status: 'PUBLISHED', limit: 20 });
+      const posts = dbService.getAllBlogPosts ? dbService.getAllBlogPosts({ status: 'PUBLISHED', limit: 20 }) : [];
       if (posts && posts.length > 0) {
         doc += `\n## Bài Viết & Phân Tích Học Thuật Mới Nhất\n\n`;
         for (const post of posts) {
@@ -137,15 +183,13 @@ router.get('/llms.txt', (req, res) => {
 
 router.get('/llms-full.txt', (req, res) => {
   try {
-    const fs = require('fs');
-    const path = require('path');
     const llmsFullPath = path.join(__dirname, '../../..', 'llms-full.txt');
     if (fs.existsSync(llmsFullPath)) {
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
       return res.send(fs.readFileSync(llmsFullPath, 'utf8'));
     }
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.send(`# Sophia Codex Full Manifest\nURL: https://www.vusitien.click/`);
+    res.send(`# Sophia Codex Full Manifest\nURL: https://${DEFAULT_DOMAIN}/`);
   } catch (err) {
     console.error('Lỗi khi đọc llms-full.txt:', err);
     res.status(500).send('Lỗi máy chủ');

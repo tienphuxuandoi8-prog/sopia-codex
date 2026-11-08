@@ -1,10 +1,12 @@
 /**
  * SOPHIA CODEX - SITEMAP XML GENERATOR
  * Tự động quét cơ sở dữ liệu SQLite (books, chapters, philosophers, blog posts)
- * và các trang tĩnh quan trọng để sinh ra file sitemap.xml chuẩn SEO & GEO.
+ * và các trang tĩnh quan trọng để sinh ra file sitemap.xml chuẩn Clean URLs, SEO, AEO & GEO.
  *
- * Tiêu chuẩn kỹ thuật:
+ * Tiêu chuẩn kỹ thuật KStudy K0826:
  * - XML Sitemap Protocol 0.9 (https://www.sitemaps.org/schemas/sitemap/0.9)
+ * - Clean URLs tuyệt đối (không lộ query parameters hay phần mở rộng .html)
+ * - Canonical Domain: https://www.vusitien.click (luôn có www)
  * - Tần suất thay đổi (<changefreq>), Độ ưu tiên (<priority>), Thời gian sửa đổi (<lastmod>)
  * - Xuất file ra cả thư mục gốc và thư mục public/
  */
@@ -13,7 +15,7 @@ const fs = require('fs');
 const path = require('path');
 const dbService = require('../server/db');
 
-const BASE_URL = process.env.SITE_URL || 'https://vusitien.click';
+const BASE_URL = process.env.SITE_URL || 'https://www.vusitien.click';
 
 function formatDate(date) {
   if (!date) return new Date().toISOString().split('T')[0];
@@ -27,23 +29,24 @@ function formatDate(date) {
 }
 
 function generateSitemap() {
-  console.log('[Sitemap Generator] Đang quét cơ sở dữ liệu và trang hệ thống...');
+  console.log('[Sitemap Generator] Đang quét cơ sở dữ liệu và sinh Clean URLs...');
 
   const urls = [];
+  const today = formatDate(new Date());
 
-  // 1. CÁC TRANG CỐ ĐỊNH / TRANG TĨNH CỐT LÕI
+  // 1. CÁC TRANG CỐ ĐỊNH / TRANG TĨNH CỐT LÕI (CLEAN ROUTING)
   const staticPages = [
-    { loc: `${BASE_URL}/`, priority: '1.0', changefreq: 'daily', lastmod: formatDate(new Date()) },
-    { loc: `${BASE_URL}/library.html`, priority: '0.9', changefreq: 'daily', lastmod: formatDate(new Date()) },
-    { loc: `${BASE_URL}/pricing.html`, priority: '0.8', changefreq: 'weekly', lastmod: formatDate(new Date()) },
-    { loc: `${BASE_URL}/views/blog-list.html`, priority: '0.8', changefreq: 'daily', lastmod: formatDate(new Date()) },
+    { loc: `${BASE_URL}/`, priority: '1.0', changefreq: 'daily', lastmod: today },
+    { loc: `${BASE_URL}/thu-vien`, priority: '0.9', changefreq: 'daily', lastmod: today },
+    { loc: `${BASE_URL}/blog`, priority: '0.9', changefreq: 'daily', lastmod: today },
+    { loc: `${BASE_URL}/pricing.html`, priority: '0.8', changefreq: 'weekly', lastmod: today },
     { loc: `${BASE_URL}/privacy.html`, priority: '0.3', changefreq: 'yearly', lastmod: '2026-01-01' },
     { loc: `${BASE_URL}/terms.html`, priority: '0.3', changefreq: 'yearly', lastmod: '2026-01-01' }
   ];
 
   urls.push(...staticPages);
 
-  // 2. CÁC TÁC PHẨM / SÁCH TRIẾT HỌC (BOOKS)
+  // 2. CÁC TÁC PHẨM / SÁCH TRIẾT HỌC KINH ĐIỂN (CLEAN URL: /kinh-dien/:bookId)
   let books = [];
   try {
     books = dbService.getAllBooks ? dbService.getAllBooks() : [];
@@ -53,7 +56,7 @@ function generateSitemap() {
 
   books.forEach(book => {
     if (book.status && book.status !== 'published') return;
-    const bookUrl = `${BASE_URL}/library.html?book=${encodeURIComponent(book.id)}`;
+    const bookUrl = `${BASE_URL}/kinh-dien/${encodeURIComponent(book.id)}`;
     urls.push({
       loc: bookUrl,
       lastmod: formatDate(book.updated_at || book.created_at),
@@ -62,7 +65,7 @@ function generateSitemap() {
     });
   });
 
-  // 3. CÁC TRIẾT GIA (PHILOSOPHERS)
+  // 3. CÁC TRIẾT GIA (CLEAN URL: /triet-gia/:philosopherId)
   let philosophers = [];
   try {
     philosophers = dbService.getAllPhilosophers ? dbService.getAllPhilosophers() : [];
@@ -71,7 +74,7 @@ function generateSitemap() {
   }
 
   philosophers.forEach(phil => {
-    const philUrl = `${BASE_URL}/library.html?philosopher=${encodeURIComponent(phil.id)}`;
+    const philUrl = `${BASE_URL}/triet-gia/${encodeURIComponent(phil.id)}`;
     urls.push({
       loc: philUrl,
       lastmod: formatDate(phil.updated_at || new Date()),
@@ -80,7 +83,7 @@ function generateSitemap() {
     });
   });
 
-  // 4. CÁC BÀI VIẾT BLOG / PHÂN TÍCH TRIẾT HỌC
+  // 4. CÁC BÀI VIẾT BLOG / PHÂN TÍCH TRIẾT HỌC (CLEAN URL: /blog/:slug)
   let posts = [];
   try {
     posts = dbService.getAllBlogPosts ? dbService.getAllBlogPosts() : [];
@@ -90,7 +93,7 @@ function generateSitemap() {
 
   posts.forEach(post => {
     if (post.status && post.status.toUpperCase() !== 'PUBLISHED') return;
-    const postUrl = `${BASE_URL}/views/blog-detail.html?slug=${encodeURIComponent(post.slug)}`;
+    const postUrl = `${BASE_URL}/blog/${encodeURIComponent(post.slug)}`;
     urls.push({
       loc: postUrl,
       lastmod: formatDate(post.updated_at || post.published_at || post.created_at),
@@ -136,7 +139,7 @@ function generateSitemap() {
 if (require.main === module) {
   try {
     const result = generateSitemap();
-    console.log(`[Sitemap Generator] Hoàn thành xuất sắc! Đã lập chỉ mục ${result.total} URL.`);
+    console.log(`[Sitemap Generator] Hoàn thành xuất sắc! Đã lập chỉ mục ${result.total} Clean URLs.`);
   } catch (e) {
     console.error('[Sitemap Generator] Lỗi:', e);
     process.exit(1);

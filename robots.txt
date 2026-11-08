@@ -75,5 +75,26 @@ Disallow: /admin.html
 Disallow: /account.html
 Disallow: /api/admin/
 
-# 3. Khai báo Sơ đồ trang web (Sitemap XML)
+# 3. Cấu hình chuyên biệt cho các Search Engines Quốc tế (Bing, Yandex, Baidu, Naver, Yahoo Japan)
+# Microsoft Bing / Bingbot
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Nga & Đông Âu: Yandex
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 1
+
+# Trung Quốc: Baidu
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 1
+
+# Hàn Quốc: Naver Yeti
+User-agent: Yeti
+Allow: /
+Crawl-delay: 1
+
+# 4. Khai báo Sơ đồ trang web (Sitemap XML)
 Sitemap: https://www.vusitien.click/sitemap.xml

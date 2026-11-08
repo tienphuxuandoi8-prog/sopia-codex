@@ -43,6 +43,82 @@
             font-weight: 600;
         }
     </style>
+    <!-- Structured Data Schema: CollectionPage & ItemList (SOPHIA-SEO) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          "@id": "https://www.vusitien.click/thu-vien#webpage",
+          "url": "https://www.vusitien.click/thu-vien",
+          "name": "Tủ Sách Tri Thức & Sổ Tay Chiêm Nghiệm — Sophia Codex",
+          "description": "Không gian lưu trữ tiến trình đọc toàn văn kinh điển, ghi chú chiêm nghiệm và danh ngôn triết học cá nhân.",
+          "isPartOf": {
+            "@type": "WebSite",
+            "@id": "https://www.vusitien.click/#website",
+            "name": "Sophia Codex",
+            "url": "https://www.vusitien.click/"
+          },
+          "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Trang Chủ",
+                "item": "https://www.vusitien.click/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Tủ Sách Tri Thức",
+                "item": "https://www.vusitien.click/thu-vien"
+              }
+            ]
+          }
+        },
+        {
+          "@type": "ItemList",
+          "@id": "https://www.vusitien.click/thu-vien#books-list",
+          "name": "Tủ Sách Kinh Điển Triết Học Sophia Codex",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "url": "https://www.vusitien.click/kinh-dien/dao-duc-kinh",
+              "name": "Đạo Đức Kinh (Tao Te Ching) — Lão Tử"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "url": "https://www.vusitien.click/kinh-dien/suy-tuong",
+              "name": "Suy Tưởng (Meditations) — Marcus Aurelius"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "url": "https://www.vusitien.click/kinh-dien/cong-hoa",
+              "name": "Cộng Hòa (The Republic) — Plato"
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "url": "https://www.vusitien.click/kinh-dien/zarathustra",
+              "name": "Zarathustra Đã Nói Như Thế — Friedrich Nietzsche"
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "url": "https://www.vusitien.click/kinh-dien/ban-ve-tu-do",
+              "name": "Bàn Về Tự Do (On Liberty) — John Stuart Mill"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
 </head>
 <body class="font-sans antialiased min-h-screen flex flex-col">
 
@@ -463,7 +539,7 @@
                 
                 return `
                 <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group border border-parchment-200 overflow-hidden">
-                    <div class="relative aspect-[3/4] overflow-hidden bg-parchment-100 cursor-pointer" onclick="window.location.href='index.html?book=${book.id}'">
+                    <div class="relative aspect-[3/4] overflow-hidden bg-parchment-100 cursor-pointer" onclick="window.location.href='/kinh-dien/' + book.id">
                         <img src="${book.coverUrl}" 
                              alt="${book.title}" 
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -481,7 +557,7 @@
                         </div>
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
-                        <h3 class="font-bold font-serif text-sm sm:text-base text-gray-900 line-clamp-1 mb-1 group-hover:text-forest-800 transition-colors cursor-pointer" onclick="window.location.href='index.html?book=${book.id}'" title="${book.title}">
+                        <h3 class="font-bold font-serif text-sm sm:text-base text-gray-900 line-clamp-1 mb-1 group-hover:text-forest-800 transition-colors cursor-pointer" onclick="window.location.href='/kinh-dien/' + book.id" title="${book.title}">
                             ${book.title}
                         </h3>
                         <p class="text-xs text-gray-600 mb-3 line-clamp-1">${book.author}</p>
@@ -494,7 +570,7 @@
                             <div class="w-full bg-gray-200 rounded-full h-1.5 mb-3">
                                 <div class="bg-forest-600 h-1.5 rounded-full transition-all" style="width: ${progress}%"></div>
                             </div>
-                            <a href="index.html?book=${book.id}" class="block w-full text-center bg-forest-900 hover:bg-forest-800 text-gold-400 font-semibold py-2 rounded-xl transition-colors text-xs sm:text-sm shadow-sm">
+                            <a href="/kinh-dien/${book.id}" class="block w-full text-center bg-forest-900 hover:bg-forest-800 text-gold-400 font-semibold py-2 rounded-xl transition-colors text-xs sm:text-sm shadow-sm">
                                 <i class="fas fa-book-open mr-1"></i> Đọc Tiếp
                             </a>
                         </div>
@@ -691,5 +767,7 @@
             if (xpBarEl) xpBarEl.style.width = `${progress}%`;
         }
     </script>
+    <!-- SEO, GEO & Retention Tracking Engine -->
+    <script defer src="js/seo-tracking.js"></script>
 </body>
 </html>

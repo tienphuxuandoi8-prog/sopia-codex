@@ -11,6 +11,26 @@
   },
   "rewrites": [
     {
+      "source": "/thu-vien",
+      "destination": "/library.html"
+    },
+    {
+      "source": "/library",
+      "destination": "/library.html"
+    },
+    {
+      "source": "/kinh-dien/:bookId",
+      "destination": "/index.html?book=:bookId"
+    },
+    {
+      "source": "/triet-gia/:philosopherId",
+      "destination": "/index.html?philosopher=:philosopherId"
+    },
+    {
+      "source": "/bai-viet/:slug",
+      "destination": "/blog/:slug"
+    },
+    {
       "source": "/blog",
       "destination": "/api/index.js"
     },

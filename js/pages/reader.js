@@ -319,7 +319,7 @@ class ReaderEngine {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Khôi phục Default Title & Meta
-    document.title = 'Sophia Codex — Thư Viện Triết Học Toàn Cầu & Đối Thoại Socrates AI';
+    document.title = 'Sophia Codex – Thư Viện Triết Học Số & Sách Kinh Điển';
     const defaultDesc = 'Khám phá Sophia Codex: Thư viện triết học toàn văn kinh điển phương Đông & Tây (Đạo Đức Kinh, Suy Tưởng, Cộng Hòa) cùng trợ lý triết học AI Socrates phản tư sâu sắc.';
     const updateTag = (selector, attr, value) => {
       const el = document.querySelector(selector);

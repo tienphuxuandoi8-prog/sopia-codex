@@ -32,6 +32,7 @@ const { prisma } = require('./lib/prisma');
 
 // Khởi tạo Express app
 const app = express();
+app.set('trust proxy', 1);
 
 // --- 1. Security & Core Middleware ---
 app.use(securityMiddleware());
@@ -192,7 +193,23 @@ app.get('/admin.html', requireAdminSession, (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'views', 'admin.html'));
 });
 
-// --- 8. Fallback cho Single Page / Client Pages ---
+// --- 8. Clean URL Routing & Fallback cho Single Page / Client Pages ---
+app.get(['/thu-vien', '/library'], (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'library.html'));
+});
+
+app.get('/kinh-dien/:bookId', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
+});
+
+app.get('/triet-gia/:philosopherId', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
+});
+
+app.get('/bai-viet/:slug', (req, res) => {
+  res.redirect(301, '/blog/' + req.params.slug);
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });

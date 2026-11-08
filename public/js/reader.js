@@ -283,7 +283,7 @@ class ReaderEngine {
       updateTag('meta[property="og:description"]', 'content', metaDesc);
       updateTag('meta[property="og:type"]', 'content', 'book');
       
-      const bookUrl = `https://vusitien.click/?book=${encodeURIComponent(book.id || book.slug)}`;
+      const bookUrl = `https://www.vusitien.click/?book=${encodeURIComponent(book.id || book.slug)}`;
       updateTag('meta[property="og:url"]', 'content', bookUrl);
 
       let canonicalEl = document.querySelector('link[rel="canonical"]');
@@ -292,7 +292,7 @@ class ReaderEngine {
       }
 
       if (book.coverImage) {
-        const fullImg = book.coverImage.startsWith('http') ? book.coverImage : `https://vusitien.click/${book.coverImage.replace(/^\//, '')}`;
+        const fullImg = book.coverImage.startsWith('http') ? book.coverImage : `https://www.vusitien.click/${book.coverImage.replace(/^\//, '')}`;
         updateTag('meta[property="og:image"]', 'content', fullImg);
         updateTag('meta[name="twitter:image"]', 'content', fullImg);
       }
@@ -319,7 +319,7 @@ class ReaderEngine {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Khôi phục Default Title & Meta
-    document.title = 'Sophia Codex — Thư Viện Triết Học Toàn Cầu & Đối Thoại Socrates AI';
+    document.title = 'Sophia Codex – Thư Viện Triết Học Số & Sách Kinh Điển';
     const defaultDesc = 'Khám phá Sophia Codex: Thư viện triết học toàn văn kinh điển phương Đông & Tây (Đạo Đức Kinh, Suy Tưởng, Cộng Hòa) cùng trợ lý triết học AI Socrates phản tư sâu sắc.';
     const updateTag = (selector, attr, value) => {
       const el = document.querySelector(selector);
@@ -329,10 +329,10 @@ class ReaderEngine {
     updateTag('meta[property="og:title"]', 'content', 'Sophia Codex — Thư Viện Triết Học Toàn Cầu & Đối Thoại Socrates AI');
     updateTag('meta[property="og:description"]', 'content', 'Thư viện triết học số tinh hoa với văn bản toàn văn, giọng đọc Audio Studio, nhạc nền thiền và trợ lý AI Socrates đồng hành chiêm nghiệm.');
     updateTag('meta[property="og:type"]', 'content', 'website');
-    updateTag('meta[property="og:url"]', 'content', 'https://vusitien.click/');
-    updateTag('meta[property="og:image"]', 'content', 'https://vusitien.click/assets/covers/suy-tuong.svg');
+    updateTag('meta[property="og:url"]', 'content', 'https://www.vusitien.click/');
+    updateTag('meta[property="og:image"]', 'content', 'https://www.vusitien.click/assets/covers/suy-tuong.svg');
     const canonicalEl = document.querySelector('link[rel="canonical"]');
-    if (canonicalEl) canonicalEl.setAttribute('href', 'https://vusitien.click/');
+    if (canonicalEl) canonicalEl.setAttribute('href', 'https://www.vusitien.click/');
 
     if (window.history && window.history.pushState) {
       const newUrl = new URL(window.location.href);
