@@ -158,7 +158,10 @@ router.get('/:slug', (req, res) => {
     const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
     const protocol = isLocal ? 'http' : 'https';
     const canonicalUrl = `${protocol}://${host}/blog/${post.slug}`;
-    const coverImage = post.cover_image || `${protocol}://${host}/assets/blog/blog-default.jpg`;
+    let rawCover = post.cover_image || '/assets/blog/blog-default.jpg';
+    const coverImage = (rawCover.startsWith('http://') || rawCover.startsWith('https://'))
+      ? rawCover
+      : `${protocol}://${host}${rawCover.startsWith('/') ? '' : '/'}${rawCover}`;
     const publishDateIso = new Date(post.created_at).toISOString();
     const updateDateIso = new Date(post.updated_at || post.created_at).toISOString();
 
