@@ -34,11 +34,27 @@ function generateSitemap() {
   const urls = [];
   const today = formatDate(new Date());
 
+  const bookImages = {
+    'dao-duc-kinh': `${BASE_URL}/assets/philosophers/lao-tzu.jpg`,
+    'suy-tuong': `${BASE_URL}/assets/philosophers/marcus-aurelius.jpg`,
+    'cong-hoa': `${BASE_URL}/assets/philosophers/socrates-plato.jpg`,
+    'zarathustra': `${BASE_URL}/assets/philosophers/nietzsche.jpg`,
+    'ban-ve-tu-do': `${BASE_URL}/assets/philosophers/john-stuart-mill.jpg`
+  };
+
+  const philImages = {
+    'marcus-aurelius': `${BASE_URL}/assets/philosophers/marcus-aurelius.jpg`,
+    'socrates': `${BASE_URL}/assets/philosophers/socrates-plato.jpg`,
+    'lao-tzu': `${BASE_URL}/assets/philosophers/lao-tzu.jpg`,
+    'nietzsche': `${BASE_URL}/assets/philosophers/nietzsche.jpg`,
+    'john-stuart-mill': `${BASE_URL}/assets/philosophers/john-stuart-mill.jpg`
+  };
+
   // 1. CÁC TRANG CỐ ĐỊNH / TRANG TĨNH CỐT LÕI (CLEAN ROUTING)
   const staticPages = [
-    { loc: `${BASE_URL}/`, priority: '1.0', changefreq: 'daily', lastmod: today },
-    { loc: `${BASE_URL}/thu-vien`, priority: '0.9', changefreq: 'daily', lastmod: today },
-    { loc: `${BASE_URL}/blog`, priority: '0.9', changefreq: 'daily', lastmod: today },
+    { loc: `${BASE_URL}/`, priority: '1.0', changefreq: 'daily', lastmod: today, image: `${BASE_URL}/assets/philosophers/marcus-aurelius.jpg` },
+    { loc: `${BASE_URL}/thu-vien`, priority: '0.9', changefreq: 'daily', lastmod: today, image: `${BASE_URL}/assets/philosophers/marcus-aurelius.jpg` },
+    { loc: `${BASE_URL}/blog`, priority: '0.9', changefreq: 'daily', lastmod: today, image: `${BASE_URL}/assets/blog/stoicism-digital-age.jpg` },
     { loc: `${BASE_URL}/pricing.html`, priority: '0.8', changefreq: 'weekly', lastmod: today },
     { loc: `${BASE_URL}/privacy.html`, priority: '0.3', changefreq: 'yearly', lastmod: '2026-01-01' },
     { loc: `${BASE_URL}/terms.html`, priority: '0.3', changefreq: 'yearly', lastmod: '2026-01-01' }
@@ -61,7 +77,8 @@ function generateSitemap() {
       loc: bookUrl,
       lastmod: formatDate(book.updated_at || book.created_at),
       changefreq: 'weekly',
-      priority: '0.9'
+      priority: '0.9',
+      image: bookImages[book.id] || null
     });
   });
 
@@ -79,7 +96,8 @@ function generateSitemap() {
       loc: philUrl,
       lastmod: formatDate(phil.updated_at || new Date()),
       changefreq: 'monthly',
-      priority: '0.8'
+      priority: '0.8',
+      image: philImages[phil.id] || null
     });
   });
 
@@ -94,17 +112,23 @@ function generateSitemap() {
   posts.forEach(post => {
     if (post.status && post.status.toUpperCase() !== 'PUBLISHED') return;
     const postUrl = `${BASE_URL}/blog/${encodeURIComponent(post.slug)}`;
+    let postImage = post.cover_image;
+    if (postImage && !postImage.startsWith('http://') && !postImage.startsWith('https://')) {
+      postImage = `${BASE_URL}${postImage.startsWith('/') ? '' : '/'}${postImage}`;
+    }
     urls.push({
       loc: postUrl,
       lastmod: formatDate(post.updated_at || post.published_at || post.created_at),
       changefreq: 'weekly',
-      priority: '0.8'
+      priority: '0.8',
+      image: postImage || null
     });
   });
 
   // TẠO NỘI DUNG XML
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n';
+  xml += '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"\n';
   xml += '        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n';
   xml += '        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9\n';
   xml += '        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">\n';
@@ -115,6 +139,11 @@ function generateSitemap() {
     xml += `    <lastmod>${item.lastmod}</lastmod>\n`;
     xml += `    <changefreq>${item.changefreq}</changefreq>\n`;
     xml += `    <priority>${item.priority}</priority>\n`;
+    if (item.image) {
+      xml += '    <image:image>\n';
+      xml += `      <image:loc>${item.image}</image:loc>\n`;
+      xml += '    </image:image>\n';
+    }
     xml += '  </url>\n';
   });
 

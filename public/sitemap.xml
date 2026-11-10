@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
@@ -8,18 +9,27 @@
     <lastmod>2026-11-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/marcus-aurelius.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/thu-vien</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/marcus-aurelius.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/blog</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/blog/stoicism-digital-age.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/pricing.html</loc>
@@ -44,89 +54,134 @@
     <lastmod>2026-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/lao-tzu.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/kinh-dien/suy-tuong</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/marcus-aurelius.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/kinh-dien/cong-hoa</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/socrates-plato.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/kinh-dien/zarathustra</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/nietzsche.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/kinh-dien/ban-ve-tu-do</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/john-stuart-mill.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/triet-gia/marcus-aurelius</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/marcus-aurelius.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/triet-gia/socrates</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/socrates-plato.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/triet-gia/lao-tzu</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/lao-tzu.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/triet-gia/nietzsche</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/nietzsche.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/triet-gia/john-stuart-mill</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/john-stuart-mill.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/blog/dao-duc-kinh-triet-ly-vo-vi-nghe-thuat-song-thuan-tu-nhien</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/lao-tzu.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/blog/an-du-hang-dong-plato-thuc-tai-hay-ao-anh-thuat-toan</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/socrates-plato.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/blog/y-chi-hung-cuong-amor-fati-nietzsche-nghe-thuat-yeu-nghich-canh</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/nietzsche.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/blog/nguyen-ly-gay-hai-john-stuart-mill-ranh-gioi-tu-do-ca-nhan</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/philosophers/john-stuart-mill.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://www.vusitien.click/blog/nghe-thuat-khac-ky-trong-doi-song-so</loc>
     <lastmod>2026-11-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://www.vusitien.click/assets/blog/stoicism-digital-age.jpg</image:loc>
+    </image:image>
   </url>
 </urlset>
