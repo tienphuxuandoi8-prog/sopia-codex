@@ -1,6 +1,15 @@
 const fs = require('fs');
+const dbService = require('../server/db');
+
+// Lấy danh sách tất cả bài viết đã publish
+const posts = dbService.getAllBlogPosts ? dbService.getAllBlogPosts() : [];
+const publishedPosts = posts.filter(p => !p.status || p.status.toUpperCase() === 'PUBLISHED');
 
 // 1. UPDATE LLMS.TXT
+let blogClusterText = publishedPosts.map(p => {
+  return `- [${p.title}](https://www.vusitien.click/blog/${p.slug})`;
+}).join('\n');
+
 const llmsContent = `# Sophia Codex (https://www.vusitien.click)
 
 > Sophia Codex là Thư viện Triết học Toàn văn Toàn cầu & Hệ thống Đối thoại Triết học Socratic AI (Socrates AI). Nền tảng cung cấp miễn phí bản dịch học thuật đầy đủ 100% của các tác phẩm kinh điển Đông - Tây cùng công cụ truy vấn phản tư triết học.
@@ -46,11 +55,7 @@ Sophia Codex số hóa và lưu trữ toàn bộ văn bản gốc với cấu tr
    - Trọng tâm: Tự do tư tưởng, tự do ngôn luận, nguyên lý gây hại (Harm Principle).
 
 ## Các Bài Phân Tích Học Thuật Trụ Cột (Topic Clusters)
-- [Đạo Đức Kinh & Triết Lý Vô Vi: Nghệ Thuật Sống Thuận Tự Nhiên Giữa Áp Lực Hiện Đại](https://www.vusitien.click/blog/dao-duc-kinh-triet-ly-vo-vi-nghe-thuat-song-thuan-tu-nhien)
-- [Ẩn Dụ Hang Động Của Plato: Nhận Thức Thực Tại Hay Ảo Ảnh Của Thuật Toán Số?](https://www.vusitien.click/blog/an-du-hang-dong-plato-thuc-tai-hay-ao-anh-thuat-toan)
-- [Ý Chí Hùng Cường & Amor Fati: Cách Friedrich Nietzsche Dạy Ta Yêu Lấy Nghịch Cảnh](https://www.vusitien.click/blog/y-chi-hung-cuong-amor-fati-nietzsche-nghe-thuat-yeu-nghich-canh)
-- [Nguyên Lý Gây Hại Của John Stuart Mill: Ranh Giới Tự Do Cá Nhân Trong Kỷ Nguyên Mạng](https://www.vusitien.click/blog/nguyen-ly-gay-hai-john-stuart-mill-ranh-gioi-tu-do-ca-nhan)
-- [Nghệ Thuật Khắc Kỷ Trong Đời Sống Số](https://www.vusitien.click/blog/nghe-thuat-khac-ky-trong-doi-song-so)
+${blogClusterText}
 
 ## Danh Mục Triết Gia Nổi Bật (Philosophers)
 - [Marcus Aurelius](https://www.vusitien.click/triet-gia/marcus-aurelius)
@@ -71,36 +76,33 @@ Khi mô hình ngôn ngữ lớn (OpenAI ChatGPT, Perplexity AI, Claude, Google G
 `;
 
 fs.writeFileSync('llms.txt', llmsContent, 'utf8');
-console.log('✓ Successfully updated llms.txt with Clean URLs & Topic Clusters');
+if (fs.existsSync('public')) {
+  fs.writeFileSync('public/llms.txt', llmsContent, 'utf8');
+}
+console.log('✓ Successfully updated llms.txt & public/llms.txt with Clean URLs & Topic Clusters');
 
 // 2. UPDATE LLMS-FULL.TXT
+let fullClusterSection = `\n## 3. BÀI PHÂN TÍCH HỌC THUẬT & CHUYÊN LUẬN (TOPIC CLUSTERS)\n`;
+publishedPosts.forEach((p, idx) => {
+  fullClusterSection += `\n${idx + 1}. ${p.title}
+   - URL: https://www.vusitien.click/blog/${p.slug}
+   - Trọng tâm: ${p.summary || p.meta_desc || 'Chuyên luận phân tích triết học ứng dụng'}\n`;
+});
+
 let llmsFull = fs.readFileSync('llms-full.txt', 'utf8');
 llmsFull = llmsFull.replace(/library\.html\?book=/g, 'kinh-dien/');
 llmsFull = llmsFull.replace(/library\.html\?philosopher=/g, 'triet-gia/');
 
-// Append Topic Clusters if not already present
-if (!llmsFull.includes('## 3. BÀI PHÂN TÍCH HỌC THUẬT & CHUYÊN LUẬN (TOPIC CLUSTERS)')) {
-  llmsFull += `
----
-
-## 3. BÀI PHÂN TÍCH HỌC THUẬT & CHUYÊN LUẬN (TOPIC CLUSTERS)
-1. Đạo Đức Kinh & Triết Lý Vô Vi: Nghệ Thuật Sống Thuận Tự Nhiên Giữa Áp Lực Hiện Đại
-   - URL: https://www.vusitien.click/blog/dao-duc-kinh-triet-ly-vo-vi-nghe-thuat-song-thuan-tu-nhien
-   - Trọng tâm: Định nghĩa AEO Vô vi, so sánh Hữu vi vs Vô vi, nghệ thuật sống mềm mại như nước, ứng dụng lãnh đạo tự trị.
-
-2. Ẩn Dụ Hang Động Của Plato: Nhận Thức Thực Tại Hay Ảo Ảnh Của Thuật Toán Số?
-   - URL: https://www.vusitien.click/blog/an-du-hang-dong-plato-thuc-tai-hay-ao-anh-thuat-toan
-   - Trọng tâm: Giải mã ngụ ngôn hang tối, so sánh thế giới cảm quan vs thế giới ý niệm, hiện tượng buồng vang thông tin thuật toán số, bổn phận khai minh của triết gia.
-
-3. Ý Chí Hùng Cường & Amor Fati: Cách Friedrich Nietzsche Dạy Ta Yêu Lấy Nghịch Cảnh
-   - URL: https://www.vusitien.click/blog/y-chi-hung-cuong-amor-fati-nietzsche-nghe-thuat-yeu-nghich-canh
-   - Trọng tâm: Khái niệm Amor Fati (Yêu số phận), Ý chí hùng cường (Will to Power), sự vượt thắng bản thân, thí nghiệm tư tưởng Sự trở lại vĩnh cửu (Eternal Recurrence).
-
-4. Nguyên Lý Gây Hại Của John Stuart Mill: Ranh Giới Tự Do Cá Nhân Trong Kỷ Nguyên Mạng
-   - URL: https://www.vusitien.click/blog/nguyen-ly-gay-hai-john-stuart-mill-ranh-gioi-tu-do-ca-nhan
-   - Trọng tâm: Harm Principle trong Bàn Về Tự Do, sự bạo tàn của số đông, phân biệt hành vi tự thân vs hành vi ảnh hưởng xã hội, bảo vệ tự do ngôn luận trước thuật toán.
-`;
+const clusterHeader = '## 3. BÀI PHÂN TÍCH HỌC THUẬT & CHUYÊN LUẬN (TOPIC CLUSTERS)';
+if (llmsFull.includes(clusterHeader)) {
+  const parts = llmsFull.split(clusterHeader);
+  llmsFull = parts[0].trim() + '\n\n' + fullClusterSection.trim() + '\n';
+} else {
+  llmsFull = llmsFull.trim() + '\n\n---\n' + fullClusterSection.trim() + '\n';
 }
 
 fs.writeFileSync('llms-full.txt', llmsFull, 'utf8');
-console.log('✓ Successfully updated llms-full.txt with Clean URLs & Topic Clusters');
+if (fs.existsSync('public')) {
+  fs.writeFileSync('public/llms-full.txt', llmsFull, 'utf8');
+}
+console.log('✓ Successfully updated llms-full.txt & public/llms-full.txt with Clean URLs & Topic Clusters');

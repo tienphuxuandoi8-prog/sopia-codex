@@ -9,10 +9,12 @@ const DEFAULT_DOMAIN = 'www.vusitien.click';
 // 1. Tự động sinh sitemap.xml cập nhật trực tiếp theo thời gian thực (Chuẩn Clean URLs)
 router.get('/sitemap.xml', (req, res) => {
   try {
-    const rootSitemapPath = path.join(__dirname, '../../..', 'sitemap.xml');
-    if (fs.existsSync(rootSitemapPath)) {
-      res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-      return res.send(fs.readFileSync(rootSitemapPath, 'utf8'));
+    if (process.env.NODE_ENV !== 'test') {
+      const rootSitemapPath = path.join(__dirname, '../../..', 'sitemap.xml');
+      if (fs.existsSync(rootSitemapPath)) {
+        res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+        return res.send(fs.readFileSync(rootSitemapPath, 'utf8'));
+      }
     }
 
     const host = req.get('host') || DEFAULT_DOMAIN;

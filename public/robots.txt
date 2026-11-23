@@ -6,6 +6,8 @@
 # 1. Cấu hình chung cho mọi Web Crawler & Search Engine
 User-agent: *
 Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
 Allow: /library.html
 Allow: /pricing.html
 Allow: /privacy.html

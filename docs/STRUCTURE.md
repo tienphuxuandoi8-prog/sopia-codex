@@ -2,6 +2,7 @@
 **Dự án:** Sophia Codex (`https://www.vusitien.click`)  
 **Khung kiến trúc:** 4 Tầng Phân Cấp Silo & Topic Cluster Hub-and-Spoke  
 **Tiêu chuẩn định tuyến:** Clean URLs Rewrite via Vercel Engine  
+**Cập nhật:** 2026-11-12 (Wave 2 Expansion: 24 Clean URLs)
 
 ---
 
@@ -25,17 +26,23 @@ graph TD
     Hub1 --> Phil4["TẦNG 3: HỒ SƠ THỰC THỂ TRIẾT GIA<br/>/triet-gia/nietzsche"]
     Hub1 --> Phil5["TẦNG 3: HỒ SƠ THỰC THỂ TRIẾT GIA<br/>/triet-gia/john-stuart-mill"]
 
-    Hub2 --> Post1["TẦNG 4: BÀI VIẾT TOPIC CLUSTER<br/>/blog/dao-duc-kinh-triet-ly-vo-vi..."]
-    Hub2 --> Post2["TẦNG 4: BÀI VIẾT TOPIC CLUSTER<br/>/blog/an-du-hang-dong-plato..."]
-    Hub2 --> Post3["TẦNG 4: BÀI VIẾT TOPIC CLUSTER<br/>/blog/y-chi-hung-cuong-amor-fati..."]
-    Hub2 --> Post4["TẦNG 4: BÀI VIẾT TOPIC CLUSTER<br/>/blog/nguyen-ly-gay-hai..."]
-    Hub2 --> Post5["TẦNG 4: BÀI VIẾT TOPIC CLUSTER<br/>/blog/nghe-thuat-khac-ky..."]
+    Hub2 --> Post1["TẦNG 4: TOPIC CLUSTER ĐẠO GIA<br/>/blog/dao-duc-kinh-triet-ly-vo-vi..."]
+    Hub2 --> Post2["TẦNG 4: TOPIC CLUSTER ĐẠO GIA (WAVE 2)<br/>/blog/triet-ly-vo-vi-quan-tri-nang-luong..."]
+    Hub2 --> Post3["TẦNG 4: TOPIC CLUSTER KHẮC KỶ<br/>/blog/nghe-thuat-khac-ky-trong-doi-song-so"]
+    Hub2 --> Post4["TẦNG 4: TOPIC CLUSTER KHẮC KỶ (WAVE 2)<br/>/blog/khac-ky-tri-chung-overthinking..."]
+    Hub2 --> Post5["TẦNG 4: TOPIC CLUSTER KHẮC KỶ (TÌNH YÊU)<br/>/blog/marcus-aurelius-nghe-thuat-yeu-thuong..."]
+    Hub2 --> Post6["TẦNG 4: TOPIC CLUSTER PLATO<br/>/blog/an-du-hang-dong-plato..."]
+    Hub2 --> Post7["TẦNG 4: TOPIC CLUSTER NIETZSCHE<br/>/blog/y-chi-hung-cuong-amor-fati..."]
+    Hub2 --> Post8["TẦNG 4: TOPIC CLUSTER MILL<br/>/blog/nguyen-ly-gay-hai..."]
 
-    Post1 -. "Liên kết nội bộ (Internal link)" .-> Book1
-    Post2 -. "Liên kết nội bộ (Internal link)" .-> Book3
-    Post3 -. "Liên kết nội bộ (Internal link)" .-> Book4
-    Post4 -. "Liên kết nội bộ (Internal link)" .-> Book5
-    Post5 -. "Liên kết nội bộ (Internal link)" .-> Book2
+    Post1 -. "Internal Link" .-> Book1
+    Post2 -. "Internal Link" .-> Book1
+    Post3 -. "Internal Link" .-> Book2
+    Post4 -. "Internal Link" .-> Book2
+    Post5 -. "Internal Link" .-> Book2
+    Post6 -. "Internal Link" .-> Book3
+    Post7 -. "Internal Link" .-> Book4
+    Post8 -. "Internal Link" .-> Book5
 ```
 
 ---
@@ -47,7 +54,7 @@ graph TD
 | **Trang chủ & Hubs** | 3 | Hàng ngày (`daily`) | 1.0 - 0.9 | Nhận diện thương hiệu & điều hướng trung tâm |
 | **Kinh điển Toàn văn** | 5 | Hàng tuần (`weekly`) | 0.9 | Nguồn sơ cấp (Primary Canonical Works), giữ chân người đọc |
 | **Thực thể Triết gia** | 5 | Hàng tháng (`monthly`) | 0.8 | Entity Grounding (Wikidata, Wikipedia `sameAs`) |
-| **Topic Cluster Blogs** | 5 | Hàng tuần (`weekly`) | 0.8 | Đón Long-tail Keywords & Chiếm Featured Snippet Top 0 |
+| **Topic Cluster Blogs** | 8 | Hàng tuần (`weekly`) | 0.8 | Đón Long-tail Keywords & Chiếm Featured Snippet Top 0 |
 | **Trang phụ trợ** | 3 | Định kỳ (`weekly` / `yearly`) | 0.8 - 0.3 | Minh bạch pháp lý, bảng giá và điều khoản dịch vụ |
 
 ---

@@ -43,12 +43,31 @@ function parseMarkdown(md) {
   html = html.replace(/(<li>[\s\S]*?<\/li>)/gim, '<ul>$1</ul>');
   html = html.replace(/<\/ul>\s*<ul>/gim, '');
 
+  // Tables (| header | ... |)
+  html = html.replace(/((?:^\|.+?\|\s*(?:\n|$)){2,})/gm, (tableMatch) => {
+    const lines = tableMatch.trim().split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length < 2) return tableMatch;
+    if (!lines[1].includes('---')) return tableMatch;
+
+    const parseCells = (row) => row.split('|').map(c => c.trim()).filter((_, idx, arr) => idx > 0 && idx < arr.length - 1);
+    const headerCells = parseCells(lines[0]);
+    const thead = `<thead><tr>${headerCells.map(c => `<th class="border border-stone-200 dark:border-emerald-800 px-4 py-2.5 bg-stone-100/90 dark:bg-emerald-950 font-semibold text-stone-900 dark:text-stone-100">${c}</th>`).join('')}</tr></thead>`;
+
+    const bodyRows = lines.slice(2).map(row => {
+      const cells = parseCells(row);
+      return `<tr class="hover:bg-stone-50/50 dark:hover:bg-emerald-900/30 transition-colors">${cells.map(c => `<td class="border border-stone-200 dark:border-emerald-800/60 px-4 py-2.5 text-stone-700 dark:text-stone-300 leading-relaxed">${c}</td>`).join('')}</tr>`;
+    }).join('');
+    const tbody = `<tbody>${bodyRows}</tbody>`;
+
+    return `<div class="overflow-x-auto my-6"><table class="w-full text-left border-collapse border border-stone-200 dark:border-emerald-800 rounded-xl overflow-hidden text-sm">${thead}${tbody}</table></div>\n`;
+  });
+
   // Paragraphs
   const paragraphs = html.split(/\n\s*\n/);
   html = paragraphs.map(p => {
     p = p.trim();
     if (!p) return '';
-    if (p.startsWith('<h1') || p.startsWith('<h2') || p.startsWith('<h3') || p.startsWith('<blockquote') || p.startsWith('<ul') || p.startsWith('<img')) {
+    if (p.startsWith('<h1') || p.startsWith('<h2') || p.startsWith('<h3') || p.startsWith('<blockquote') || p.startsWith('<ul') || p.startsWith('<img') || p.startsWith('<div class="overflow-x-auto') || p.startsWith('<table')) {
       return p;
     }
     return `<p>${p.replace(/\n/g, '<br>')}</p>`;
