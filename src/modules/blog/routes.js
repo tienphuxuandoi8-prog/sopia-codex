@@ -196,7 +196,12 @@ router.get('/:slug', (req, res) => {
     const slugLower = (post.slug || '').toLowerCase();
     const contentLower = ((post.title || '') + ' ' + (post.content || '')).toLowerCase();
 
+    let socratesBookId = 'suy-tuong';
+    let socratesPrompt = 'Socrates ơi, hãy giúp tôi phân tích sâu hơn góc nhìn triết học trong bài viết này!';
+
     if (slugLower.includes('khac-ky') || contentLower.includes('marcus aurelius') || contentLower.includes('khắc kỷ')) {
+      socratesBookId = 'suy-tuong';
+      socratesPrompt = 'Socrates ơi, Marcus Aurelius dạy về Pháo đài nội tâm và buông bỏ điều bất như ý, trong hoàn cảnh áp lực hiện đại thì ta nên rèn luyện tâm trí thế nào?';
       articleSchema.about = {
         "@type": "Person",
         "name": "Marcus Aurelius",
@@ -211,6 +216,8 @@ router.get('/:slug', (req, res) => {
         }
       ];
     } else if (slugLower.includes('dao-duc-kinh') || slugLower.includes('vo-vi') || contentLower.includes('lão tử')) {
+      socratesBookId = 'dao-duc-kinh';
+      socratesPrompt = 'Socrates ơi, triết lý Vô vi của Lão Tử khuyên ta sống thuận tự nhiên như nước, điều này khác gì với sự thụ động hay trốn tránh thực tế?';
       articleSchema.about = {
         "@type": "Person",
         "name": "Lão Tử",
@@ -226,6 +233,8 @@ router.get('/:slug', (req, res) => {
         }
       ];
     } else if (slugLower.includes('hang-dong') || slugLower.includes('plato') || contentLower.includes('cộng hòa')) {
+      socratesBookId = 'cong-hoa';
+      socratesPrompt = 'Socrates ơi, trong ẩn dụ Hang động của Plato, làm sao để một người nhận biết mình đang bị giam cầm trong những ảo ảnh của thuật toán và định kiến số?';
       articleSchema.about = {
         "@type": "Person",
         "name": "Plato",
@@ -240,6 +249,8 @@ router.get('/:slug', (req, res) => {
         }
       ];
     } else if (slugLower.includes('nietzsche') || slugLower.includes('amor-fati') || slugLower.includes('hung-cuong')) {
+      socratesBookId = 'zarathustra';
+      socratesPrompt = 'Socrates ơi, triết lý Amor Fati và Ý chí hùng cường của Nietzsche dạy ta yêu lấy nghịch cảnh như thế nào khi cuộc sống gặp khủng hoảng?';
       articleSchema.about = {
         "@type": "Person",
         "name": "Friedrich Nietzsche",
@@ -254,6 +265,8 @@ router.get('/:slug', (req, res) => {
         }
       ];
     } else if (slugLower.includes('john-stuart-mill') || slugLower.includes('gay-hai') || contentLower.includes('bàn về tự do')) {
+      socratesBookId = 'ban-ve-tu-do';
+      socratesPrompt = 'Socrates ơi, Nguyên lý gây hại của John Stuart Mill định hình ranh giới tự do cá nhân ra sao trong một xã hội đầy rẫy dư luận và phán xét?';
       articleSchema.about = {
         "@type": "Person",
         "name": "John Stuart Mill",
@@ -376,6 +389,8 @@ router.get('/:slug', (req, res) => {
       year: 'numeric'
     });
 
+    const socratesCtaUrl = `/?chat=socrates&book=${socratesBookId}&prompt=${encodeURIComponent(socratesPrompt)}`;
+
     html = html
       .replace(/{{PAGE_TITLE}}/g, escapeHtml(post.meta_title || post.title) + ' — Sophia Codex')
       .replace(/{{META_DESCRIPTION}}/g, escapeHtml(post.meta_desc || post.summary || ''))
@@ -388,6 +403,8 @@ router.get('/:slug', (req, res) => {
       .replace(/{{POST_READING_TIME}}/g, String(post.reading_time || 5))
       .replace(/{{POST_CATEGORY}}/g, escapeHtml(post.category || 'Triết học'))
       .replace(/{{POST_VIEWS}}/g, String(post.views || 0))
+      .replace(/{{SOCRATES_CTA_URL}}/g, socratesCtaUrl)
+      .replace(/{{CURRENT_BOOK_ID}}/g, socratesBookId)
       .replace('<!-- STRUCTURED_DATA_SCHEMA -->', schemasHtml)
       .replace('<!-- POST_CONTENT_HTML -->', contentHtml)
       .replace('<!-- FAQ_SECTION_HTML -->', faqHtml)

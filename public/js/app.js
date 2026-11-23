@@ -27,10 +27,29 @@ function initApp() {
     }
     const schoolParam = params.get('school');
     const actionParam = params.get('action');
+    const chatParam = params.get('chat');
+    const promptParam = params.get('prompt');
+    let philosopherParam = params.get('philosopher');
+    const philMatch = pathname.match(/\/triet-gia\/([a-zA-Z0-9_-]+)/);
+    if (philMatch) {
+      philosopherParam = philMatch[1];
+    }
 
-    if (bookParam) {
+    if (chatParam === 'socrates' || actionParam === 'socrates') {
+      setTimeout(() => {
+        const targetBook = bookParam || 'suy-tuong';
+        const decodedPrompt = promptParam ? decodeURIComponent(promptParam) : '';
+        if (window.openAIChatWithBook) {
+          window.openAIChatWithBook(targetBook, decodedPrompt);
+        }
+      }, 500);
+    } else if (bookParam) {
       setTimeout(() => {
         if (window.openBookReader) window.openBookReader(bookParam);
+      }, 400);
+    } else if (philosopherParam) {
+      setTimeout(() => {
+        handlePhilosopherHighlight(philosopherParam);
       }, 400);
     } else if (schoolParam) {
       setTimeout(() => {
@@ -517,7 +536,7 @@ window.playBookAudio = async function(bookId) {
   }
 };
 
-window.openAIChatWithBook = async function(bookId) {
+window.openAIChatWithBook = async function(bookId, promptText) {
   let book = null;
   try {
     const res = await fetch(`/api/v1/books/${bookId}`);
@@ -529,8 +548,50 @@ window.openAIChatWithBook = async function(bookId) {
   if (window.aiChat) {
     window.aiChat.openPanel();
     if (book) window.aiChat.setContext(book, book.chapters ? book.chapters[0] : null);
+    if (promptText && window.aiChat.inputField) {
+      window.aiChat.inputField.value = promptText;
+      window.aiChat.inputField.focus();
+    }
   }
 };
+
+function handlePhilosopherHighlight(philosopherId) {
+  try {
+    const section = document.getElementById('philosophers-container');
+    if (!section) return;
+
+    // Cuộn mượt đến khu vực triết gia
+    const parentSection = section.closest('div.p-6') || section;
+    parentSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // Tìm card của triết gia tương ứng
+    const idMap = {
+      'marcus-aurelius': ['marcus', 'aurelius', 'suy-tuong'],
+      'lao-tzu': ['lao', 'tzu', 'lão tử', 'dao-duc-kinh'],
+      'socrates': ['socrates', 'plato', 'cong-hoa'],
+      'nietzsche': ['nietzsche', 'zarathustra'],
+      'john-stuart-mill': ['mill', 'tu-do', 'ban-ve-tu-do']
+    };
+
+    const keywords = idMap[philosopherId] || [philosopherId];
+    const cards = section.querySelectorAll('div.flex-col');
+    for (const card of cards) {
+      const text = card.textContent.toLowerCase();
+      const match = keywords.some(k => text.includes(k));
+      if (match) {
+        card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        card.classList.add('ring-4', 'ring-amber-500', 'shadow-2xl', 'scale-[1.03]');
+        card.style.transition = 'all 0.5s ease';
+        setTimeout(() => {
+          card.classList.remove('scale-[1.03]');
+        }, 2000);
+        break;
+      }
+    }
+  } catch(e) {
+    console.warn('Lỗi định vị triết gia:', e);
+  }
+}
 
 /* ==========================================================================
    8. SIDEBAR NAVIGATION CONTROLLER (ĐIỀU HƯỚNG THƯ VIỆN ĐA TƯƠNG TÁC)

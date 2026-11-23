@@ -163,6 +163,8 @@
     let isPlaying = false;
     if (window.audioEngine && window.audioEngine.isPlaying) {
       isPlaying = true;
+    } else if (window.bgmEngine && window.bgmEngine.isPlaying) {
+      isPlaying = true;
     } else {
       const audios = document.querySelectorAll('audio');
       for (let i = 0; i < audios.length; i++) {
