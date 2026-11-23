@@ -8,6 +8,14 @@ User-agent: *
 Allow: /
 Allow: /llms.txt
 Allow: /llms-full.txt
+Allow: /thu-vien
+Allow: /pricing
+Allow: /privacy
+Allow: /terms
+Allow: /kinh-dien/
+Allow: /triet-gia/
+Allow: /blog
+Allow: /blog/
 Allow: /library.html
 Allow: /pricing.html
 Allow: /privacy.html
@@ -19,9 +27,16 @@ Allow: /css/
 Allow: /js/
 
 # Chặn thu thập dữ liệu khu vực bảo mật, tài khoản và quản trị
+Disallow: /admin
 Disallow: /admin.html
 Disallow: /views/admin.html
+Disallow: /account
 Disallow: /account.html
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
 Disallow: /api/admin/
 Disallow: /api/auth/
 Disallow: /api/payments/

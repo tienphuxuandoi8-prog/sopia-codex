@@ -30,9 +30,9 @@ router.get('/sitemap.xml', (req, res) => {
       { url: '/', changefreq: 'daily', priority: 1.0 },
       { url: '/thu-vien', changefreq: 'daily', priority: 0.9 },
       { url: '/blog', changefreq: 'daily', priority: 0.9 },
-      { url: '/pricing.html', changefreq: 'weekly', priority: 0.8 },
-      { url: '/privacy.html', changefreq: 'yearly', priority: 0.3 },
-      { url: '/terms.html', changefreq: 'yearly', priority: 0.3 }
+      { url: '/pricing', changefreq: 'weekly', priority: 0.8 },
+      { url: '/privacy', changefreq: 'yearly', priority: 0.3 },
+      { url: '/terms', changefreq: 'yearly', priority: 0.3 }
     ];
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
